@@ -8,14 +8,52 @@
   "margin_floor": 3.0,
   "margin_plan": 4.0,
   "margin_soft": 10.0,
-  "finray_window": [3.0, 10.0],
-  "finray": { "L": 85.0, "base": 28.0, "width": 22.0, "n_ribs": 4, "pair_y": 13.0 },
-  "objects": {
-    "battery": { "kind": "cyl", "d": 14.0, "len": 50.0, "axis": "x" },
-    "cap":     { "kind": "cyl", "d": 30.0, "len": 12.0, "axis": "z" },
-    "chip":    { "kind": "ellip", "a": 25.0, "b": 20.0, "c": 6.0 },
-    "sponge":  { "kind": "box", "sx": 70.0, "sy": 45.0, "sz": 30.0 },
-    "cable":   { "kind": "cyl", "d": 5.0, "len": 200.0, "axis": "x" }
+  "finray_window": [
+    3.0,
+    10.0
+  ],
+  "finray": {
+    "L": 85.0,
+    "base": 28.0,
+    "width": 22.0,
+    "n_ribs": 4,
+    "pair_y": 13.0
   },
-  "force": { "chip_limit_N": 5.0, "pinch_target_N": 8.0 }
+  "objects": {
+    "battery": {
+      "kind": "cyl",
+      "d": 14.0,
+      "len": 50.0,
+      "axis": "x"
+    },
+    "cap": {
+      "kind": "cyl",
+      "d": 30.0,
+      "len": 12.0,
+      "axis": "z"
+    },
+    "chip": {
+      "kind": "ellip",
+      "a": 25.0,
+      "b": 20.0,
+      "c": 6.0
+    },
+    "sponge": {
+      "kind": "box",
+      "sx": 70.0,
+      "sy": 45.0,
+      "sz": 30.0
+    },
+    "cable": {
+      "kind": "cyl",
+      "d": 5.0,
+      "len": 200.0,
+      "axis": "x"
+    }
+  },
+  "force": {
+    "chip_limit_N": 5.0,
+    "pinch_target_N": 8.0
+  },
+  "pad_t": 2.0
 }

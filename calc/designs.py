@@ -94,9 +94,9 @@ def soft_flap(r: Report, w_hard: float):
     drum = d["soft"]["drum_r"]
     pull = drum * (phi_open - phi_min)
     r.put("soft_pull_mm", pull)
-    # 칩 5 N 접촉점을 Fin Ray 길이 70% 위치로 가정한 줄 장력
-    lever = d["soft"]["root_len"] + 0.7 * c["finray"]["L"]
-    T = c["force"]["chip_limit_N"] * lever / drum
+    # 한쪽 플랩 = Fin Ray 2개, 손가락당 한계 F/2. 접촉점을 끝(최악, 레버 Rs)으로 둔 보수적 줄 장력
+    #   T = 2 * (F/2) * Rs / r  (시뮬에서 칩 접촉이 손끝 근처로 나와 70% 가정은 낙관적이었음)
+    T = c["force"]["chip_limit_N"] * Rs / drum
     r.put("soft_string_T_at_limit_N", T)
     r.check("S3", "칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N)", T, hi=40, unit="N")
     return dict(z_top=z_top, Rs=Rs, tip_x=tip_x, tip_z=tip_z, phi=phi, phi_b=phi_b, phi_c=phi_c,
@@ -121,8 +121,9 @@ def b1():
     w_h = h["width"]
     s = soft_flap(r, w_h)
     z_top = s["z_top"]
-    face = h["plies"] * c["board_t"] / 2
-    yp = d["palm"]["sy"] / 2 + face  # 피벗 축 = 손가락 두께 중심, 손바닥 앞면 바깥
+    half_t = h["plies"] * c["board_t"] / 2
+    face = half_t + c["pad_t"]  # 축 → 패드 표면
+    yp = d["palm"]["sy"] / 2 + half_t  # 피벗 축 = 손가락 두께 중심, 손바닥 앞면 바깥
     Lh = h["len"]
     psi = sp.symbols("psi", real=True)
     tip_y = yp + Lh * sp.sin(psi)
@@ -139,9 +140,25 @@ def b1():
     r.put("hard_psi_min_deg", psi_min / deg)
     r.put("hard_face_wedge_deg", -psi_b / deg)  # 건전지 파지 시 면이 수직이 되도록 패드 쐐기각
 
-    # Rigid(건전지): 손톱 끝이 바닥 → 그 높이가 바닥
-    z_floor = tip_z.subs(psi, psi_b)
-    r.put("rigid_palm_height", z_top - z_floor)
+    # Rigid(건전지) — 실제 조건: 손톱 끝이 바닥에 닿은 채, 쥐는 면(축에서 face 안쪽 평행선)이 원통에 접함.
+    #   (처음엔 '면 y = 반지름' 을 손톱 끝 높이에서 맞췄는데, 원통은 바닥에서 폭이 0 이라 시뮬에서
+    #    손가락이 더 닫히며 끝이 들려 적도에서 닿는 것이 드러남 → 접선 조건으로 교체)
+    zf = sp.symbols("z_f", real=True)
+
+    def tangent(rad):
+        N = sp.Matrix([sp.cos(psi), sp.sin(psi)])
+        Cc = sp.Matrix([0 - yp, zf + rad - z_top])
+        eqs = [-(Cc.dot(N)) - face - rad, zf - tip_z]
+        return sp.nsolve(eqs, [psi, zf], [-0.3, -100])
+
+    sol = tangent(o["battery"]["d"] / 2)
+    psi_b, z_floor = sol[0], sol[1]
+    r.put("hard_psi_battery_deg", psi_b / deg)
+    r.put("hard_face_wedge_deg", -psi_b / deg)
+    sol_c = tangent(o["cable"]["d"] / 2)
+    r.put("hard_psi_cable_tangent_deg", sol_c[0] / deg)
+    r.put("rigid_palm_height_cable", -sol_c[1])
+    r.put("rigid_palm_height", -z_floor)  # 손바닥 아랫면(z=0) 기준
     soft_tip_batt = s["tip_z"].subs(s["phi"], s["phi_b"])
     finray_window(r, soft_tip_batt, z_floor)
 
@@ -174,7 +191,7 @@ def b2():
     r = Report(d, c)
     h, so = d["hard"], d["soft"]
     w_h = h["width"]
-    face = h["plies"] * c["board_t"] / 2
+    face = h["plies"] * c["board_t"] / 2 + c["pad_t"]
     o = c["objects"]
     # soft: 수평 슬롯, contact flank x = u
     x_min = w_h / 2 + c["margin_plan"]
@@ -189,7 +206,8 @@ def b2():
     r.put("soft_string_T_at_limit_N", T)
     r.check("S3", "칩 한계력에서 실 A 장력 ≤ 40 N (마찰 제외)", T, hi=40, unit="N")
     # 슬롯 벽이 손바닥 안에 들어가는가
-    r.check("S4", "soft 슬롯 끝 + 여유가 손바닥 반폭 안", so["x_open"] + 5, hi=d["palm"]["sx"] / 2, unit="mm")
+    # 캐리지 핀 2개 (u+4, u+10) + 벽 여유 3 이 손바닥 안
+    r.check("S4", "soft 슬롯(핀 u+10) + 여유 3 이 손바닥 반폭 안", so["x_open"] + 13, hi=d["palm"]["sx"] / 2, unit="mm")
 
     # hard: 경사 슬롯. 캐리지 y_c 가 줄면 끝이 tan(a) 만큼 내려감
     a = h["slope_deg"] * deg
@@ -252,7 +270,7 @@ def b3():
     r.check("H3", "원위 관절 스프링이 근위보다 강하지 않아도 됨 (0.2 ≤ k2/k1 ≤ 5, 고무줄로 구현 가능)",
             k2_over_k1, lo=0.2, hi=5)
     z_floor = tip_z.subs({t1: t1p, t2: t2p})
-    r.put("rigid_palm_height", z_top - z_floor)
+    r.put("rigid_palm_height", -z_floor)  # 손바닥 아랫면(z=0) 기준
     soft_tip_batt = s["tip_z"].subs(s["phi"], s["phi_b"])
     finray_window(r, soft_tip_batt, z_floor)
     rest_z = tip_z.subs({t1: t10, t2: t20})

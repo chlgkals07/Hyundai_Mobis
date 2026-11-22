@@ -1,8 +1,30 @@
 {
-  "id": "B3", "name": "B3 말림 — 빨대축 플랩 + 2마디 텐던 손가락",
-  "palm": { "sx": 60.0, "sy": 80.0 },
-  "soft": { "type": "flap", "joint": "axle", "root_len": 16.0, "phi_open_deg": 90.0, "drum_r": 15.0, "drum_y": 33.0 },
-  "hard": { "type": "tendon", "l1": 65.0, "l2": 50.0, "width": 28.0, "plies": 3, "nail_len": 10.0,
-            "theta1_rest_deg": 40.0, "theta2_rest_deg": 0.0, "r1": 10.0, "r2": 8.0,
-            "target_tip_y": 9.0, "target_distal_deg": -30.0 }
+  "id": "B3",
+  "name": "B3 말림 — 빨대축 플랩 + 2마디 텐던 손가락",
+  "palm": {
+    "sx": 60.0,
+    "sy": 80.0
+  },
+  "soft": {
+    "type": "flap",
+    "joint": "axle",
+    "root_len": 16.0,
+    "phi_open_deg": 90.0,
+    "drum_r": 15.0,
+    "drum_y": 33.0
+  },
+  "hard": {
+    "type": "tendon",
+    "l1": 65.0,
+    "l2": 50.0,
+    "width": 28.0,
+    "plies": 3,
+    "nail_len": 6.0,
+    "theta1_rest_deg": 40.0,
+    "theta2_rest_deg": 0.0,
+    "r1": 10.0,
+    "r2": 8.0,
+    "target_tip_y": 9.0,
+    "target_distal_deg": -30.0
+  }
 }
