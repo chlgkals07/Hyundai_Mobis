@@ -1,0 +1,169 @@
+<title>골판지 그리퍼 벤치</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 커팅매트 위 작업대 — 왼쪽 조작 레일, 가운데 3D, 오른쪽 계측. 폰에선 세로로 쌓임 */
+:root {
+  --bg: #eef1ef;
+  --panel: #f8faf9;
+  --ink: #1d2422;
+  --muted: #5b6763;
+  --line: #d3dad7;
+  --mat: #2f6b5b;          /* 커팅매트 녹색 = accent */
+  --mat-soft: #dcebe6;
+  --kraft: #b98b5a;
+  --ok: #2c7a4b;
+  --warn: #b7791f;
+  --bad: #c0392b;
+  --bad-soft: #f8e3e0;
+  --canvas: #e3e8e5;
+  --font-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131917; --panel: #1a2220; --ink: #e4ebe8; --muted: #93a39d; --line: #2c3834;
+    --mat: #5fb39b; --mat-soft: #1f3a33; --kraft: #c99a68; --ok: #5cc28a; --warn: #e0a84a; --bad: #f07a6c; --bad-soft: #3a1f1c;
+    --canvas: #1b2321; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131917; --panel: #1a2220; --ink: #e4ebe8; --muted: #93a39d; --line: #2c3834;
+  --mat: #5fb39b; --mat-soft: #1f3a33; --kraft: #c99a68; --ok: #5cc28a; --warn: #e0a84a; --bad: #f07a6c; --bad-soft: #3a1f1c;
+  --canvas: #1b2321; color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.5; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 24px; display: grid; gap: 14px; max-width: 1500px; margin: 0 auto; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; }
+h1 { font-size: 20px; margin: 0; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--muted); font-size: 13px; }
+nav.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+nav.tabs a { color: var(--muted); text-decoration: none; padding: 4px 10px; border-radius: 6px; font-size: 13px; border: 1px solid transparent; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--line); background: var(--panel); }
+.bench { display: grid; grid-template-columns: 280px minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: 260px minmax(0, 1fr); } .meter { grid-column: 1 / -1; } }
+@media (max-width: 720px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.rail, .meter { display: grid; gap: 14px; min-width: 0; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 10px; min-width: 0; }
+.box h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; font-weight: 500; }
+.designs { display: grid; gap: 6px; }
+.designs button { text-align: left; font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; cursor: pointer; display: grid; gap: 1px; }
+.designs button small { color: var(--muted); font-size: 12px; }
+.designs button[aria-pressed="true"] { border-color: var(--mat); background: var(--mat-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { font: inherit; font-size: 13px; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; cursor: pointer; }
+.chips button[aria-pressed="true"] { background: var(--mat); border-color: var(--mat); color: var(--panel); }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--mat); outline-offset: 2px; }
+label.slider { display: grid; gap: 2px; font-size: 13px; }
+label.slider span.row { display: flex; justify-content: space-between; gap: 8px; }
+label.slider output { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--muted); }
+input[type="range"] { width: 100%; accent-color: var(--mat); }
+select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.stage { position: relative; background: var(--canvas); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-width: 0; aspect-ratio: 4 / 3.2; max-width: 100%; }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.views { position: absolute; top: 8px; left: 8px; display: flex; gap: 4px; flex-wrap: wrap; }
+.views button { font: inherit; font-size: 12px; padding: 2px 8px; border-radius: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.legend { position: absolute; bottom: 8px; left: 8px; right: 8px; background: color-mix(in srgb, var(--panel) 85%, transparent); padding: 4px 8px; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--muted); pointer-events: none; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.status { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.pill { font-size: 12px; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.pill.ok { color: var(--ok); } .pill.bad { color: var(--bad); } .pill.warn { color: var(--warn); }
+dl.read { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; font-size: 13px; }
+dl.read dt { color: var(--muted); min-width: 0; font-size: 12px; padding-top: 6px; border-top: 1px solid var(--line); }
+dl.read dt:first-child { border-top: 0; padding-top: 0; }
+dl.read dd { margin: 0 0 6px; font-family: var(--font-num); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+dl.read dd.warn { color: var(--bad); font-weight: 500; }
+ul.col { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 12.5px; }
+ul.col li { background: var(--bad-soft); color: var(--bad); border-radius: 5px; padding: 4px 8px; overflow-wrap: anywhere; }
+ul.col li.none { background: transparent; color: var(--ok); padding: 0; }
+table.checks { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.checks td { border-top: 1px solid var(--line); padding: 4px 4px; vertical-align: top; }
+table.checks td.v { font-family: var(--font-num); text-align: right; white-space: nowrap; }
+.mark-ok { color: var(--ok); } .mark-bad { color: var(--bad); }
+.summary { font-size: 13px; color: var(--muted); max-width: 70ch; }
+.note { font-size: 12px; color: var(--muted); }
+section.page { display: grid; gap: 14px; }
+.scroll { overflow-x: auto; }
+table.cmp { border-collapse: collapse; font-size: 13px; min-width: 760px; width: 100%; }
+table.cmp th, table.cmp td { border-bottom: 1px solid var(--line); padding: 7px 8px; text-align: left; vertical-align: top; }
+table.cmp th { font-weight: 500; color: var(--muted); font-size: 12px; }
+table.cmp td.n { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.score { font-family: var(--font-num); font-weight: 500; }
+.patterns { display: grid; gap: 14px; }
+.sheet { background: #fff; border: 1px solid var(--line); border-radius: 6px; overflow: auto; }
+.sheet svg { display: block; width: 100%; height: auto; min-width: 560px; }
+.prose { max-width: 72ch; display: grid; gap: 8px; }
+.prose p, .prose li { margin: 0; }
+.prose ul, .prose ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<div class="wrap">
+  <header>
+    <h1>골판지 그리퍼 벤치</h1>
+    <span class="sub">MOBIS Robotics Challenge · 직교 2축 역할 분담 그리퍼 · 단위 mm</span>
+    <nav class="tabs" aria-label="보기">
+      <a href="#bench" data-tab="bench">시뮬레이터</a>
+      <a href="#compare" data-tab="compare">비교</a>
+      <a href="#patterns" data-tab="patterns">전개도</a>
+    </nav>
+  </header>
+
+  <section class="page" id="page-bench">
+    <div class="bench">
+      <div class="rail">
+        <div class="box"><h2>설계안</h2><div class="designs" id="designs"></div></div>
+        <div class="box">
+          <h2>모드 프리셋</h2>
+          <div class="chips" id="modes"></div>
+          <label class="slider" for="obj">물체
+            <select id="obj">
+              <option value="">없음</option>
+              <option value="chip">감자칩 (취성)</option>
+              <option value="sponge">스펀지 (유연)</option>
+              <option value="battery">AA 건전지 (강체)</option>
+              <option value="cap">페트병 뚜껑 (강체)</option>
+              <option value="cable">케이블 Ø5 (하네스)</option>
+            </select>
+          </label>
+        </div>
+        <div class="box" id="ctrlbox">
+          <h2>실 당김</h2>
+          <label class="slider" for="sa" id="la"><span class="row">실 A · soft (Fin Ray 4)<output id="oa"></output></span><input id="sa" type="range" min="0" max="1" step="0.01"></label>
+          <label class="slider" for="sb" id="lb"><span class="row">실 B · hard (집게 2)<output id="ob"></output></span><input id="sb" type="range" min="0" max="1" step="0.01"></label>
+          <label class="slider" for="ss" id="ls"><span class="row">단일 실 S<output id="os"></output></span><input id="ss" type="range" min="0" max="1" step="0.01"></label>
+          <label class="slider" for="sh"><span class="row">손바닥 높이 (바닥 위)<output id="oh"></output></span><input id="sh" type="range" min="80" max="140" step="0.5"></label>
+          <p class="note">실 A 에는 직렬 고무줄이 있어 Fin Ray 손가락당 2.5 N 에서 더 닫히지 않고 고무줄이 늘어납니다.</p>
+        </div>
+      </div>
+      <div class="stage" id="stage">
+        <div class="views" id="views"></div>
+        <div class="legend">
+          <span><i style="background:#b98b5a"></i>골판지</span>
+          <span><i style="background:#d9b382"></i>Fin Ray 플랭크</span>
+          <span><i style="background:#f1efe9;border:1px solid #999"></i>빨대</span>
+          <span><i style="background:#7fb3d5"></i>굵은 빨대</span>
+          <span><i style="background:#333"></i>고무 패드</span>
+          <span><i style="background:#1b3a6b"></i>실</span>
+          <span><i style="background:#e4572e"></i>고무줄</span>
+          <span><i style="background:#8e44ad"></i>텐던</span>
+          <span><i style="background:#e53935"></i>간섭</span>
+        </div>
+      </div>
+      <div class="meter">
+        <div class="box">
+          <div class="status"><span id="stat" class="pill ok">간섭 없음</span><span id="ms" class="note"></span></div>
+          <p class="summary" id="summary"></p>
+        </div>
+        <div class="box"><h2>계측</h2><dl class="read" id="read"></dl></div>
+        <div class="box"><h2>간섭 · 걸림</h2><ul class="col" id="cols"></ul></div>
+        <div class="box"><h2>SymPy 설계 조건</h2><table class="checks" id="checks"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-compare" hidden></section>
+  <section class="page" id="page-patterns" hidden></section>
+</div>
+<!--APP-->

@@ -37,6 +37,8 @@ interface HardOut {
   lines: Line[];
   readouts: Readout[];
   tops: Vector3[];
+  /** gap = 마주보는 쥐는 면 간격, tipZ = 손톱 끝 높이(바닥 위) */
+  metrics: Record<string, number>;
 }
 
 /** 1-string(V5) 순차 매핑: s 하나로 soft 먼저, 장력이 프리로드 T0 를 넘으면 hard */
@@ -77,7 +79,7 @@ function assemble(
     parts.push(...ws.parts, ...wh.parts);
     lines.push(...ws.lines, ...wh.lines);
   }
-  return { parts, lines, floorZ, object: obj, readouts: [...extra, ...soft.readouts, ...hard.readouts], finrayForces: [] };
+  return { parts, lines, floorZ, object: obj, readouts: [...extra, ...soft.readouts, ...hard.readouts], finrayForces: [], metrics: { ...soft.metrics, ...hard.metrics } };
 }
 
 // ================================================================== B1
@@ -160,6 +162,7 @@ function hardPivot(p: typeof B1p, d: Derived, b: number, sdf: (v: Vector3) => nu
     parts,
     lines,
     tops: [V(0, tanY, Z_TOP + 45), V(0, -tanY, Z_TOP + 45)],
+    metrics: { gap: 2 * faceY, tipZ: nail.tip.z - floorZ, hardTravel: q / qmax },
     readouts: [
       { label: "Hard 각 ψ", value: `${(psi / DEG).toFixed(1)}° (지령 ${((psiOpen - qcmd) / DEG).toFixed(1)}°)` },
       { label: "Hard 손끝 간격 (패드면)", value: `${(2 * faceY).toFixed(1)} mm` },
@@ -325,6 +328,7 @@ function hardSlot(p: typeof B2p, b: number, sdf: (v: Vector3) => number, floorZ:
     parts,
     lines,
     tops: [V(1.8, 2, Z_TOP + 45), V(1.8, -2, Z_TOP + 45)],
+    metrics: { gap: 2 * (yc - face), tipZ: nail.tip.z - floorZ, hardTravel: q / qmax },
     readouts: [
       { label: "Hard 캐리지 y", value: `${yc.toFixed(1)} mm (지령 ${(yOpen - qcmd).toFixed(1)})` },
       { label: "Hard 손끝 간격 (패드면)", value: `${(2 * (yc - face)).toFixed(1)} mm` },
@@ -360,7 +364,7 @@ export function makeB2(): Design {
       const obj = ctrl.obj ? makeObject(ctrl.obj, floorZ) : null;
       const sdf = sceneSdf(obj, floorZ);
       const soft = softSlot(
-        { xMin: num(d, "soft_x_min"), xOpen: p.soft.x_open, wallY: p.soft.wall_y, slotZ: p.soft.slot_z, rootLen: p.soft.root_len, Flim: C.force.chip_limit_N },
+        { xMin: num(d, "soft_x_min"), xOpen: p.soft.x_open, wallY: p.soft.wall_y, slotZ: p.soft.slot_z, rootLen: p.soft.root_len, Flim: C.force.chip_limit_N / 2 },
         ctrl.a,
         sdf,
       );
@@ -494,10 +498,16 @@ function hardTendon(p: typeof B3p, d: Derived, b: number, sdfScene: (v: Vector3)
     lines.push(mirrorLine(l, 1, -1, ".B", ["hardB", "hard2B", "palm"]));
   }
   const faceY = samples(t1, t2)[8].y;
+  // 쥐는 면 최소 y (원위 패드 + 손톱 끝)
+  function minInnerY(a: number, b2: number) {
+    const ss = samples(a, b2).slice(5);
+    return Math.min(...ss.map((v) => v.y));
+  }
   return {
     parts,
     lines,
     tops: [V(0, yp - h.r1, Z_TOP + 45), V(0, -(yp - h.r1), Z_TOP + 45)],
+    metrics: { gap: 2 * minInnerY(t1, t2), tipZ: k.tip.z, hardTravel: Tc },
     readouts: [
       { label: "Tendon θ1 / θ2", value: `${(t1 / DEG).toFixed(1)}° / ${(t2 / DEG).toFixed(1)}° (원위 절대각 ${((t1 + t2) / DEG).toFixed(1)}°)` },
       { label: "텐던 장력 (정규화)", value: `${(Tc * 100).toFixed(0)}%` },
@@ -547,6 +557,7 @@ export function makeB3(oneString = false): Design {
         sdf,
       );
       const hard = hardTendon(p, d, b, sdf);
+      hard.metrics.tipZ -= floorZ;
       return assemble({ id, oneString }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, oneStringReadout(ctrl, oneString));
     },
   };

@@ -68,6 +68,7 @@ export interface SoftOut {
   forces: number[];
   /** 실 A 상단 (whiffletree 로 연결할 점) */
   tops: Vector3[];
+  metrics: Record<string, number>;
 }
 
 export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
@@ -164,7 +165,7 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     { label: "실 A 장력 (추정)", value: `${T.toFixed(1)} N` },
     { label: "Fin Ray 접촉 노드", value: `${fr.nContact} / ${FINRAY.nSeg}` },
   ];
-  return { parts, lines, readouts, forces: [sol.F, sol.F, sol.F, sol.F], tops };
+  return { parts, lines, readouts, forces: [sol.F, sol.F, sol.F, sol.F], tops, metrics: { finrayF: sol.F, finrayNodes: fr.nContact, softT: T, softStretch: stretch } };
 }
 
 // ------------------------------------------------------------------ soft: 슬롯 캐리지 (B2)
@@ -251,6 +252,7 @@ export function softSlot(cfg: SlotSoftCfg, a: number, sdf: Sdf): SoftOut {
     lines,
     tops,
     forces: [sol.F, sol.F, sol.F, sol.F],
+    metrics: { finrayF: sol.F, finrayNodes: fr.nContact, softT: T, softStretch: qcmd - q },
     readouts: [
       { label: "Soft 캐리지 x", value: `${u.toFixed(1)} mm (지령 ${(cfg.xOpen - qcmd).toFixed(1)}, 스토퍼 ${cfg.xMin})` },
       { label: "Fin Ray 접촉력 (추정, 손가락당)", value: `${sol.F.toFixed(2)} N`, warn: sol.F > cfg.Flim + 0.05 },

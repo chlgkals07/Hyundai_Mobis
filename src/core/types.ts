@@ -65,6 +65,8 @@ export interface Assembly {
   collisions?: string[];
   /** Fin Ray 손가락 접촉력 추정 [N] */
   finrayForces?: number[];
+  /** 채점용 수치 */
+  metrics: Record<string, number>;
 }
 
 export type ModeName = "open" | "soft" | "rigid" | "hybrid";
