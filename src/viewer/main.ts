@@ -5,11 +5,12 @@ import type { Assembly, Controls, Design, ModeName, ObjName, Part } from "../cor
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
+import B4c from "../../calc/out/B4.json";
 import viewerData from "../../out/viewer-data.json";
 import { renderCompare, renderPatterns } from "./pages";
 
 interface CalcOut { checks: { id: string; desc: string; value: number; unit: string; pass: boolean }[] }
-const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
+const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, B4: B4c, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 

@@ -244,12 +244,10 @@ def b2():
 
 # ---------------------------------------------------------------- B3
 
-def b3():
-    c, d = load("common"), load("B3")
-    r = Report(d, c)
+def hard_tendon(r: Report, z_top, soft_tip_batt, soft_tip_chip):
+    """2마디 텐던 hard (B3, B4 공용). soft 쪽 Fin Ray 끝 높이를 받아 높이 순서를 검사."""
+    c, d = r.c, r.d
     h = d["hard"]
-    s = soft_flap(r, h["width"])
-    z_top = s["z_top"]
     yp = d["palm"]["sy"] / 2 + h["plies"] * c["board_t"] / 2
     l1, l2 = h["l1"], h["l2"]
     t1, t2 = sp.symbols("t1 t2", real=True)
@@ -271,10 +269,8 @@ def b3():
             k2_over_k1, lo=0.2, hi=5)
     z_floor = tip_z.subs({t1: t1p, t2: t2p})
     r.put("rigid_palm_height", -z_floor)  # 손바닥 아랫면(z=0) 기준
-    soft_tip_batt = s["tip_z"].subs(s["phi"], s["phi_b"])
     finray_window(r, soft_tip_batt, z_floor)
     rest_z = tip_z.subs({t1: t10, t2: t20})
-    soft_tip_chip = s["tip_z"].subs(s["phi"], s["phi_c"])
     gap = rest_z - soft_tip_chip
     r.put("soft_mode_hard_above_finray", gap)
     r.check("R1", "Soft 모드: 펴진(휴지) hard 손끝이 Fin Ray 끝보다 위 (≥ margin_soft)", gap,
@@ -287,11 +283,41 @@ def b3():
     r.put("hard_string_T_N", T)
     r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한)", T, hi=60, unit="N")
     r.put("hard_face_wedge_deg", -td / deg)
+
+
+def b3():
+    c, d = load("common"), load("B3")
+    r = Report(d, c)
+    s = soft_flap(r, d["hard"]["width"])
+    hard_tendon(r, s["z_top"], s["tip_z"].subs(s["phi"], s["phi_b"]), s["tip_z"].subs(s["phi"], s["phi_c"]))
+    return r.dump()
+
+
+def b4():
+    """하이브리드: B2 soft (슬롯 캐리지, 직선 직접 구동) + B3 텐던 hard. 가운데 벽 없음."""
+    c, d = load("common"), load("B4")
+    r = Report(d, c)
+    so = d["soft"]
+    o = c["objects"]
+    z_top = c["board_t"] * c["palm_layers"]
+    x_min = d["hard"]["width"] / 2 + c["margin_plan"]
+    r.put("soft_x_min", x_min)
+    Rs = -so["slot_z"] + so["root_len"] + c["finray"]["L"]
+    r.put("soft_reach", Rs)
+    r.check("S1", "건전지 끝(25) ≥ 스토퍼 x_min", o["battery"]["len"] / 2, lo=x_min, unit="mm")
+    r.check("S2", "스펀지 반폭 ≤ 개방 x_open", o["sponge"]["sx"] / 2, hi=so["x_open"], unit="mm")
+    r.check("S4", "soft 슬롯(핀 u+10) + 여유 3 이 손바닥 반폭 안", so["x_open"] + 13, hi=d["palm"]["sx"] / 2, unit="mm")
+    r.check("S5", "soft 가이드 벽(y=±wall_y)이 텐던 손가락 피벗보다 안쪽 (벽이 hard 경로를 막지 않음: 손가락 |x|<w/2, 벽 x≥x_min-2)",
+            x_min - 2, lo=d["hard"]["width"] / 2, unit="mm")
+    T = c["force"]["chip_limit_N"]
+    r.put("soft_string_T_at_limit_N", T)
+    r.put("soft_pull_mm", so["x_open"] - x_min)
+    hard_tendon(r, z_top, -Rs, -Rs)
     return r.dump()
 
 
 def main():
-    res = [b1(), b2(), b3()]
+    res = [b1(), b2(), b3(), b4()]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",

@@ -7,9 +7,11 @@ import common from "../../params/common.json";
 import B1p from "../../params/B1.json";
 import B2p from "../../params/B2.json";
 import B3p from "../../params/B3.json";
+import B4p from "../../params/B4.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
+import B4c from "../../calc/out/B4.json";
 
 export type P2 = [number, number];
 export interface Shape {
@@ -207,9 +209,10 @@ function b1(): DesignPattern {
 
 // ---------------------------------------------------------------------------- B2
 
-function b2(): DesignPattern {
-  const p = B2p;
-  const d = B2c.derived as unknown as Record<string, number>;
+/** B2 (또는 soft 슬롯 값만 바꾼 변형). hard 관련 부품은 B2 hard 가 있을 때만 의미 있음. */
+function b2(pIn: typeof B2p = B2p, dIn: Record<string, unknown> = B2c.derived): DesignPattern {
+  const p = pIn;
+  const d = dIn as unknown as Record<string, number>;
   const shapes: Shape[] = [];
   const sx = p.palm.sx;
   const sy = p.palm.sy;
@@ -313,9 +316,9 @@ function b2(): DesignPattern {
 
 // ---------------------------------------------------------------------------- B3
 
-function b3(): DesignPattern {
-  const p = B3p;
-  const d = B3c.derived as Record<string, number>;
+function b3(pIn: typeof B3p = B3p, dIn: Record<string, unknown> = B3c.derived): DesignPattern {
+  const p = pIn;
+  const d = dIn as unknown as Record<string, number>;
   const base = b1();
   const shapes = base.shapes.filter((s) => !s.label.startsWith("Hard") && !s.label.startsWith("쐐기") && !s.label.startsWith("손톱") && !s.label.startsWith("손바닥"));
   const bot = rect("손바닥 아랫장", 1, "B골 3 mm", p.palm.sx, p.palm.sy, "윗장과 골 방향 엇갈림. 텐던 구멍·드럼 슬롯 같은 위치.", "y");
@@ -375,4 +378,49 @@ function b3(): DesignPattern {
   };
 }
 
-export const PATTERNS: DesignPattern[] = [b1(), b2(), b3()];
+// ---------------------------------------------------------------------------- B4 (하이브리드)
+
+function b4(): DesignPattern {
+  const p = B4p;
+  // soft 슬롯 부품은 B2 생성기에 B4 soft 값을 넣어 만들고, hard 는 B3 텐던 부품을 그대로 가져옴
+  const softSrc = b2({ ...B2p, palm: p.palm, soft: p.soft }, { ...B2c.derived, ...B4c.derived });
+  const hardSrc = b3({ ...B3p, palm: p.palm, hard: p.hard }, B4c.derived);
+  const soft = softSrc.shapes.filter((s) => /^(Soft|Fin Ray|균형막대)/.test(s.label));
+  const hard = hardSrc.shapes.filter((s) => /^(텐던|원위 쐐기)/.test(s.label));
+  const sx = p.palm.sx;
+  const sy = p.palm.sy;
+  const wy = p.soft.wall_y;
+  const xMin = Number(B4c.derived.soft_x_min);
+  const palms = (["손바닥 윗장", "손바닥 아랫장"] as const).map((lbl, i) => {
+    const s = rect(lbl, 1, "B골 3 mm", sx, sy, i === 0 ? "실 A 구멍 4 (x=±16, y=±26), 텐던 구멍 2 (가장자리 중앙)." : "윗장과 골 방향 엇갈림.", i === 0 ? "x" : "y");
+    for (const a of [-1, 1]) for (const b of [-1, 1]) s.holes.push({ c: [sx / 2 + a * 16, sy / 2 + b * (wy - 4)], d: 3 });
+    for (const t of [-1, 1]) s.holes.push({ c: [sx / 2, sy / 2 + t * (sy / 2 + (p.hard.plies * T) / 2 - p.hard.r1)], d: 3 });
+    for (const a of [-1, 1]) for (const b of [-1, 1]) {
+      const y = sy / 2 + b * (wy + 2.5);
+      s.mark.push([[sx / 2 + a * (xMin - 2), y], [sx / 2 + a * (p.soft.x_open + 13), y]]);
+    }
+    return s;
+  });
+  return {
+    id: "B4",
+    name: p.name,
+    shapes: [...palms, ...soft, ...hard],
+    cutList: [
+      ...finrayCutList(),
+      `일반 빨대 핀: soft ${2 * wy + 10} mm × 4 / hard 축 ${p.hard.width + 14} mm × 2, 텐던 고리 8 mm × 8`,
+      "굵은 빨대 부싱 7 mm × 4 (텐던 손가락 피벗, 손바닥 앞·뒤 모서리)",
+      `고무줄: 캐리지 복원 2, J1 2, J2 2 (k2/k1 ≈ ${fx(Number(B4c.derived.tendon_k2_over_k1))} → J2 를 두 겹)`,
+      "조작 순서(B3 와 같음): 공중에서 실 B 60% → 내림 → 끝까지",
+    ],
+    steps: [
+      "손바닥 2장 엇갈려 풀칠, 가이드 벽 위치·실/텐던 구멍 표시.",
+      "Soft 가이드 벽 4장을 손바닥 아랫면에 접착, 빨대 핀 미끄럼부터 확인 (B2 와 같은 10분 테스트).",
+      "Fin Ray 4개 조립 → 캐리지(뿌리 2 mm 로 짧음)에 고정 → 핀으로 벽에 걸기.",
+      "텐던 손가락 2개: 근위·원위 3장 적층, J2 힌지, 안쪽 고리 4개, 바깥 고무줄 (B3 와 같음).",
+      "손바닥 앞·뒤 모서리 부싱에 텐던 손가락 축 끼우고, 텐던을 손바닥 구멍으로 올림.",
+      "놓았을 때 캐리지 x=45, 손가락 θ1=40° 로 돌아오는지 확인.",
+    ],
+  };
+}
+
+export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b4()];

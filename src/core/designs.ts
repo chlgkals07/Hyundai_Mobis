@@ -2,9 +2,11 @@ import { Vector3 } from "three";
 import B1p from "../../params/B1.json";
 import B2p from "../../params/B2.json";
 import B3p from "../../params/B3.json";
+import B4p from "../../params/B4.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
+import B4c from "../../calc/out/B4.json";
 import { DEG, V, boxPart, clamp, cylPart, lerp, segPart } from "./build";
 import { makeObject, sceneSdf } from "./objects";
 import {
@@ -379,7 +381,7 @@ export function makeB2(): Design {
 export const TENDON_PRE = 0.6;
 export const TENDON_LIFT = 30;
 
-function hardTendon(p: typeof B3p, d: Derived, b: number, sdfScene: (v: Vector3) => number): HardOut {
+function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Derived, b: number, sdfScene: (v: Vector3) => number): HardOut {
   // 손바닥을 lift 만큼 올린 상황 = 장면을 lift 만큼 내린 것
   let lift = 0;
   const sdf = (v: Vector3) => sdfScene(V(v.x, v.y, v.z + lift));
@@ -563,7 +565,48 @@ export function makeB3(oneString = false): Design {
   };
 }
 
-export const DESIGNS: Design[] = [makeB1(), makeB2(), makeB3()];
+// ================================================================== B4 (하이브리드)
+
+export function makeB4(): Design {
+  const p = B4p;
+  const d = B4c.derived as unknown as Derived;
+  return {
+    id: "B4",
+    name: p.name,
+    summary:
+      "B2 의 soft(가이드 벽 슬롯 + 빨대 핀 캐리지, 레버 없는 직선 구동)와 B3 의 2마디 텐던 hard 를 결합. 가운데 경사 벽이 없어져 hard 경로가 비고, 손 모양(말리는 손가락)과 낮은 실 A 장력을 같이 노린 안. Fin Ray 를 3.6 mm 줄여(뿌리 2 mm) 텐던 손가락의 Rigid 높이에 맞춤.",
+    oneString: false,
+    adjacent: [
+      ["palm", "carR"],
+      ["palm", "carL"],
+      ["palm", "hardF"],
+      ["palm", "hardB"],
+      ["hardF", "hard2F"],
+      ["hardB", "hard2B"],
+    ],
+    preset(mode, obj) {
+      const Rs = num(d, "soft_reach");
+      const xMin = num(d, "soft_x_min");
+      const aFor = (x: number) => clamp((p.soft.x_open - x) / (p.soft.x_open - xMin), 0, 1);
+      return presetCommon(mode, obj, Rs - 2, num(d, "rigid_palm_height"), false, aFor);
+    },
+    build(ctrl) {
+      const floorZ = -ctrl.palmH;
+      const obj = ctrl.obj ? makeObject(ctrl.obj, floorZ) : null;
+      const sdf = sceneSdf(obj, floorZ);
+      const soft = softSlot(
+        { xMin: num(d, "soft_x_min"), xOpen: p.soft.x_open, wallY: p.soft.wall_y, slotZ: p.soft.slot_z, rootLen: p.soft.root_len, Flim: C.force.chip_limit_N / 2 },
+        ctrl.a,
+        sdf,
+      );
+      const hard = hardTendon(p, d, ctrl.b, sdf);
+      hard.metrics.tipZ -= floorZ;
+      return assemble({ id: "B4", oneString: false }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, []);
+    },
+  };
+}
+
+export const DESIGNS: Design[] = [makeB1(), makeB2(), makeB3(), makeB4()];
 export const VARIANTS: Design[] = [makeB1(true), makeB3(true)];
 export const ALL: Design[] = [...DESIGNS, ...VARIANTS];
 void lerp;
