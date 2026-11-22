@@ -1,0 +1,7 @@
+{
+  "id": "B2", "name": "B2 직선 — 슬롯 가이드(빨대 핀) 캐리지",
+  "palm": { "sx": 100.0, "sy": 100.0 },
+  "soft": { "type": "slot", "root_len": 10.0, "x_open": 45.0, "wall_y": 30.0, "slot_z": -10.0 },
+  "hard": { "type": "slot", "reach_open": 93.0, "width": 28.0, "plies": 3, "nail_len": 10.0,
+            "y_open": 42.0, "slope_deg": 30.0, "wall_depth": 25.0 }
+}

@@ -1,0 +1,6 @@
+{
+  "id": "B1", "name": "B1 회전 — 플랩(score 힌지) + 단일 피벗",
+  "palm": { "sx": 60.0, "sy": 80.0 },
+  "soft": { "type": "flap", "joint": "score", "root_len": 16.0, "phi_open_deg": 90.0, "drum_r": 15.0, "drum_y": 33.0 },
+  "hard": { "type": "pivot", "len": 112.0, "width": 28.0, "plies": 3, "nail_len": 10.0, "psi_open_deg": 40.0, "drum_r": 25.0 }
+}
