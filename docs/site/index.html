@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>골판지 그리퍼 자료</title>
+<style>
+:root { --bg: #eef1ef; --panel: #f8faf9; --ink: #1d2422; --muted: #5b6763; --line: #d3dad7; --mat: #2f6b5b; }
+@media (prefers-color-scheme: dark) { :root { --bg: #131917; --panel: #1a2220; --ink: #e4ebe8; --muted: #93a39d; --line: #2c3834; --mat: #5fb39b; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 28px 16px; display: grid; gap: 14px; }
+h1 { margin: 0; font-size: 22px; }
+p { margin: 0; color: var(--muted); }
+a.card { display: grid; gap: 4px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); text-decoration: none; }
+a.card:hover, a.card:focus-visible { border-color: var(--mat); outline: none; }
+a.card b { font-size: 16px; }
+a.card span { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>골판지 그리퍼 — MOBIS Robotics Challenge</h1>
+  <p>현재 기준안 B5N. 이 폴더의 HTML 은 브라우저로 바로 열립니다 (three.js 만 인터넷에서 불러옴).</p>
+  <a class="card" href="assembly.html"><b>조립 과정</b><span>전체 애니메이션 · 블록별 조립(드럼, Fin Ray, soft 모듈, hard 손가락, 실) · 메커니즘 단면도 · 전개도</span></a>
+  <a class="card" href="arm.html"><b>팔 결합 시뮬레이터</b><span>R4(가정 치수) 손목에 그리퍼를 달고 soft 열림 제한·wrist roll·거리별 간섭 확인</span></a>
+  <a class="card" href="bench.html"><b>설계안 벤치</b><span>현재 후보(B5N·B5F·B5)와 보관안 시뮬레이터 · 자동 비교표 · 전개도</span></a>
+  <a class="card" href="../ARM-HANDOFF.md"><b>팔 결합 핸드오프 문서</b><span>장착 위치, 크기 맞추기, 회전부 제작 레시피, 실 경로, 재현 방법</span></a>
+  <a class="card" href="../B5N-조립과정.mp4"><b>조립 영상 (mp4)</b><span>94 초</span></a>
+  <a class="card" href="../../patterns/B5N/B5N-전개도-A4.pdf"><b>인쇄용 전개도 (PDF)</b><span>A4 실제 크기 100% · 구멍 맞춤 시험편부터</span></a>
+</main>
+</body>
+</html>

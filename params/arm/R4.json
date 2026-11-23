@@ -1,0 +1,11 @@
+{
+  "_doc": "⚠ 가정 치수 (placeholder). 팀원 R4 실측값으로 교체할 것. 단위 mm. 링크 단면 w(가로)×t(두께), 관절은 빨대 축 가정.",
+  "_status": "placeholder",
+  "base": { "w": 120.0, "h": 20.0 },
+  "column": { "w": 40.0, "h": 120.0 },
+  "upper": { "L": 170.0, "w": 36.0, "t": 24.0 },
+  "fore": { "L": 160.0, "w": 32.0, "t": 22.0 },
+  "wrist": { "w": 40.0, "h": 30.0, "has_roll": true, "pitch": "level" },
+  "mount": { "x": 24.0, "y": 30.0, "h": 20.0, "_doc": "손바닥 윗면 장착 기둥: calc/out/envelope.json mount_free_rect (x±13, y±17.5) 안에 들어가야 함" },
+  "gripper": { "design": "B5N", "soft_open_limit_deg": 30.0, "_doc": "soft 열림 제한 스토퍼 각 (90 이면 손바닥 위로 28 mm 솟아 손목과 간섭 가능)" }
+}

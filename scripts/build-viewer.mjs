@@ -30,6 +30,7 @@ const doc = (page) =>
 for (const [entry, tpl, out] of [
   ["src/viewer/main.ts", "src/viewer/page.html", "gripper-bench"],
   ["src/viewer/assembly.ts", "src/viewer/assembly.html", "assembly"],
+  ["src/viewer/arm.ts", "src/viewer/arm.html", "arm"],
 ]) {
   const js = await bundle(entry, out);
   const page = readFileSync(tpl, "utf8").replace("<!--APP-->", `${tags}\n<script>\n${js}\n</script>`);
@@ -37,3 +38,9 @@ for (const [entry, tpl, out] of [
   writeFileSync(`out/${out === "gripper-bench" ? "local" : out + "-local"}.html`, doc(page));
   console.log(out, (page.length / 1024).toFixed(0), "KB");
 }
+
+// 팀 전달용 정적 사이트: docs/site/*.html (브라우저로 바로 열림, three.js 만 CDN)
+mkdirSync("docs/site", { recursive: true });
+for (const [src, dst] of [["out/local.html", "bench.html"], ["out/assembly-local.html", "assembly.html"], ["out/arm-local.html", "arm.html"]])
+  writeFileSync(`docs/site/${dst}`, readFileSync(src, "utf8"));
+console.log("docs/site updated");

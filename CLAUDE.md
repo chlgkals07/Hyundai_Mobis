@@ -20,6 +20,8 @@ npm run build                    # 뷰어 → out/gripper-bench.html (Artifact),
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
 node scripts/record-assembly.mjs # B5N 조립 애니메이션 → docs/B5N-조립과정.mp4 (프레임 캡처 + ffmpeg)
 npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg
+python3 calc/envelope.py         # 팔 결합용 그리퍼 점유 공간·장착 영역·실 마찰
+npx tsx scripts/arm-check.ts     # 팔↔그리퍼 간섭표 → docs/arm-check.md (params/arm/R4.json 은 가정값)
 ```
 params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/patterns → build).
 
@@ -83,4 +85,4 @@ Fin Ray 솔버 터널링(고정 8단계 → 2°/단계; V5b '간섭 탈락' 은 
 - [ ] 팔 높이 오차 실측 → 수직 순응 목표(현재 ±10 가정) 갱신
 - [ ] 실측값 반영: 골판지 두께, 빨대 외경, 고무줄 강성
 - [x] 하이브리드 B4 (B2 soft + B3 텐던 hard): 물체 5/5, 간섭 0, 42.4점
-- [ ] (보류) 팀원 R4 팔과 결합 — 장착·wrist roll·텐던 커플링·팔 높이 오차
+- [ ] 팀원 R4 팔과 결합 — `docs/ARM-HANDOFF.md` (팀원 진행), `src/core/arm.ts` · `docs/site/arm.html` 템플릿
