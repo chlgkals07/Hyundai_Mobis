@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 338" role="img" aria-label="드럼 만들기"><style>
+.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.pad{fill:#333}
+.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.floor{stroke:#2f6b5b;stroke-width:3}
+.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.lead{fill:none;stroke:#555;stroke-width:.8}
+.dot{fill:#555}
+.glue{fill:url(#hatch);stroke:none}
+text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.lbl{font-size:12.5px;fill:#1d2422}
+.note{font-size:11px;fill:#5b6763}
+.hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+</style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><text class="hd" x="26" y="20.8" text-anchor="start">① 원판 3장 자르기</text><ellipse class="drum" cx="78" cy="91" rx="41.6" ry="14.56"/><ellipse class="drum" cx="182" cy="91" rx="33.8" ry="11.83"/><ellipse class="drum" cx="286" cy="91" rx="41.6" ry="14.56"/><text class="note" x="78" y="143" text-anchor="middle">큰판 r16</text><text class="note" x="182" y="143" text-anchor="middle">작은판 r13</text><text class="note" x="286" y="143" text-anchor="middle">큰판 r16</text><text class="note" x="26" y="169" text-anchor="start">중심 십자에 송곳 → 짧은 직선으로 끊어 자르고 칼로 다듬기</text><text class="hd" x="416" y="20.8" text-anchor="start">② 빨대에 꽂아 중심 맞춰 풀칠</text><polygon class="straw" points="533,234 540.8,234 540.8,31.2 533,31.2"/><ellipse class="drum" cx="536.9" cy="78" rx="41.6" ry="14.56"/><ellipse class="drum" cx="536.9" cy="104" rx="33.8" ry="11.83"/><ellipse class="drum" cx="536.9" cy="130" rx="41.6" ry="14.56"/><polyline class="lead" points="611,104 568.1,104"/><circle class="dot" cx="568.1" cy="104" r="2"/><text class="lbl" x="611" y="101" text-anchor="start">가운데가 3 mm 작음</text><text class="lbl" x="611" y="115" text-anchor="start">→ 깊이 3 mm 실 홈</text><text class="hd" x="26" y="208" text-anchor="start">③ 홈에 테이프 1바퀴(골판지 단면 마감) · 큰판 가장자리 구멍에 실 매듭</text><circle class="drum" cx="156" cy="280.8" r="41.6"/><circle class="groove" cx="156" cy="280.8" r="33.8"/><circle class="pivot" cx="156" cy="247" r="3.12"/><polyline class="string" points="156,247 205.4,275.6 205.4,332.8"/><polyline class="lead" points="286,254.8 205.4,299"/><circle class="dot" cx="205.4" cy="299" r="2"/><text class="lbl" x="286" y="251.8" text-anchor="start">감는 방향: 실을 위로 당길 때</text><text class="lbl" x="286" y="265.8" text-anchor="start">손가락이 닫히는 쪽 (조립 후 손으로 확인)</text><text class="lbl" x="442" y="280.8" text-anchor="start">④ hard 드럼 → 바깥 링크 막대 사이(D4)</text><text class="lbl" x="442" y="312" text-anchor="start">④ soft 드럼 → 플랩 바깥 힌지선에 세워 + 삼각 보강</text></svg>

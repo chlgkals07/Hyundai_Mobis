@@ -41,7 +41,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="14" y="62" font-size="3" transform="rotate(-90 14 62)">밑변</text>
 <text x="36" y="238.99" font-size="3" transform="rotate(-90 36 238.99)">↑ 손가락 끝은 contact 와 back 사이 접는 선</text>
 <path class="flute" d="M18 33H28M26 31L28 33L26 35M20 31L18 33L20 35"/>
-<text class="lbl" x="10" y="242.49">19. Fin Ray 띠 3/4 ×1</text>
+<text class="lbl" x="10" y="242.49">22. Fin Ray 띠 3/4 ×1</text>
 <text class="dim" x="10" y="246.09">214.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
 <polygon class="glue" points="80.02,36 80.02,24 102.02,24 102.02,36"/>
 <polygon class="cut" points="80.02,238.49 80.02,24 102.02,24 102.02,238.49"/>
@@ -69,7 +69,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="84.02" y="62" font-size="3" transform="rotate(-90 84.02 62)">밑변</text>
 <text x="106.02" y="238.99" font-size="3" transform="rotate(-90 106.02 238.99)">↑ 손가락 끝은 contact 와 back 사이 접는 선</text>
 <path class="flute" d="M88.02 33H98.02M96.02 31L98.02 33L96.02 35M90.02 31L88.02 33L90.02 35"/>
-<text class="lbl" x="80.02" y="242.49">20. Fin Ray 띠 4/4 ×1</text>
+<text class="lbl" x="80.02" y="242.49">23. Fin Ray 띠 4/4 ×1</text>
 <text class="dim" x="80.02" y="246.09">214.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
 <path class="cut" d="M10 281h100"/>
 <path class="cut" d="M10 281v-4"/>

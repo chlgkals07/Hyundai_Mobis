@@ -443,11 +443,38 @@ def b5(name="B5"):
     r.check("H5b", "앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3)", 2 * (yp + dd - h["drum_r"]), lo=3, unit="mm")
     r.check("H6", "드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2)", h["bracket_drop"], lo=h["drum_r"] + 2, unit="mm")
     # 두 링크는 평행, 수직 거리 = d·cosψ. 완전 개방에서 가장 가까움 (1차 시도: 피벗을 위·아래로 쌓아 수직일 때 겹침 → 수평 배치로 변경)
-    r.check("H7", "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2", dd * sp.cos(h["psi_open_deg"] * deg), lo=h["link_plies"] * c["board_t"] + 2, unit="mm")
+    # H7 (조립 검토에서 수정): 링크 막대는 y–z 평면 판 → 운동 평면 안의 높이 = 막대 높이(12). 앞·뒤 링크가 같은 x 평면이라
+    #   평행 링크 수직 거리 d·cosψ 가 막대 높이 + 2 이상이어야 함 (이전엔 판 두께 6 으로 잘못 잡아 68° 까지 허용했음)
+    r.check("H7", "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 막대 높이 + 2", dd * sp.cos(h["psi_open_deg"] * deg), lo=h.get("link_bar_h", 12) + 2, unit="mm")
     r.check("H9", "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
             12, lo=9 + 3, unit="mm")
     # H10 (시뮬에서 발견): 브래킷(x = w/2+1 ~ w/2+4)과 soft 드럼 아래 절반(x ≥ 손바닥 반폭 - r_s) 이 겹침
     r.check("H10", "soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1", d["palm"]["sx"] / 2 - d["soft"]["drum_r"], lo=h["width"] / 2 + 4 + 1, unit="mm")
+    # --- 조립 메커니즘 (2026-11-23 조립 검토에서 추가)
+    so = d["soft"]
+    phm = abs(s["phi_min"])
+    # S5: 접는 선 힌지(윗장 바깥 위 모서리) 기준으로 플랩이 φ_min 까지 안쪽으로 돌면 손바닥 옆면을 파고듦
+    #     (시뮬은 palm–flap 인접 처리로 못 잡음). 아랫장을 relief 만큼 좁게 → 아랫면 모서리 간섭 z_top·tan|φ| 이하여야
+    need = z_top * sp.tan(phm)
+    r.put("soft_edge_interference_mm", need)
+    r.check("S5", "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| (플랩이 −8° 까지 닫힐 공간)", so.get("palm_edge_relief", 0), lo=need, unit="mm")
+    # 닫힘 스토퍼 블록: 손바닥 아랫면에 붙인 블록의 바깥면 x — 플랩 안쪽 면이 φ_min 에서 블록 아래 모서리에 닿음
+    hb = so.get("stop_block_h", 8.0)
+    r.put("soft_stop_face_x", d["palm"]["sx"] / 2 - (z_top + hb) * sp.tan(phm))
+    # 열림 스토퍼 탭 (hard): ψ_open 에서 바깥 링크 윗면이 닿는 점 (브래킷 안쪽 면에 붙임)
+    pso = h["psi_open_deg"] * deg
+    s_tab = h.get("stop_tab_s", 5.0)
+    ty_ = yp + dd + s_tab * sp.sin(pso) + (h["link_plies"] * c["board_t"] / 2) * sp.cos(pso)
+    tz_ = -h["bracket_drop"] - s_tab * sp.cos(pso) + (h["link_plies"] * c["board_t"] / 2) * sp.sin(pso)
+    r.put("hard_stop_tab_y", ty_)
+    r.put("hard_stop_tab_z", tz_)
+    r.check("H11", "열림 스토퍼 접촉점이 브래킷 안 (y ≤ 바깥 피벗 + 6)", ty_, hi=yp + dd + 6 + 1.5, unit="mm")
+    # 드럼 = 바깥 링크 막대 2장 사이에 끼워 면 접착 (빨대로 토크 전달 금지). 막대 안쪽 면 간격 vs 드럼 두께
+    bar_t = h["link_plies"] * c["board_t"]
+    gap = (h["width"] - 2) - 2 * bar_t
+    r.put("hard_outer_bar_inner_gap", gap)
+    # 배치(x): 드럼 ±4.5 | 바깥·안쪽 링크 막대 4.5~10.5 (같은 평면, 수직거리로 분리) | 브래킷 안쪽 면 w/2+1
+    r.check("H12", "링크 막대 바깥 면(4.5+막대두께) + 1 ≤ 브래킷 안쪽 면 (w/2+1)", 4.5 + bar_t + 1, hi=h["width"] / 2 + 1, unit="mm")
     r.check("H8", "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)", yp + dd + 6, hi=d["palm"]["sy"] / 2, unit="mm")
     # 장력: 손끝판 수평력 F → 링크 토크 F·L·cosψ (ψ=0 최대) → T = F L / r
     T = c["force"]["pinch_target_N"] * L / h["drum_r"]

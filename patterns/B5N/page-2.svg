@@ -41,7 +41,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="14" y="62" font-size="3" transform="rotate(-90 14 62)">밑변</text>
 <text x="36" y="238.99" font-size="3" transform="rotate(-90 36 238.99)">↑ 손가락 끝은 contact 와 back 사이 접는 선</text>
 <path class="flute" d="M18 33H28M26 31L28 33L26 35M20 31L18 33L20 35"/>
-<text class="lbl" x="10" y="242.49">15. Fin Ray 띠 1/4 ×1</text>
+<text class="lbl" x="10" y="242.49">13. Fin Ray 띠 1/4 ×1</text>
 <text class="dim" x="10" y="246.09">214.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
 <polygon class="glue" points="80.02,36 80.02,24 102.02,24 102.02,36"/>
 <polygon class="cut" points="80.02,238.49 80.02,24 102.02,24 102.02,238.49"/>
@@ -69,16 +69,38 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="84.02" y="62" font-size="3" transform="rotate(-90 84.02 62)">밑변</text>
 <text x="106.02" y="238.99" font-size="3" transform="rotate(-90 106.02 238.99)">↑ 손가락 끝은 contact 와 back 사이 접는 선</text>
 <path class="flute" d="M88.02 33H98.02M96.02 31L98.02 33L96.02 35M90.02 31L88.02 33L90.02 35"/>
-<text class="lbl" x="80.02" y="242.49">16. Fin Ray 띠 2/4 ×1</text>
+<text class="lbl" x="80.02" y="242.49">14. Fin Ray 띠 2/4 ×1</text>
 <text class="dim" x="80.02" y="246.09">214.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
 <polygon class="cut" points="150.04,24 172.04,24 172.04,44 150.04,44"/>
 <polyline class="score" points="150.04,30 172.04,30"/>
 <path class="flute" d="M158.04 33H168.04M166.04 31L168.04 33L166.04 35M160.04 31L158.04 33L160.04 35"/>
-<text class="lbl" x="150.04" y="48">17. 손톱 플랩 ×2</text>
-<text class="dim" x="150.04" y="51.6">22×20 · B골 3 mm 2겹 + 테이프</text>
+<text class="lbl" x="150.04" y="48">15. 손톱 플랩 ×6</text>
+<text class="dim" x="150.04" y="51.6">22×20 · B골 3 mm, 3장 적층</text>
 <polygon class="cut" points="170.04,69 169.96,70.31 169.7,71.59 169.28,72.83 168.71,74 167.98,75.09 167.12,76.07 166.13,76.93 165.04,77.66 163.87,78.24 162.63,78.66 161.35,78.91 160.04,79 158.74,78.91 157.46,78.66 156.22,78.24 155.04,77.66 153.96,76.93 152.97,76.07 152.11,75.09 151.38,74 150.81,72.83 150.39,71.59 150.13,70.31 150.04,69 150.13,67.69 150.39,66.41 150.81,65.17 151.38,64 152.11,62.91 152.97,61.93 153.96,61.07 155.04,60.34 156.22,59.76 157.46,59.34 158.74,59.09 160.04,59 161.35,59.09 162.63,59.34 163.87,59.76 165.04,60.34 166.13,61.07 167.12,61.93 167.98,62.91 168.71,64 169.28,65.17 169.7,66.41 169.96,67.69"/>
-<text class="lbl" x="150.04" y="83">18. Soft 드럼 작은판 ×2</text>
+<text class="lbl" x="150.04" y="83">16. Soft 드럼 작은판 ×2</text>
 <text class="dim" x="150.04" y="86.6">20×20 · B골 3 mm</text>
+<polygon class="cut" points="150.04,94 174.04,94 174.04,108.38 150.04,108.38"/>
+<path class="flute" d="M165.04 98V108M163.04 106L165.04 108L167.04 106M163.04 100L165.04 98L167.04 100"/>
+<text class="lbl" x="150.04" y="112.38">17. 손끝판 ×6</text>
+<text class="dim" x="150.04" y="115.98">24×14.38 · B골 3 mm</text>
+<polygon class="cut" points="150.04,123.38 165.04,123.38 150.04,138.38"/>
+<text class="lbl" x="150.04" y="142.38">18. 드럼 삼각 보강 ×4</text>
+<text class="dim" x="150.04" y="145.98">15×15 · B골 3 mm</text>
+<polygon class="cut" points="150.04,153.38 172.04,153.38 172.04,161.38 150.04,161.38"/>
+<path class="flute" d="M158.04 162.38H168.04M166.04 160.38L168.04 162.38L166.04 164.38M160.04 160.38L158.04 162.38L160.04 164.38"/>
+<text class="lbl" x="150.04" y="165.38">19. 손톱 스토퍼 ×2</text>
+<text class="dim" x="150.04" y="168.98">22×8 · B골 3 mm</text>
+<polygon class="cut" points="10,253.49 30,253.49 30,261.49 10,261.49"/>
+<path class="flute" d="M16 262.49H26M24 260.49L26 262.49L24 264.49M18 260.49L16 262.49L18 264.49"/>
+<text class="lbl" x="10" y="265.49">20. Soft 닫힘 스토퍼 블록 ×4</text>
+<text class="dim" x="10" y="269.09">20×8 · B골 3 mm (2장 적층 × 좌우)</text>
+<polygon class="cut" points="150.04,176.38 162.04,176.38 150.04,188.38"/>
+<text class="lbl" x="150.04" y="192.38">21. 브래킷 삼각 보강 ×4</text>
+<text class="dim" x="150.04" y="195.98">12×12 · B골 3 mm</text>
+<polygon class="cut" points="150.04,203.38 156.04,203.38 156.04,209.38 150.04,209.38"/>
+<path class="flute" d="M142.04 212.38H152.04M150.04 210.38L152.04 212.38L150.04 214.38M144.04 210.38L142.04 212.38L144.04 214.38"/>
+<text class="lbl" x="150.04" y="213.38">22. 열림 스토퍼 탭 ×8</text>
+<text class="dim" x="150.04" y="216.98">6×6 · B골 3 mm (2장 적층)</text>
 <path class="cut" d="M10 281h100"/>
 <path class="cut" d="M10 281v-4"/>
 <path class="cut" d="M20 281v-2.5"/>

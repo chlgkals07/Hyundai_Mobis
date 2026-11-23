@@ -39,10 +39,28 @@ h1 { font-size: 18px; margin: 0; text-wrap: balance; }
 .controls input[type=range] { flex: 1 1 260px; accent-color: var(--mat); }
 .chapters { display: flex; flex-wrap: wrap; gap: 4px; }
 .chapters button { font-family: var(--font-num); min-width: 2.2em; }
+.chapters button[aria-pressed="true"] { background: var(--mat); color: var(--panel); border-color: var(--mat); }
+.hdr { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: end; justify-content: space-between; }
+nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+nav.tabs a { color: var(--muted); text-decoration: none; padding: 4px 10px; border-radius: 6px; font-size: 13px; border: 1px solid transparent; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--line); background: var(--panel); }
+#player { display: grid; gap: 10px; }
+.intro { color: var(--muted); font-size: 13px; max-width: 75ch; margin-bottom: 10px; }
+.figs { display: grid; gap: 16px; }
+.fig { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; overflow-x: auto; }
+.fig figcaption { font-weight: 700; color: #1d2422; margin-bottom: 6px; font-size: 14px; }
+.fig svg { width: 100%; min-width: 640px; height: auto; display: block; }
+.pgs { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.pg { background: #fff; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.pg svg { width: 100%; height: auto; display: block; }
+.bom { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; max-width: 90ch; }
+.bom ul, .bom ol { padding-left: 20px; display: grid; gap: 3px; }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--mat); outline-offset: 2px; }
 </style>
 <div class="wrap">
-  <div><h1>골판지 그리퍼 조립 과정 — B5N</h1><div class="sub">전개도에서 자르고, 접고, 붙이고, 조립해서 동작하기까지 · 시간·난이도는 추정</div></div>
+  <header class="hdr"><div><h1>골판지 그리퍼 조립 과정 — B5N</h1><div class="sub">전개도에서 자르고, 접고, 붙이고, 조립해서 동작하기까지 · 시간·난이도는 추정</div></div>
+  <nav class="tabs" aria-label="보기"><a href="#full" data-tab="full">전체 과정</a><a href="#blocks" data-tab="blocks">블록별 조립</a><a href="#sections" data-tab="sections">메커니즘 단면도</a><a href="#patterns" data-tab="patterns">전개도</a></nav></header>
+  <section id="player">
   <div class="stage" id="stage">
     <div class="sheet" id="sheet" hidden></div>
     <div class="cap" id="cap">
@@ -63,5 +81,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--mat); outli
     <input type="range" id="scrub" min="0" max="94" step="0.05" value="0" aria-label="시간">
   </div>
   <div class="chapters" id="chapters" aria-label="단계로 이동"></div>
+  </section>
+  <section id="page-sections" hidden><div class="intro">단면도는 params·SymPy 결과에서 그려집니다 (치수가 바뀌면 그림도 바뀜). 실선 = 닫힘/쥔 자세, 점선 = 열림 자세.</div><div id="sections" class="figs"></div></section>
+  <section id="page-patterns" hidden><div class="intro">A4 실제 크기(100%) 인쇄용 PDF: 레포 <code>patterns/B5N/</code>. 가장 먼저 <b>구멍 맞춤 시험편</b>을 잘라 빨대 구멍 지름을 고르세요.</div><div id="patternBom" class="bom"></div><div id="patternSheets" class="pgs"></div></section>
 </div>
 <!--APP-->

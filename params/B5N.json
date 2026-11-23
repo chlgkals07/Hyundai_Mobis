@@ -11,7 +11,9 @@
     "root_len": 16.0,
     "phi_open_deg": 90.0,
     "drum_r": 13.0,
-    "drum_y": 33.0
+    "drum_y": 33.0,
+    "palm_edge_relief": 1.5,
+    "stop_block_h": 8.0
   },
   "hard": {
     "type": "parallel",
@@ -22,13 +24,16 @@
     "plies": 3,
     "link_plies": 2,
     "nail_len": 14.0,
-    "psi_open_deg": 68.0,
+    "psi_open_deg": 54.0,
     "drum_r": 16.0,
     "bracket_drop": 20.0,
     "compliance": {
       "type": "nail",
       "nail_len": 14.0,
       "fold_max_deg": 80.0
-    }
+    },
+    "stop_tab_s": 5.0,
+    "nail_plies": 3,
+    "link_bar_h": 12.0
   }
 }

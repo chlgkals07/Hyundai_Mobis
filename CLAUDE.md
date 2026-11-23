@@ -19,6 +19,7 @@ npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개�
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
 node scripts/record-assembly.mjs # B5N 조립 애니메이션 → docs/B5N-조립과정.mp4 (프레임 캡처 + ffmpeg)
+npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg
 ```
 params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/patterns → build).
 
@@ -69,6 +70,13 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 같이 고친 것: hard 폭 28→24·soft 드럼 r 15→13 (브래킷↔soft 드럼 간섭이 palm 인접 처리로 가려져 있었음, H10),
 Fin Ray 솔버 터널링(고정 8단계 → 2°/단계; V5b '간섭 탈락' 은 이 버그였음)
 참고: 같은 채점에서 보관된 B3 가 63.3 으로 가장 높음 (텐던 underactuation 이 수직 순응 14 mm) — 단 예비 말기·50 N
+
+## 조립 메커니즘 검토 (2026-11-23, 풀 사용 허용)
+- 플랩이 −8° 로 닫히면 손바닥 옆면 0.84 mm 간섭 (시뮬은 palm–flap 인접이라 못 잡음) → 아랫장 좌우 1.5 mm 좁게 (S5)
+- 링크 막대는 y–z 판(높이 12): 앞·뒤 링크 같은 평면 → d·cosψ ≥ 14 → 열림 68°→54°, 개구 103 mm (H7 수정)
+- 드럼을 빨대 축에 풀칠하면 토크가 플라스틱에 걸려 헛돎 → 드럼을 바깥 링크 막대 2개 사이에 면 접착 (H12), 빨대는 핀만
+- 추가 부품: soft 닫힘 스토퍼 블록, hard 열림 스토퍼 탭(H11 접촉점), 브래킷 삼각 보강, 구멍 맞춤 시험편, 손톱 3겹
+- 단면도 `src/core/diagrams.ts` (→ docs/diagrams/*.svg), 블록별 조립 애니메이션은 조립 Artifact '블록별 조립' 탭
 
 ## 다음 할 일
 - [ ] 목요일 실물 (B5N): Fin Ray 1개 → EI 보정, 평행 링크 손가락 1개 → 손끝판 수직 유지·손톱 접힘 확인

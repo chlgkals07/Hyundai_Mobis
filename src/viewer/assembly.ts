@@ -7,6 +7,7 @@ import { ALL } from "../core/designs";
 import { PATTERNS } from "../core/pattern";
 import type { Assembly, Part } from "../core/types";
 import viewerData from "../../out/viewer-data.json";
+import { DIAGRAMS } from "../core/diagrams";
 
 const DESIGN_ID = "B5N";
 const design = ALL.find((d) => d.id === DESIGN_ID)!;
@@ -43,16 +44,16 @@ interface Step {
 const T_PATTERN = [4, 22]; // 2D 전개도
 const STEPS: Step[] = [
   { t0: 0, t1: 4, title: "B5N 골판지 그리퍼 — 만드는 과정", craft: "평행 링크 hard (긴 손톱) + 플랩 Fin Ray soft · 1:1 전개도 A4 3장", feas: "", level: 1 },
-  { t0: 4, t1: 10, title: "1. 도면 출력 → 골판지에 붙이기 → 자르기", craft: "A4 실제 크기(100%) 인쇄, 100 mm 눈금자 확인 → 딱풀로 택배상자에 붙임 → 커터칼+쇠자로 실선을 자름", feas: `판 부품 ${FEAS.boardPieces}개 (원판 ${FEAS.circles}) · 자르기 약 ${Math.round(FEAS.cutMin / 10) * 10}분 (추정)`, level: 1 },
+  { t0: 4, t1: 10, title: "1. 도면 출력 → 골판지에 붙이기 → 자르기", craft: "A4 실제 크기(100%) 인쇄, 100 mm 눈금자 확인 → 딱풀로 택배상자에 붙임 → 구멍 맞춤 시험편부터 자르고 빨대 구멍 지름 결정 → 커터칼+쇠자", feas: `판 부품 ${FEAS.boardPieces}개 (원판 ${FEAS.circles}) · 자르기 약 ${Math.round(FEAS.cutMin / 10) * 10}분 (추정)`, level: 1 },
   { t0: 10, t1: 16, title: "2. 접는 선·구멍", craft: "파란 점선 = 볼펜으로 자 대고 꾹 눌러 score → 깔끔하게 접힘. 빨간 원 = 송곳으로 뚫고 연필로 넓혀 빨대 구멍", feas: "구멍 위치 ±1 mm 가 평행 링크의 평행도를 좌우 — 가장 꼼꼼해야 하는 단계", level: 2 },
   { t0: 16, t1: 22, title: "3. Fin Ray 띠 — 한쪽 라이너 벗기기", craft: "Fin Ray 띠 4개는 골판지 한쪽 종이(라이너)를 물에 살짝 적셔 벗긴 '단면 골판지' → 골이 폭 방향이라 길이 방향으로 잘 휨", feas: "벗기기 + 건조 시간 필요 (드라이어로 5분)", level: 2 },
   { t0: 22, t1: 27, title: "4. 잘린 부품들", craft: "커팅매트 위에 모두 펼친 상태. 같은 부품은 겹쳐 붙여(적층) 두께를 만듦 — 링크·손끝판·브래킷", feas: "적층은 목공풀(얇게) 또는 글루건. 글루건은 두께가 생겨 치수 오차↑", level: 1 },
-  { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장·아랫장 골 방향 엇갈려 풀칠 (플랩 부분은 풀칠 금지). 플랩은 score 선에서 접힘 = 힌지", feas: "쉬움", level: 1 },
+  { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장·아랫장(좌우 1.5 mm 좁게) 골 방향 엇갈려 풀칠, 플랩 부분 풀칠 금지. 플랩은 score 선 = 힌지. 닫힘 스토퍼 블록 부착", feas: "쉬움", level: 1 },
   { t0: 33, t1: 41, title: "6. Fin Ray 접기 + 리브", craft: "띠를 접는 선 3곳에서 삼각형으로 → 탭 풀칠. 빨대 리브 4개를 R2–R8 표시에 테이프로 양끝 힌지", feas: "Fin Ray 4개 × 약 10분. 리브 길이 22/17/11/6 mm 빨대 자르기", level: 2 },
   { t0: 41, t1: 46, title: "7. Fin Ray → 플랩, 드럼", craft: "Fin Ray 밑판 탭을 플랩 끝에 수직으로 풀칠. 드럼(원판 큰-작은-큰)을 플랩 바깥 힌지선에 세워 붙이고 삼각 보강", feas: "드럼 직각 접착부가 약점 — 삼각 보강 필수", level: 2 },
-  { t0: 46, t1: 52, title: "8. 브래킷 + 축 (hard)", craft: "브래킷 4장: 위 탭을 접어 손바닥 아랫면에 평행하게 풀칠. 구멍에 굵은 빨대 부싱 → 일반 빨대 축 2개", feas: "두 브래킷 평행·구멍 정렬이 핵심. 축을 먼저 끼운 채로 풀칠하면 정렬이 맞음", level: 3 },
-  { t0: 52, t1: 58, title: "9. 평행 링크", craft: "바깥 링크 막대 + 드럼을 바깥 축에 풀칠(한 몸 회전). 안쪽 링크 두 갈래는 안쪽 축에 (드럼 양옆)", feas: "링크 2개의 구멍 간격(55 mm)이 같아야 평행사변형 — 두 막대를 겹쳐 함께 뚫기", level: 3 },
-  { t0: 58, t1: 64, title: "10. 커플러 + 손끝판 + 긴 손톱", craft: "L자 측판 2장 + 손끝판 → 링크 끝 핀 2개. 손톱(14 mm, 3겹)을 테이프 힌지 + 안쪽 스토퍼", feas: "⚠ 손끝판이 8 mm 뿐이고 손톱 14 mm 가 쥐는 면 — 손톱 3겹 + 고무줄 감기 권장", level: 3 },
+  { t0: 46, t1: 52, title: "8. 브래킷 + 축 (hard)", craft: "브래킷 4장: 위 탭을 접어 손바닥 아랫면에 평행하게 풀칠 + 삼각 보강. 축 빨대 2개 (구멍 지름은 시험편으로 결정)", feas: "두 브래킷 평행·구멍 정렬이 핵심. 축을 먼저 끼운 채로 풀칠하면 정렬이 맞음", level: 3 },
+  { t0: 52, t1: 58, title: "9. 평행 링크", craft: "드럼을 바깥 링크 막대 2개 사이에 끼워 면 풀칠 (토크는 골판지로, 빨대는 핀만). 안쪽 링크 막대 2개는 드럼 양옆 같은 평면", feas: "링크 2개의 구멍 간격(55 mm)이 같아야 평행사변형 — 두 막대를 겹쳐 함께 뚫기", level: 3 },
+  { t0: 58, t1: 64, title: "10. 커플러 + 손끝판 + 긴 손톱", craft: "L자 측판 2장 + 손끝판 → 링크 끝 핀 2개. 손톱(14 mm, 3겹)을 테이프 힌지 + 안쪽 스토퍼. 열림 스토퍼 탭 (54°)", feas: "⚠ 손끝판이 8 mm 뿐이고 손톱 14 mm 가 쥐는 면 — 손톱 3겹 + 고무줄 감기 권장", level: 3 },
   { t0: 64, t1: 70, title: "11. 실·텐던·고무줄", craft: "soft: 드럼 → 위로 → 균형막대. hard: 텐던 1가닥 루프(앞 드럼 → 손잡이/모터 → 뒤 드럼). 복원 고무줄", feas: "실 길이 맞추기·매듭이 의외로 시간 소모 (30분 이상)", level: 2 },
   { t0: 70, t1: 84, title: "12. 동작 — 건전지 (Rigid) · 감자칩 (Soft)", craft: "실 B 를 당기면 앞·뒤 손끝판이 수직을 유지한 채 닫힘 · 실 A 를 당기면 Fin Ray 가 감쌈 (직렬 고무줄 2.5 N/손가락 제한)", feas: "시뮬 결과 재생 (마찰·골판지 휨 미포함)", level: 1 },
   { t0: 84, t1: 94, title: "실현 가능한가?", craft: "", feas: "", level: 1 },
@@ -385,6 +386,7 @@ function setCaption(t: number) {
 
 // ------------------------------------------------------------------ 메인 렌더
 function render(t: number) {
+  blockGroup.visible = false;
   setCaption(t);
   const in2D = t >= T_PATTERN[0] && t < T_PATTERN[1];
   sheetBox.hidden = !in2D;
@@ -450,57 +452,362 @@ function resize() {
 new ResizeObserver(resize).observe(stage);
 resize();
 
-// 결정적 렌더 (캡처용)
-(window as unknown as { __render: (t: number) => void; __T: number }).__render = (t: number) => {
+// ================================================================== 블록별 조립
+interface BStep {
+  t0: number;
+  t1: number;
+  match: RegExp;
+  from: [number, number, number]; // 분해(exploded) 위치 오프셋
+  cap: string;
+}
+interface Block {
+  id: string;
+  title: string;
+  dur: number;
+  /** 이 블록에 속하는 최종 부품 */
+  parts: (p: Part) => boolean;
+  lines: RegExp | null;
+  steps: BStep[];
+  /** 동작 구간: [시작, 컨트롤 함수] */
+  act?: [number, (u: number) => { a: number; b: number; obj: "battery" | "chip" | null }];
+  feas: string;
+  custom?: (t: number, g: THREE.Group) => void;
+}
+const R_ = (s: string) => new RegExp(s);
+const isSoftR = (p: Part) => (p.body === "flapR" || /^(palm$|softStop1)/.test(p.id)) && !p.ghost;
+const isHardF = (p: Part) => (/^hardF/.test(p.body) || (p.body === "palm" && /\.F$/.test(p.id) && !/finray/.test(p.id)) || p.id === "palm") && !p.ghost;
+const BLOCKS: Block[] = [
+  {
+    id: "drum",
+    title: "A. 원형 드럼 만들기 (hard 드럼 r16 기준)",
+    dur: 10,
+    parts: () => false,
+    lines: null,
+    steps: [
+      { t0: 0, t1: 3, match: R_("x"), from: [0, 0, 0], cap: "원판 3장 (큰 r16 – 작은 r13 – 큰 r16) 을 잘라 중심에 송곳 구멍" },
+      { t0: 3, t1: 6, match: R_("x"), from: [0, 0, 0], cap: "빨대를 지그로 꽂아 중심 맞춰 풀칠 → 가운데 3 mm 홈" },
+      { t0: 6, t1: 10, match: R_("x"), from: [0, 0, 0], cap: "홈 바닥 테이프 1바퀴 → 큰판 가장자리 구멍에 실 매듭 → 홈에 1바퀴 감기" },
+    ],
+    feas: "원은 짧은 직선으로 끊어 자르고 다듬기. 지름 32 mm 정도는 커터칼로 충분",
+    custom: (t, g) => {
+      const R = 16;
+      const disk = (r: number, x: number, color: number) => {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 3, 40), new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
+        m.rotation.z = Math.PI / 2;
+        m.position.set(x, 0, 0);
+        g.add(m);
+      };
+      const u = ease(Math.min(1, Math.max(0, (t - 3) / 2.5)));
+      const xs = [-3, 0, 3].map((x0, i) => x0 + (1 - u) * (i - 1) * 30);
+      disk(R, xs[0], 0x9c7046);
+      disk(R - 3, xs[1], 0x8a6038);
+      disk(R, xs[2], 0x9c7046);
+      if (t >= 3) {
+        const st = new THREE.Mesh(cylGeo, mat("straw", false));
+        st.scale.set(6, 70, 6);
+        st.rotation.z = Math.PI / 2;
+        g.add(st);
+      }
+      if (t >= 6) {
+        // 홈 테이프 + 실 1바퀴 + 위로
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(R - 3 + 0.3, 0.6, 8, 48), new THREE.MeshStandardMaterial({ color: 0xdedede }));
+        ring.rotation.y = Math.PI / 2;
+        g.add(ring);
+        const w = ease(Math.min(1, (t - 6.5) / 2.5));
+        const pts: THREE.Vector3[] = [];
+        const turns = 1 * w;
+        for (let i = 0; i <= 60; i++) {
+          const a = -Math.PI / 2 + (turns * 2 * Math.PI * i) / 60;
+          pts.push(new THREE.Vector3(0, (R - 2) * Math.cos(a), (R - 2) * Math.sin(a)));
+        }
+        pts.push(new THREE.Vector3(0, -(R - 2), 40 * w));
+        const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.8, 6, false);
+        g.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x1b3a6b })));
+      }
+    },
+  },
+  {
+    id: "finray",
+    title: "B. Fin Ray 1개 접기",
+    dur: 9,
+    parts: (p) => /^finray\.F\.(c\d|b\d|rib\d|base)\.R$/.test(p.id),
+    lines: null,
+    steps: [
+      { t0: 0, t1: 4, match: R_("finray\\.F\\.(c|b)\\d|base"), from: [0, 0, -70], cap: "단면 골판지 띠: 접는 선 3곳에서 삼각형으로 접고 탭 풀칠 (contact flank 가 물체 쪽)" },
+      { t0: 4, t1: 7, match: R_("rib"), from: [0, -40, 20], cap: "빨대 리브 4개 (22/17/11/6 mm) 를 R2–R8 표시에, 양끝 테이프 힌지 (회전해야 Fin Ray 거동)" },
+      { t0: 7, t1: 9, match: R_("base"), from: [0, 0, 0], cap: "밑판을 붙여 완성 → 플랩 끝에 수직으로" },
+    ],
+    feas: "Fin Ray 4개 × 약 10분. 리브 테이프가 너무 단단하면 Fin Ray 가 안 휨",
+  },
+  {
+    id: "soft",
+    title: "C. Soft 플랩 모듈 (오른쪽)",
+    dur: 13,
+    parts: isSoftR,
+    lines: /^(stringA|returnA)\.R$/,
+    steps: [
+      { t0: 0, t1: 2.5, match: R_("^(palm|flap)"), from: [0, 0, -60], cap: "윗장(플랩 포함) + 아랫장(좌우 1.5 mm 좁게) 풀칠. 플랩은 score 선에서 접힘 = 힌지" },
+      { t0: 2.5, t1: 4, match: R_("softStop"), from: [0, 0, -50], cap: "닫힘 스토퍼 블록: 손바닥 아랫면 — 플랩이 −8° 에서 기댐" },
+      { t0: 4, t1: 5.5, match: R_("^drum"), from: [40, 0, 40], cap: "soft 드럼(r13, 3장) 을 플랩 바깥 힌지선에 세워 붙이고 삼각 보강 — 아래 절반은 손바닥 슬롯 통과" },
+      { t0: 5.5, t1: 7.5, match: R_("^finray"), from: [60, 0, -40], cap: "Fin Ray 2개를 플랩 끝에 밑판으로 고정 (contact flank 안쪽)" },
+      { t0: 7.5, t1: 8.5, match: R_("zzz"), from: [0, 0, 0], cap: "실 A: 드럼 매듭 → 1/2바퀴 → 안쪽 접선에서 위로 · 복원 고무줄: 플랩 ↔ 손바닥 구멍" },
+    ],
+    act: [8.5, (u) => ({ a: u < 0.5 ? u * 2 : 2 - u * 2, b: 0, obj: null })],
+    feas: "드럼 직각 접착이 약점 → 삼각 보강 2개",
+  },
+  {
+    id: "hard",
+    title: "D. Hard 손가락 (앞쪽) — 평행 링크",
+    dur: 17,
+    parts: isHardF,
+    lines: /^(returnB)\.F$/,
+    steps: [
+      { t0: 0, t1: 2.5, match: R_("^(palm$|bracket|gusset)"), from: [0, 0, -50], cap: "브래킷 2장: 탭을 접어 손바닥 아랫면에 평행하게 풀칠 + 삼각 보강" },
+      { t0: 2.5, t1: 3.5, match: R_("^axle"), from: [60, 0, 0], cap: "축 빨대 2개 (안쪽·바깥). 구멍은 시험편으로 고른 지름" },
+      { t0: 3.5, t1: 6, match: R_("^(linkOut|drum)"), from: [0, 0, -45], cap: "바깥 링크 막대 2개 사이에 드럼을 끼워 면 풀칠 → 토크는 골판지로, 빨대는 핀만" },
+      { t0: 6, t1: 7.5, match: R_("^linkIn"), from: [0, 30, -45], cap: "안쪽 링크 막대 2개 (드럼 양옆, 같은 평면). 바깥 막대와 겹쳐 함께 뚫어 구멍 간격 일치" },
+      { t0: 7.5, t1: 10.5, match: R_("^(coupler|pin|tipPlate|pad|nail)"), from: [0, -20, -60], cap: "커플러 측판 + 손끝판 + 핀 2개 → 평행사변형. 긴 손톱(3겹) 테이프 힌지 + 스토퍼" },
+      { t0: 10.5, t1: 11.5, match: R_("^stopTab"), from: [40, 0, 0], cap: "열림 스토퍼 탭 (브래킷 안쪽 면) + 복원 고무줄" },
+    ],
+    act: [11.5, (u) => ({ a: 0, b: u < 0.55 ? u / 0.55 : 1 - (u - 0.55) / 0.45, obj: "battery" })],
+    feas: "구멍 간격 ±1 mm 가 평행도를 좌우 — 손으로 돌려 손끝판이 수직인지 확인",
+  },
+  {
+    id: "strings",
+    title: "E. 실 연결 + 전체 동작",
+    dur: 14,
+    parts: (p) => !p.ghost,
+    lines: /./,
+    steps: [{ t0: 0, t1: 4, match: R_("zzz"), from: [0, 0, 0], cap: "실 A (파랑): 좌·우 드럼 → 균형막대 → 직렬 고무줄 → 손잡이 · 텐던(보라): 앞 드럼 → 손잡이/모터 → 뒤 드럼 (1가닥 루프)" }],
+    act: [4, (u) => ({ a: Math.min(1, u * 2), b: Math.max(0, Math.min(1, (u - 0.3) * 2)), obj: "battery" })],
+    feas: "실 길이 맞추기는 매듭 대신 테이프 임시 고정 → 전 범위 동작 확인 후 매듭",
+  },
+];
+let mode: "full" | "blocks" = "full";
+let blockIdx = 0;
+const blockGroup = new THREE.Group();
+scene.add(blockGroup);
+const blockAnchor = (() => {
+  const m = new Map<string, THREE.Vector3>();
+  for (const b of BLOCKS) {
+    const ps = finalAsm.parts.filter(b.parts);
+    const c = new THREE.Vector3();
+    for (const p of ps) c.add(decompose(p.m as unknown as THREE.Matrix4).p);
+    m.set(b.id, ps.length ? c.multiplyScalar(1 / ps.length) : new THREE.Vector3());
+  }
+  return m;
+})();
+function renderBlock(t: number) {
+  const b = BLOCKS[blockIdx];
+  blockGroup.clear();
+  const st = [...b.steps].reverse().find((s) => t >= s.t0) ?? b.steps[0];
+  const inAct = b.act && t >= b.act[0];
+  capTitle.textContent = b.title;
+  capCraft.textContent = inAct ? "동작 확인 (시뮬 재생)" : st.cap;
+  capFeas.textContent = b.feas;
+  capFeas.hidden = false;
+  capLevel.textContent = "";
+  cap.hidden = false;
+  endCard.hidden = true;
+  sheetBox.hidden = true;
+  timeEl.textContent = `${t.toFixed(1)} / ${b.dur} s`;
+  group.visible = false;
+  liveGroup.visible = false;
+  lineGroup.visible = false;
+  matMesh.visible = false;
+  blockGroup.visible = true;
+  // 카메라
+  const anc = blockAnchor.get(b.id)!;
+  const dist = b.id === "drum" ? 110 : b.id === "finray" ? 190 : b.id === "strings" ? 420 : 260;
+  const az = b.id === "hard" ? 0.9 : b.id === "soft" ? -0.25 : -0.6;
+  const target = b.id === "drum" ? new THREE.Vector3() : anc.clone();
+  camera.clearViewOffset();
+  const r0 = stage.getBoundingClientRect();
+  camera.setViewOffset(r0.width, r0.height, -r0.width * 0.16, 0, r0.width, r0.height);
+  camera.position.set(target.x + Math.sin(az) * dist, target.y - Math.cos(az) * dist, target.z + dist * 0.35);
+  camera.lookAt(target);
+  if (b.custom) {
+    blockGroup.position.set(0, 0, 0);
+    b.custom(t, blockGroup);
+    renderer.render(scene, camera);
+    return;
+  }
+  let asm = finalAsm;
+  if (inAct) {
+    const u = Math.min(1, (t - b.act![0]) / (b.dur - b.act![0]));
+    const c = b.act![1](u);
+    const base = c.obj ? design.preset("rigid", c.obj) : design.preset("open", null);
+    asm = design.build({ ...base, a: b.id === "hard" ? 0 : c.a * base.a + (b.id === "soft" ? c.a * (1 - base.a) : 0), b: c.b, obj: c.obj, palmH: c.obj ? base.palmH : finalAsm.floorZ * -1 });
+  }
+  const finSteps = b.id === "finray";
+  for (const p of asm.parts) {
+    if (!b.parts(p)) continue;
+    const id = p.id.replace(/\.(R|L|F|B)$/, "");
+    let m = (p.m as unknown as THREE.Matrix4).clone();
+    if (!inAct) {
+      const s = b.steps.find((x) => x.match.test(id));
+      if (finSteps && /^finray/.test(p.id) && !/rib|base/.test(p.id)) {
+        // 띠: 평평한 매트 위 → 접힌 삼각형 (최종 위치 근처)
+        const s0 = finStart.get(p.id);
+        const fin = m.clone();
+        const flat = s0 ? s0.clone().premultiply(new THREE.Matrix4().makeTranslation(anc.x + 250, anc.y + 110, anc.z - MAT_Z - 40)) : fin;
+        const u = ease((t - 0) / 3.5);
+        m = blend(flat, fin, u, 20);
+      } else if (s) {
+        if (t < s.t0) continue;
+        const u = ease((t - s.t0) / Math.max(0.5, s.t1 - s.t0 - 0.3));
+        const from = m.clone().premultiply(new THREE.Matrix4().makeTranslation(...s.from));
+        m = blend(from, m, u, 0);
+      }
+    }
+    const active = !inAct && b.steps.some((x) => x.match.test(id) && t >= x.t0 && t < x.t1);
+    const mesh = new THREE.Mesh(isCyl(p) ? cylGeo : boxGeo, mat(p.kind, false, active));
+    mesh.matrixAutoUpdate = false;
+    mesh.matrix.copy(m).multiply(localScale(p));
+    blockGroup.add(mesh);
+  }
+  // 실
+  if (b.lines) {
+    const lastStep = b.steps[b.steps.length - 1];
+    const frac = inAct ? 1 : ease((t - lastStep.t0) / Math.max(0.5, lastStep.t1 - lastStep.t0));
+    if (frac > 0 && (inAct || t >= lastStep.t0)) {
+      const sub = { ...asm, lines: asm.lines.filter((l) => b.lines!.test(l.id)) };
+      drawLines(sub as Assembly, frac);
+      lineGroup.visible = true;
+    }
+  }
+  if (inAct && asm.object) {
+    const o = asm.object;
+    const s = o.shape;
+    if (s.kind === "cyl") {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(s.r, s.r, s.len, 28), objMat(0x6d7b8d));
+      if (s.axis === "x") mesh.rotation.z = Math.PI / 2;
+      mesh.position.copy(s.c as unknown as THREE.Vector3);
+      blockGroup.add(mesh);
+    }
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(400, 300), new THREE.MeshStandardMaterial({ color: 0x2f6b5b, roughness: 1 }));
+    fl.position.set(0, 0, asm.floorZ - 0.05);
+    blockGroup.add(fl);
+  }
+  renderer.render(scene, camera);
+}
+
+// 결정적 렌더 (캡처용): mode=full 이면 전체, blocks 면 ?block=id
+(window as unknown as { __render: (t: number) => void; __T: number; __setBlock: (id: string) => number }).__render = (t: number) => {
   resize();
-  render(t);
+  if (mode === "blocks") renderBlock(t);
+  else render(t);
 };
 (window as unknown as { __T: number }).__T = T_END;
+(window as unknown as { __setBlock: (id: string) => number }).__setBlock = (id: string) => {
+  mode = "blocks";
+  blockIdx = Math.max(0, BLOCKS.findIndex((b) => b.id === id));
+  return BLOCKS[blockIdx].dur;
+};
 
-// 재생 UI
+// ------------------------------------------------------------------ 탭 + 재생 UI
 const scrub = document.getElementById("scrub") as HTMLInputElement;
 const playBtn = document.getElementById("play") as HTMLButtonElement;
-scrub.max = String(T_END);
 let playing = !new URLSearchParams(location.search).has("capture");
 let t = 0;
 let last = performance.now();
+const durNow = () => (mode === "blocks" ? BLOCKS[blockIdx].dur : T_END);
+const draw = () => (mode === "blocks" ? renderBlock(t) : render(t));
 playBtn.onclick = () => {
   playing = !playing;
   playBtn.textContent = playing ? "일시정지" : "재생";
-  if (t >= T_END) t = 0;
+  if (t >= durNow()) t = 0;
 };
 playBtn.textContent = playing ? "일시정지" : "재생";
 scrub.oninput = () => {
   t = +scrub.value;
-  render(t);
+  draw();
 };
 const chapters = document.getElementById("chapters")!;
-for (const s of STEPS.slice(1)) {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = s.title.split(" ")[0].replace(".", "") || "끝";
-  b.title = s.title;
-  b.onclick = () => {
-    t = s.t0 + 0.01;
-    render(t);
-  };
-  chapters.append(b);
+function buildChapters() {
+  chapters.innerHTML = "";
+  if (mode === "full") {
+    for (const s of STEPS.slice(1)) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = s.title.split(" ")[0].replace(".", "") || "끝";
+      b.title = s.title;
+      b.onclick = () => {
+        t = s.t0 + 0.01;
+        draw();
+      };
+      chapters.append(b);
+    }
+  } else {
+    BLOCKS.forEach((bl, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = bl.title.split(" (")[0];
+      b.setAttribute("aria-pressed", String(i === blockIdx));
+      b.onclick = () => {
+        blockIdx = i;
+        t = 0;
+        playing = true;
+        playBtn.textContent = "일시정지";
+        buildChapters();
+        scrub.max = String(durNow());
+        draw();
+      };
+      chapters.append(b);
+    });
+  }
 }
+// 탭 (hash): full / blocks / sections / patterns
+const TABS = ["full", "blocks", "sections", "patterns"];
+const playerBox = document.getElementById("player")!;
+function route() {
+  const hsh = location.hash.slice(1);
+  const tab = TABS.includes(hsh) ? hsh : "full";
+  for (const a of document.querySelectorAll<HTMLAnchorElement>("nav.tabs a")) {
+    if (a.dataset.tab === tab) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  }
+  playerBox.hidden = !(tab === "full" || tab === "blocks");
+  document.getElementById("page-sections")!.hidden = tab !== "sections";
+  document.getElementById("page-patterns")!.hidden = tab !== "patterns";
+  if (tab === "full" || tab === "blocks") {
+    const newMode = tab as "full" | "blocks";
+    if (newMode !== mode) {
+      mode = newMode;
+      t = 0;
+      playing = true;
+      playBtn.textContent = "일시정지";
+    }
+    group.visible = mode === "full";
+    blockGroup.visible = mode === "blocks";
+    scrub.max = String(durNow());
+    buildChapters();
+    resize();
+    draw();
+  }
+}
+window.addEventListener("hashchange", route);
+// 단면도 + 전개도 페이지 채우기
+document.getElementById("sections")!.innerHTML = DIAGRAMS()
+  .map((d) => `<figure class="fig"><figcaption>${d.title}</figcaption>${d.svg}</figure>`)
+  .join("");
+document.getElementById("patternSheets")!.innerHTML = sheets.map((s) => `<div class="pg">${s}</div>`).join("");
+document.getElementById("patternBom")!.innerHTML = `<p><b>재료·실 경로</b></p><ul>${pattern.cutList.map((c) => `<li>${c}</li>`).join("")}</ul><p><b>조립 순서</b></p><ol>${pattern.steps.map((c) => `<li>${c}</li>`).join("")}</ol>`;
+
 function loop(now: number) {
   const dt = (now - last) / 1000;
   last = now;
-  if (playing) {
-    t = Math.min(T_END, t + dt);
+  if (playing && !playerBox.hidden) {
+    t = Math.min(durNow(), t + dt);
     scrub.value = String(t);
-    render(t);
-    if (t >= T_END) {
+    draw();
+    if (t >= durNow()) {
       playing = false;
       playBtn.textContent = "재생";
     }
   }
   requestAnimationFrame(loop);
 }
-render(0);
+route();
 document.body.dataset.ready = "1";
-if (playing) requestAnimationFrame(loop);
-else requestAnimationFrame(loop);
+requestAnimationFrame(loop);

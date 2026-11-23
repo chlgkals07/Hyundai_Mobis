@@ -713,11 +713,15 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
   const W = h.width - 2;
   const plateBody = comp?.type === "tip" ? "hard_t" : "hard_c";
   const brBody = comp?.type === "float" ? "hard_br" : "palm";
-  // 안쪽 링크는 두 갈래(x=±fx)로 나눠 가운데의 바깥 피벗 드럼(두께 9)을 비켜 감 — 열릴 때 d·cosψ < r 이라 일체형이면 드럼과 부딪힘
-  const forkW = (W - 11) / 2;
-  const fxo = 5.5 + forkW / 2;
-  for (const sx of [1, -1]) R.push(segPart(`linkIn${sx}`, "hard_l2", "board", g.P1.clone().setX(sx * fxo), g.E1.clone().setX(sx * fxo), forkW, linkT, X));
-  R.push(segPart("linkOut", "hard", "board", g.P2, g.E2, W, linkT, X));
+  // 링크 막대 = y–z 평면 판 (x 두께 barT, 운동 평면 안 높이 barH). 앞·뒤(안쪽/바깥) 링크는 같은 x 평면(±7.5)을 쓰고
+  // 수직 거리 d·cosψ ≥ barH+2 로 분리(SymPy H7). 드럼(±4.5)은 바깥 링크 막대 두 장 사이에 끼워 면 접착 → 빨대는 핀만.
+  const barT = linkT;
+  const barH = (h as { link_bar_h?: number }).link_bar_h ?? 12;
+  const bxl = 4.5 + barT / 2;
+  for (const sx of [1, -1]) {
+    R.push(segPart(`linkIn${sx}`, "hard_l2", "board", g.P1.clone().setX(sx * bxl), g.E1.clone().setX(sx * bxl), barT, barH, X));
+    R.push(segPart(`linkOut${sx}`, "hard", "board", g.P2.clone().setX(sx * bxl), g.E2.clone().setX(sx * bxl), barT, barH, X));
+  }
   R.push(cylPart("drum", "hard", "disk", g.P2.clone(), X, 9, h.drum_r * 2));
   R.push(segPart("couplerBar", "hard_c", "board", g.E1.clone().add(V(0, -halfT, 0)), g.E2.clone().add(V(0, 4, 0)), h.width, 2 * halfT, X));
   for (const [n, e] of [["pinIn", g.E1], ["pinOut", g.E2]] as const) R.push(cylPart(n, "hard_c", "straw", e.clone(), X, h.width + 6, C.straw_d));
@@ -742,6 +746,13 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
   for (const sx of [1, -1]) R.push(boxPart(`bracket${sx}`, brBody, "board", [3, h.d + 12, brH], V(sx * bx, yp + h.d / 2, -brH / 2 + lift)));
   R.push(cylPart("axleIn", brBody, "straw", g.P1.clone(), X, h.width + 8, C.straw_d));
   R.push(cylPart("axleOut", brBody, "straw", g.P2.clone(), X, h.width + 8, C.straw_d));
+  // 열림 스토퍼 탭 (브래킷 안쪽 면 → 링크 막대 평면까지 돌출): ψ_open 에서 바깥 링크 윗면이 기댐 (SymPy H11 접촉점)
+  const pso = h.psi_open_deg * DEG;
+  const tabC = V(0, num(d, "hard_stop_tab_y") + 3.2 * Math.cos(pso), num(d, "hard_stop_tab_z") + lift + 3.2 * Math.sin(pso));
+  const bIn = h.width / 2 + 1;
+  for (const sx of [1, -1]) R.push(boxPart(`stopTab${sx}`, brBody, "board", [bIn - (bxl + barT / 2 - 1.5), 6, 6], tabC.clone().setX(sx * ((bIn + bxl + barT / 2 - 1.5) / 2))));
+  // 브래킷 삼각 보강 (바깥 면, 안쪽 끝): 쥐는 힘 × 약 100 mm 레버가 브래킷 접착면에 거는 모멘트 대비
+  if (comp?.type !== "float") for (const sx of [1, -1]) R.push(boxPart(`gusset${sx}`, brBody, "board", [3, 10, 10], V(sx * (bx + 3), yp - 1, -5)));
   if (comp?.type === "float") {
     // 텔레스코프 2쌍은 손바닥 '위'(y=yp+2): 굵은 빨대 슬리브(손바닥 윗면 고정) ↔ 일반 빨대(브래킷 위끝에서 손바닥 구멍 통과).
     // (손바닥 아래 브래킷 옆에 두었더니 Fin Ray 와 간섭 → 위로 옮김). 브래킷 윗부분은 손바닥 슬롯을 지나 함께 올라감.
@@ -871,6 +882,11 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
         sdf,
       );
       const hard = hardParallel(p, d, ctrl.b, obj ? obj.sdf : () => 1e9, floorZ);
+      // soft 닫힘 스토퍼 블록 (손바닥 아랫면, 플랩 안쪽): 플랩이 φ_min 에서 블록 아래 바깥 모서리에 닿음
+      const sp = p.soft as typeof p.soft & { stop_block_h?: number };
+      const hb = sp.stop_block_h ?? 8;
+      const fx0 = num(d, "soft_stop_face_x");
+      for (const sx of [1, -1]) soft.parts.push(boxPart(`softStop${sx}`, "palm", "board", [6, 20, hb], V(sx * (fx0 - 3), -10, -hb / 2)));
       return assemble({ id, oneString: false }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, []);
     },
   };
