@@ -11,7 +11,7 @@ import B5c from "../../calc/out/B5.json";
 import B5Tc from "../../calc/out/B5T.json";
 import B5Fc from "../../calc/out/B5F.json";
 import B5Nc from "../../calc/out/B5N.json";
-import viewerData from "../../out/viewer-data.json";
+import viewerData from "../../data/viewer-data.json";
 import { renderCompare, renderPatterns } from "./pages";
 
 interface CalcOut { checks: { id: string; desc: string; value: number; unit: string; pass: boolean }[] }

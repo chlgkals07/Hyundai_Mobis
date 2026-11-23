@@ -184,7 +184,7 @@ const md = [
 ].join("\n");
 writeFileSync("docs/COMPARISON.md", md);
 mkdirSync("out", { recursive: true });
-const vdPath = "out/viewer-data.json";
+const vdPath = "data/viewer-data.json";
 const vd = existsSync(vdPath) ? JSON.parse(readFileSync(vdPath, "utf8")) : { patterns: [] };
 Object.assign(vd, { generated: new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC", criteria, rows, recommendation });
 writeFileSync(vdPath, JSON.stringify(vd));

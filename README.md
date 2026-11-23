@@ -59,6 +59,7 @@ src/viewer/        HTML 페이지 (vanilla three.js r128 + IIFE 번들)
   assembly.ts/assembly.html  조립 과정 (STEPS 전체 / BLOCKS 블록별)
   arm.ts/arm.html            팔 결합
 scripts/           test · approach · score · patterns · diagrams · arm-check · build-viewer · record-assembly · shots
+data/viewer-data.json   비교표·전개도 데이터 (score.ts / patterns.ts 가 갱신, 뷰어가 import)
 patterns/<ID>/     현재 후보 전개도 (SVG, PDF, README 부품표) · patterns/old/ 보관안
 docs/              ARM-HANDOFF.md · DESIGN.md · COMPARISON.md · arm-check.md · diagrams/ · shots/ · site/ · 영상
 CLAUDE.md          설계 결정·발견·수정 이력 (작업 규칙 포함)

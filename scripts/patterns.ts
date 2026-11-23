@@ -192,7 +192,7 @@ await browser.close();
 
 // 뷰어 데이터에 전개도 병합
 mkdirSync("out", { recursive: true });
-const vdPath = "out/viewer-data.json";
+const vdPath = "data/viewer-data.json";
 const vd = existsSync(vdPath) ? JSON.parse(readFileSync(vdPath, "utf8")) : { generated: "", criteria: [], rows: [], recommendation: [] };
 vd.patterns = viewerPatterns;
 writeFileSync(vdPath, JSON.stringify(vd));

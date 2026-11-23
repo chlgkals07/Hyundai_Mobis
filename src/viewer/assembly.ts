@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { ALL } from "../core/designs";
 import { PATTERNS } from "../core/pattern";
 import type { Assembly, Part } from "../core/types";
-import viewerData from "../../out/viewer-data.json";
+import viewerData from "../../data/viewer-data.json";
 import { DIAGRAMS } from "../core/diagrams";
 
 const DESIGN_ID = "B5N";

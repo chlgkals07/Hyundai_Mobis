@@ -4,7 +4,7 @@ import { build } from "vite";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 
 mkdirSync("out", { recursive: true });
-if (!existsSync("out/viewer-data.json")) writeFileSync("out/viewer-data.json", JSON.stringify({ generated: "", criteria: [], rows: [], recommendation: [], patterns: [] }));
+if (!existsSync("data/viewer-data.json")) writeFileSync("data/viewer-data.json", JSON.stringify({ generated: "", criteria: [], rows: [], recommendation: [], patterns: [] }));
 
 async function bundle(entry, name) {
   await build({
