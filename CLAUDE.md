@@ -4,6 +4,9 @@
 설계 결정 요약: `docs/DESIGN.md` · 비교: `docs/COMPARISON.md` · SymPy 리포트: `calc/REPORT.md`
 뷰어(Artifact, 비공개): https://claude.ai/artifact/Qb8EG5pCeWV9fuD3PxMnuT
 
+> **⚠ 이 레포의 최종본은 '영상 과제용' 설계다 (하민, 2026-11-23).** 손 구동·골판지, 영상 물체(건전지·케이블·스펀지·뚜껑·칩)만 들면 된다.
+> 본선 그리퍼 힘은 고려하지 않는다. 힘은 키우지 말 것: hard pinch 1–2 N(하한 0.85 N), soft ≤ 0.5 N/손가락. 근거는 `docs/FINAL-CHANGES.md` §1.
+
 ## 작업 규칙 (하민 선호)
 - 수치 계산(기하·힘·각도·간섭)은 `calc/`에서 SymPy로 검증 후 제시
 - 치수 단일 소스: `params/*.json` (Python calc + TS core 공용). calc 결과 `calc/out/*.json` 을 TS 가 import
