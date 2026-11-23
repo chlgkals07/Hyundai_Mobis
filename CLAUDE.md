@@ -18,6 +18,7 @@ npx tsx scripts/score.ts         # 채점 → docs/COMPARISON.md + out/viewer-da
 npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개도-A4.pdf, README.md
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
+node scripts/record-assembly.mjs # B5N 조립 애니메이션 → docs/B5N-조립과정.mp4 (프레임 캡처 + ffmpeg)
 ```
 params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/patterns → build).
 
@@ -32,6 +33,7 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 - `src/core/collide.ts` OBB SAT 부품 간섭 + 바닥/물체 관통 + 실 걸림
 - `src/core/pattern.ts` 전개도 부품 (params/calc 에서 생성)
 - `src/viewer/` three.js r128(cdnjs UMD) + IIFE 번들. R3F 는 Artifact CDN 규칙 때문에 쓰지 않음
+- `src/viewer/assembly.ts` 조립 과정 애니메이션 (전개도 자르기 → 부품 → 12단계 조립 → 동작 → 실현성), Artifact: https://claude.ai/artifact/VBuZDZwSdEKW868aH6jNfw
 
 ## 시뮬에서 발견해 반영한 것
 - 건전지 pinch 는 '면 y = r' 가 아니라 '쥐는 면이 원통에 접하면서 손톱 끝이 바닥' (접선 조건)
