@@ -5,6 +5,8 @@
 
 현재 기준안: **B5N** (평행 링크 hard + 14 mm 접히는 손톱). 팔 결합은 [`docs/ARM-HANDOFF.md`](docs/ARM-HANDOFF.md).
 
+실로 구동하는 전체 팔의 [R4 × B5N 시연·제작 자료](arm/R4-B5N/README.md)도 볼 수 있다.
+
 ## 바로 보기 (빌드 결과, 브라우저로 열기)
 | 파일 | 내용 |
 |---|---|
