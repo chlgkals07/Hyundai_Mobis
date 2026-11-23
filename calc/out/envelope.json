@@ -1,0 +1,93 @@
+{
+  "soft_open_table": [
+    {
+      "phi_open_deg": 90,
+      "half_width_x": 131.0,
+      "top_above_palm_z": 28.0,
+      "soft_pull_mm": 22.2
+    },
+    {
+      "phi_open_deg": 60,
+      "half_width_x": 117.5,
+      "top_above_palm_z": 16.2,
+      "soft_pull_mm": 15.4
+    },
+    {
+      "phi_open_deg": 45,
+      "half_width_x": 101.4,
+      "top_above_palm_z": 8.5,
+      "soft_pull_mm": 12.0
+    },
+    {
+      "phi_open_deg": 30,
+      "half_width_x": 80.5,
+      "top_above_palm_z": 0.1,
+      "soft_pull_mm": 8.6
+    },
+    {
+      "phi_open_deg": 20,
+      "half_width_x": 64.5,
+      "top_above_palm_z": -5.5,
+      "soft_pull_mm": 6.3
+    }
+  ],
+  "soft_open_needed_deg": {
+    "chip": 2.8,
+    "sponge_70": 8.5,
+    "kitchen_sponge_110": 20.3
+  },
+  "hard_half_width_y_open": 88.0,
+  "hard_drum_outer_y": 53.5,
+  "below_palm_rigid_z": -101.4,
+  "mount_free_rect": {
+    "x_half": 13.0,
+    "y_half": 17.5,
+    "note": "가운데 영역. 텐던 루프는 y=±21.5 로 올라옴 → 장착 기둥 안을 빨대로 통과시키거나 기둥 양옆"
+  },
+  "tendon_holes_y": 21.5,
+  "stringA_x": 17.0,
+  "capstan": [
+    {
+      "bend_deg": 90,
+      "mu": 0.2,
+      "tension_ratio": 1.37
+    },
+    {
+      "bend_deg": 90,
+      "mu": 0.3,
+      "tension_ratio": 1.6
+    },
+    {
+      "bend_deg": 180,
+      "mu": 0.2,
+      "tension_ratio": 1.87
+    },
+    {
+      "bend_deg": 180,
+      "mu": 0.3,
+      "tension_ratio": 2.57
+    },
+    {
+      "bend_deg": 270,
+      "mu": 0.2,
+      "tension_ratio": 2.57
+    },
+    {
+      "bend_deg": 270,
+      "mu": 0.3,
+      "tension_ratio": 4.11
+    },
+    {
+      "bend_deg": 360,
+      "mu": 0.2,
+      "tension_ratio": 3.51
+    },
+    {
+      "bend_deg": 360,
+      "mu": 0.3,
+      "tension_ratio": 6.59
+    }
+  ],
+  "hard_T_N": 27.5,
+  "soft_T_N": 38.8462
+}

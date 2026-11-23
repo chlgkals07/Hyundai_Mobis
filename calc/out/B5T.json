@@ -1,0 +1,232 @@
+{
+  "id": "B5T",
+  "name": "B5T 손끝판 관절 — 평행 링크 + 바닥 쪽으로만 꺾이는 손끝판",
+  "derived": {
+    "soft_hinge_x": 30.0,
+    "soft_reach": 101.0,
+    "soft_phi_min_deg": -7.9676,
+    "soft_x_min": 16.0,
+    "soft_phi_battery_deg": -2.8376,
+    "soft_phi_chip_deg": -2.8376,
+    "soft_phi_sponge_deg": 2.8376,
+    "soft_open_half_width": 131.0,
+    "soft_pull_mm": 22.2282,
+    "soft_string_T_at_limit_N": 38.8462,
+    "hard_pivot_y": 13.5,
+    "hard_coupler_below_E": 26.3762,
+    "rigid_palm_height": 101.3762,
+    "rigid_finray_tip_above_floor": 6.5,
+    "hard_psi_cable_deg": -4.6931,
+    "hard_tip_rise_cable_mm": 0.1844,
+    "hard_psi_cap_deg": 8.3636,
+    "hard_tip_rise_cap_mm": 0.5849,
+    "hard_psi_min_deg": -7.312,
+    "soft_mode_hard_above_finray": 16.1718,
+    "hard_opening_mm": 102.9919,
+    "soft_edge_interference_mm": 0.8398,
+    "soft_stop_face_x": 28.0405,
+    "hard_stop_tab_y": 43.3084,
+    "hard_stop_tab_z": -20.5119,
+    "hard_outer_bar_inner_gap": 10.0,
+    "hard_string_T_N": 27.5,
+    "hard_pull_mm": 17.1215,
+    "hard_face_wedge_deg": 0.0,
+    "tip_theta_for_10mm_deg": 46.2526,
+    "tip_inward_shift_at_10mm": 14.4149,
+    "vertical_compliance_mm": 11.2616,
+    "tip_preload_Nmm": 13.5,
+    "tip_rubber_k_Nmm_per_rad": 16.7232
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음)",
+      "value": -2.838,
+      "unit": "deg",
+      "lo": -7.968,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 폭이 개방 범위 안",
+      "value": 2.838,
+      "unit": "deg",
+      "lo": null,
+      "hi": 90.0,
+      "pass": true
+    },
+    {
+      "id": "S3",
+      "desc": "칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N)",
+      "value": 38.846,
+      "unit": "N",
+      "lo": null,
+      "hi": 40.0,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 6.5,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "desc": "케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽",
+      "value": -4.693,
+      "unit": "deg",
+      "lo": -7.312,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H4",
+      "desc": "케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm)",
+      "value": 0.184,
+      "unit": "mm",
+      "lo": null,
+      "hi": 2.5,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위",
+      "value": 16.172,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H5",
+      "desc": "바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4)",
+      "value": 16.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 20.0,
+      "pass": true
+    },
+    {
+      "id": "H5b",
+      "desc": "앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3)",
+      "value": 43.0,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H6",
+      "desc": "드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2)",
+      "value": 20.0,
+      "unit": "mm",
+      "lo": 18.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H7",
+      "desc": "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 막대 높이 + 2",
+      "value": 14.107,
+      "unit": "mm",
+      "lo": 14.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H9",
+      "desc": "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
+      "value": 12.0,
+      "unit": "mm",
+      "lo": 12.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H10",
+      "desc": "soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1",
+      "value": 17.0,
+      "unit": "mm",
+      "lo": 17.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S5",
+      "desc": "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| (플랩이 −8° 까지 닫힐 공간)",
+      "value": 1.5,
+      "unit": "mm",
+      "lo": 0.84,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H11",
+      "desc": "열림 스토퍼 접촉점이 브래킷 안 (y ≤ 바깥 피벗 + 6)",
+      "value": 43.308,
+      "unit": "mm",
+      "lo": null,
+      "hi": 45.0,
+      "pass": true
+    },
+    {
+      "id": "H12",
+      "desc": "링크 막대 바깥 면(4.5+막대두께) + 1 ≤ 브래킷 안쪽 면 (w/2+1)",
+      "value": 11.5,
+      "unit": "mm",
+      "lo": null,
+      "hi": 13.0,
+      "pass": true
+    },
+    {
+      "id": "H8",
+      "desc": "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)",
+      "value": 43.5,
+      "unit": "mm",
+      "lo": null,
+      "hi": 44.0,
+      "pass": true
+    },
+    {
+      "id": "H1",
+      "desc": "pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각)",
+      "value": 27.5,
+      "unit": "N",
+      "lo": null,
+      "hi": 45.0,
+      "pass": true
+    },
+    {
+      "id": "C1",
+      "desc": "바닥 힘과 pinch 반력이 손끝판을 반대로 돌림 (M_floor·M_pinch < 0 → pinch 는 스토퍼, 바닥은 꺾임)",
+      "value": -49.221,
+      "unit": "",
+      "lo": null,
+      "hi": -0.0,
+      "pass": true
+    },
+    {
+      "id": "C2",
+      "desc": "10 mm 상승에 필요한 손끝판 꺾임각 ≤ θ_max",
+      "value": 46.253,
+      "unit": "deg",
+      "lo": null,
+      "hi": 50.0,
+      "pass": true
+    },
+    {
+      "id": "C3",
+      "desc": "10 mm 순응 시 손끝 안쪽 이동 ≤ 2 mm (물체 쪽으로 파고들지 않음)",
+      "value": 14.415,
+      "unit": "mm",
+      "lo": null,
+      "hi": 2.0,
+      "pass": false
+    }
+  ],
+  "pass": false
+}

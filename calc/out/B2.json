@@ -1,0 +1,93 @@
+{
+  "id": "B2",
+  "name": "B2 직선 — 슬롯 가이드(빨대 핀) 캐리지",
+  "derived": {
+    "soft_x_min": 18.0,
+    "soft_reach": 105.0,
+    "soft_pull_mm": 27.0,
+    "soft_string_T_at_limit_N": 5.0,
+    "rigid_palm_height": 109.4545,
+    "hard_drop_battery": 16.4545,
+    "rigid_finray_tip_above_floor": 4.4545,
+    "soft_mode_hard_above_finray": 12.0,
+    "hard_reach_open_feasible": "[91.5, 95.0]",
+    "hard_pull_mm": 38.1051,
+    "hard_string_T_N": 9.2376,
+    "hard_face_wedge_deg": 0.0
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝(25) ≥ 스토퍼 x_min",
+      "value": 25.0,
+      "unit": "mm",
+      "lo": 18.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 반폭 ≤ 개방 x_open",
+      "value": 35.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 45.0,
+      "pass": true
+    },
+    {
+      "id": "S3",
+      "desc": "칩 한계력에서 실 A 장력 ≤ 40 N (마찰 제외)",
+      "value": 5.0,
+      "unit": "N",
+      "lo": null,
+      "hi": 40.0,
+      "pass": true
+    },
+    {
+      "id": "S4",
+      "desc": "soft 슬롯(핀 u+10) + 여유 3 이 손바닥 반폭 안",
+      "value": 58.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 60.0,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 4.454,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 열린 hard 손끝이 Fin Ray 끝보다 위 (≥ margin_soft)",
+      "value": 12.0,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "desc": "hard 슬롯 경로가 손바닥 반깊이 안",
+      "value": 51.5,
+      "unit": "mm",
+      "lo": null,
+      "hi": 52.0,
+      "pass": true
+    },
+    {
+      "id": "H1",
+      "desc": "pinch 8 N 에서 실 B 장력 ≤ 40 N (마찰 제외)",
+      "value": 9.238,
+      "unit": "N",
+      "lo": null,
+      "hi": 40.0,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

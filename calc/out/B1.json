@@ -1,0 +1,95 @@
+{
+  "id": "B1",
+  "name": "B1 회전 — 플랩(score 힌지) + 단일 피벗",
+  "derived": {
+    "soft_hinge_x": 30.0,
+    "soft_reach": 101.0,
+    "soft_phi_min_deg": -6.8235,
+    "soft_x_min": 18.0,
+    "soft_phi_battery_deg": -2.8376,
+    "soft_phi_chip_deg": -2.8376,
+    "soft_phi_sponge_deg": 2.8376,
+    "soft_open_half_width": 131.0,
+    "soft_pull_mm": 25.3483,
+    "soft_string_T_at_limit_N": 33.6667,
+    "hard_psi_battery_deg": -16.8773,
+    "hard_psi_cable_deg": -18.6639,
+    "hard_psi_min_deg": -20.0477,
+    "hard_face_wedge_deg": 16.8773,
+    "hard_psi_cable_tangent_deg": -18.6656,
+    "rigid_palm_height_cable": 100.1091,
+    "rigid_palm_height": 101.176,
+    "rigid_finray_tip_above_floor": 6.2999,
+    "soft_mode_hard_above_finray": 15.0792,
+    "hard_psi_open_min_deg": 35.7676,
+    "hard_pull_mm": 26.2007,
+    "hard_string_T_N": 35.84,
+    "plan_hard_half_width": 14.0
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음)",
+      "value": -2.838,
+      "unit": "deg",
+      "lo": -6.824,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 폭이 개방 범위 안",
+      "value": 2.838,
+      "unit": "deg",
+      "lo": null,
+      "hi": 90.0,
+      "pass": true
+    },
+    {
+      "id": "S3",
+      "desc": "칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N)",
+      "value": 33.667,
+      "unit": "N",
+      "lo": null,
+      "hi": 40.0,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 6.3,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 열린 hard 손끝이 Fin Ray 끝보다 위 (≥ margin_soft)",
+      "value": 15.079,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H1",
+      "desc": "pinch 8 N 에서 실 B 장력 ≤ 40 N",
+      "value": 35.84,
+      "unit": "N",
+      "lo": null,
+      "hi": 40.0,
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "desc": "케이블(Ø5) 각이 손끝 맞닿음 각보다 열린 쪽 (케이블 쥘 수 있음)",
+      "value": -18.664,
+      "unit": "deg",
+      "lo": -20.048,
+      "hi": null,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

@@ -1,0 +1,95 @@
+{
+  "id": "B4",
+  "name": "B4 하이브리드 — 슬롯 캐리지 soft + 텐던 hard",
+  "derived": {
+    "soft_x_min": 18.0,
+    "soft_reach": 97.0,
+    "soft_string_T_at_limit_N": 5.0,
+    "soft_pull_mm": 27.0,
+    "hard_theta1_pinch_deg": -9.2962,
+    "hard_theta2_pinch_deg": -20.7038,
+    "tendon_path_ratio": 0.42,
+    "tendon_k2_over_k1": 1.9048,
+    "rigid_palm_height": 101.4476,
+    "rigid_finray_tip_above_floor": 4.4476,
+    "soft_mode_hard_above_finray": 14.9049,
+    "hard_pull_mm": 11.4946,
+    "hard_string_T_N": 50.0,
+    "hard_face_wedge_deg": 30.0
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝(25) ≥ 스토퍼 x_min",
+      "value": 25.0,
+      "unit": "mm",
+      "lo": 18.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 반폭 ≤ 개방 x_open",
+      "value": 35.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 45.0,
+      "pass": true
+    },
+    {
+      "id": "S4",
+      "desc": "soft 슬롯(핀 u+10) + 여유 3 이 손바닥 반폭 안",
+      "value": 58.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 60.0,
+      "pass": true
+    },
+    {
+      "id": "S5",
+      "desc": "soft 가이드 벽(y=±wall_y)이 텐던 손가락 피벗보다 안쪽 (벽이 hard 경로를 막지 않음: 손가락 |x|<w/2, 벽 x≥x_min-2)",
+      "value": 16.0,
+      "unit": "mm",
+      "lo": 14.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H3",
+      "desc": "원위 관절 스프링이 근위보다 강하지 않아도 됨 (0.2 ≤ k2/k1 ≤ 5, 고무줄로 구현 가능)",
+      "value": 1.905,
+      "unit": "",
+      "lo": 0.2,
+      "hi": 5.0,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 4.448,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 펴진(휴지) hard 손끝이 Fin Ray 끝보다 위 (≥ margin_soft)",
+      "value": 14.905,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H1",
+      "desc": "pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한)",
+      "value": 50.0,
+      "unit": "N",
+      "lo": null,
+      "hi": 60.0,
+      "pass": true
+    }
+  ],
+  "pass": true
+}
