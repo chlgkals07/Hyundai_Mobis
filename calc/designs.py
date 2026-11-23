@@ -390,8 +390,74 @@ def b4():
     return r.dump()
 
 
+def b5():
+    """평행사변형 hard. 손끝판(coupler)은 항상 수직 → 쐐기 0°, 평행 pinch.
+    피벗 y 를 '건전지 pinch 에서 링크 수직' 으로 두면 pinch = 손끝 궤적 최저점 → 닫히는 도중 바닥 파고듦 없음."""
+    c, d = load("common"), load("B5")
+    r = Report(d, c)
+    h = d["hard"]
+    s = soft_flap(r, h["width"])
+    z_top = s["z_top"]
+    o = c["objects"]
+    half_t = h["plies"] * c["board_t"] / 2
+    face = half_t + c["pad_t"]
+    L, dd = h["L"], h["d"]
+    yp = o["battery"]["d"] / 2 + face  # 링크 수직일 때 패드면 y = 건전지 반지름
+    r.put("hard_pivot_y", yp)
+    zP = -h["bracket_drop"]  # 두 피벗 높이 (손바닥 아랫면 아래), P_in y=yp, P_out y=yp+d
+    psi = sp.symbols("psi", real=True)
+    # 안쪽 링크 끝 E_in = P_in + L(sinψ, -cosψ); 손끝판은 E_in 에서 아래로 Lc (Lc 는 아래에서 결정)
+    Lc = sp.symbols("Lc", positive=True)
+    tip_z = zP - L * sp.cos(psi) - Lc
+    face_y = yp + L * sp.sin(psi) - face
+    # Fin Ray 창 가운데(6.5)에 오도록 Lc 결정: Rigid 높이 H = -tip_z(0)
+    soft_tip_batt = s["tip_z"].subs(s["phi"], s["phi_b"])
+    lo, hi = c["finray_window"]
+    Lc_val = sp.solve(sp.Eq(soft_tip_batt - tip_z.subs(psi, 0), (lo + hi) / 2), Lc)[0]
+    r.put("hard_coupler_below_E", Lc_val)
+    tip_z = tip_z.subs(Lc, Lc_val)
+    z_floor = tip_z.subs(psi, 0)
+    r.put("rigid_palm_height", -z_floor)
+    finray_window(r, soft_tip_batt, z_floor)
+    # 물체별 ψ
+    for name, rad in (("cable", o["cable"]["d"] / 2), ("cap", o["cap"]["d"] / 2)):
+        pv = sp.nsolve(face_y - rad, psi, 0.05)
+        r.put(f"hard_psi_{name}_deg", pv / deg)
+        r.put(f"hard_tip_rise_{name}_mm", tip_z.subs(psi, pv) - z_floor)
+    psi_min = sp.nsolve(face_y, psi, -0.1)
+    r.put("hard_psi_min_deg", psi_min / deg)
+    r.check("H2", "케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽", sp.nsolve(face_y - o["cable"]["d"] / 2, psi, 0) / deg, lo=psi_min / deg, unit="deg")
+    rise_cable = tip_z.subs(psi, sp.nsolve(face_y - o["cable"]["d"] / 2, psi, 0)) - z_floor
+    r.check("H4", "케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm)", rise_cable, hi=o["cable"]["d"] / 2, unit="mm")
+    # 열림: 손끝 상승 → Soft 모드 간섭
+    psi_open = h["psi_open_deg"] * deg
+    soft_tip_chip = s["tip_z"].subs(s["phi"], s["phi_c"])
+    gap = tip_z.subs(psi, psi_open) - soft_tip_chip
+    r.put("soft_mode_hard_above_finray", gap)
+    r.check("R1", "Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위", gap, lo=c["margin_soft"], unit="mm")
+    # 개구
+    Y = 2 * (yp + L * sp.sin(psi_open) - face)
+    r.put("hard_opening_mm", Y)
+    # 링크 끼리 / 바닥 / 드럼
+    r.check("H5", "바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4)", h["drum_r"], hi=dd - 4, unit="mm")
+    r.check("H5b", "앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3)", 2 * (yp + dd - h["drum_r"]), lo=3, unit="mm")
+    r.check("H6", "드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2)", h["bracket_drop"], lo=h["drum_r"] + 2, unit="mm")
+    # 두 링크는 평행, 수직 거리 = d·cosψ. 완전 개방에서 가장 가까움 (1차 시도: 피벗을 위·아래로 쌓아 수직일 때 겹침 → 수평 배치로 변경)
+    r.check("H7", "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2", dd * sp.cos(h["psi_open_deg"] * deg), lo=h["link_plies"] * c["board_t"] + 2, unit="mm")
+    r.check("H9", "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
+            12, lo=9 + 3, unit="mm")
+    r.check("H8", "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)", yp + dd + 6, hi=d["palm"]["sy"] / 2, unit="mm")
+    # 장력: 손끝판 수평력 F → 링크 토크 F·L·cosψ (ψ=0 최대) → T = F L / r
+    T = c["force"]["pinch_target_N"] * L / h["drum_r"]
+    r.put("hard_string_T_N", T)
+    r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각)", T, hi=45, unit="N")
+    r.put("hard_pull_mm", h["drum_r"] * (psi_open - psi_min))
+    r.put("hard_face_wedge_deg", 0)
+    return r.dump()
+
+
 def main():
-    res = [b1(), b2(), b3(), b3o(), b4()]
+    res = [b1(), b2(), b3(), b3o(), b4(), b5()]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",

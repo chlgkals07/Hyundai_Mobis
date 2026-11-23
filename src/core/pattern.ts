@@ -9,11 +9,13 @@ import B2p from "../../params/B2.json";
 import B3p from "../../params/B3.json";
 import B3op from "../../params/B3o.json";
 import B4p from "../../params/B4.json";
+import B5p from "../../params/B5.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
 import B3oc from "../../calc/out/B3o.json";
 import B4c from "../../calc/out/B4.json";
+import B5c from "../../calc/out/B5.json";
 
 export type P2 = [number, number];
 export interface Shape {
@@ -106,9 +108,11 @@ function finrayCutList(): string[] {
 
 // ---------------------------------------------------------------------------- B1
 
-function b1(): DesignPattern {
-  const p = B1p;
-  const d = B1c.derived as Record<string, number>;
+/** B1 (soft 플랩 부품은 B5 도 재사용: pIn 으로 손바닥 치수만 바꾸고 hard 피벗 슬롯은 pivot 형일 때만) */
+function b1(pIn: { palm: { sx: number; sy: number }; soft: typeof B1p.soft; hard: { type: string; drum_r: number } } = B1p, dIn: Record<string, unknown> = B1c.derived): DesignPattern {
+  const p = pIn as typeof B1p;
+  const d = dIn as unknown as Record<string, number>;
+  const pivot = pIn.hard.type === "pivot";
   const sx = p.palm.sx;
   const sy = p.palm.sy;
   const rl = p.soft.root_len;
@@ -133,7 +137,7 @@ function b1(): DesignPattern {
     rectCut(top, x0, oy(p.soft.drum_y) - 5, sr, 10);
   }
   const hr = p.hard.drum_r;
-  for (const t of [0, 1]) rectCut(top, rl + sx / 2 - 5, t ? sy - hr : 0, 10, hr);
+  if (pivot) for (const t of [0, 1]) rectCut(top, rl + sx / 2 - 5, t ? sy - hr : 0, 10, hr);
   // 고무줄 고정 구멍
   for (const s of [-1, 1]) top.holes.push({ c: [rl + sx / 2 + s * (sx / 2 - 14), oy(-yf)], d: 3 });
   top.text.push({ p: [rl + 4, sy / 2], s: "윗장 (골 ↔)", size: 4 });
@@ -141,7 +145,7 @@ function b1(): DesignPattern {
   shapes.push(top);
   const bot = rect("손바닥 아랫장", 1, "B골 3 mm", sx, sy, "윗장과 골 방향을 엇갈리게(↕) 풀칠. 같은 위치에 드럼 슬롯을 자름.", "y");
   for (const s of [-1, 1]) rectCut(bot, s > 0 ? sx - sr : 0, oy(p.soft.drum_y) - 5, sr, 10);
-  for (const t of [0, 1]) rectCut(bot, sx / 2 - 5, t ? sy - hr : 0, 10, hr);
+  if (pivot) for (const t of [0, 1]) rectCut(bot, sx / 2 - 5, t ? sy - hr : 0, 10, hr);
   shapes.push(bot);
   // Fin Ray
   shapes.push(...[1, 2, 3, 4].map((k) => finrayStrip(k)));
@@ -450,4 +454,77 @@ function b4(): DesignPattern {
   };
 }
 
-export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b3(B3op as unknown as typeof B3p, B3oc.derived), b4()];
+// ---------------------------------------------------------------------------- B5 (평행사변형 링크)
+
+/** 둥근 끝 막대 프로파일 (y–z 평면 판, 두께는 골판지) + 양끝 구멍 간격 L */
+function linkBar(label: string, qty: number, L: number, h: number, note: string, hole = C.straw_d + 0.5) {
+  const w = L + h;
+  const s = blank(label, qty, "B골 3 mm", w, h, note);
+  const pts: P2[] = [];
+  const r = h / 2;
+  for (let i = 0; i <= 12; i++) pts.push([r + L + r * Math.cos(-Math.PI / 2 + (i / 12) * Math.PI), r + r * Math.sin(-Math.PI / 2 + (i / 12) * Math.PI)]);
+  for (let i = 0; i <= 12; i++) pts.push([r + r * Math.cos(Math.PI / 2 + (i / 12) * Math.PI), r + r * Math.sin(Math.PI / 2 + (i / 12) * Math.PI)]);
+  s.cut.push({ pts, closed: true });
+  s.holes.push({ c: [r, r], d: hole }, { c: [r + L, r], d: hole });
+  s.flute = "x";
+  return s;
+}
+
+function b5(): DesignPattern {
+  const p = B5p;
+  const d = B5c.derived as unknown as Record<string, number>;
+  const h = p.hard;
+  const base = b1(p, B5c.derived);
+  const keep = base.shapes.filter((s) => /^(손바닥|Fin Ray|Soft|드럼 삼각|균형막대|손톱)/.test(s.label));
+  const halfT = (h.plies * T) / 2;
+  const Lc = Number(d.hard_coupler_below_E);
+  const shapes: Shape[] = [...keep];
+  // 브래킷: 위 8 mm 탭(손바닥 접착), 피벗 구멍 2개(굵은 빨대 부싱 Ø12)
+  const bh = h.bracket_drop + 8 + 8;
+  const bw = h.d + 16;
+  const br = blank("링크 브래킷", 4, "B골 3 mm 2겹", bw, bh, `손가락당 2장(링크 양옆 x=±${fx(h.width / 2 + 2.5)}). 위 8 mm 탭을 꺾어 손바닥 아랫면 y=±${fx(Number(d.hard_pivot_y))}~${fx(Number(d.hard_pivot_y) + h.d)} 에 풀칠. 구멍엔 굵은 빨대 부싱.`);
+  rectCut(br, 0, 0, bw, bh);
+  br.score.push([[0, 8], [bw, 8]]);
+  br.glue.push({ x: 0, y: 0, w: bw, h: 8 });
+  br.holes.push({ c: [8, 8 + h.bracket_drop], d: C.bubble_d + 0.5 }, { c: [8 + h.d, 8 + h.bracket_drop], d: C.bubble_d + 0.5 });
+  br.text.push({ p: [4, 8 + h.bracket_drop + 9], s: "안쪽", size: 3 }, { p: [h.d + 2, 8 + h.bracket_drop + 9], s: "바깥(드럼)", size: 3 });
+  br.flute = "y";
+  shapes.push(br);
+  shapes.push(linkBar("바깥 링크 막대", 4, h.L, 12, "손가락당 2장 (x=±11). 바깥 축(빨대)에 풀칠 → 축·드럼·링크가 한 몸으로 회전, 축은 브래킷 부싱 안에서 돎."));
+  shapes.push(linkBar("안쪽 링크 막대", 4, h.L, 12, "손가락당 2장 (x=±11, 갈래). 가운데 드럼을 비켜 감. 양끝 핀은 자유 회전."));
+  // 커플러 측판: L 자 (수평 팔 E_in→E_out, 수직 다리 E_in→손끝)
+  const arm = h.d + 12;
+  const leg = Lc - h.nail_len + 6;
+  const cs = blank("커플러 측판 (L자)", 4, "B골 3 mm 2겹", arm, leg, `손가락당 2장. 구멍 간격 = 링크 피벗 간격 ${h.d} mm → 평행사변형. 수직 다리 안쪽에 손끝판을 끼워 풀칠.`);
+  cs.cut.push({ pts: [[0, 0], [arm, 0], [arm, 12], [12, 12], [12, leg], [0, leg]], closed: true });
+  cs.holes.push({ c: [6, 6], d: C.straw_d + 0.5 }, { c: [6 + h.d, 6], d: C.straw_d + 0.5 });
+  cs.flute = "y";
+  shapes.push(cs);
+  shapes.push(rect("손끝판 (패드)", 6, "B골 3 mm", h.width, Lc - h.nail_len + 2, `3장 적층 → 두 측판의 수직 다리 사이(안쪽 면)에 풀칠. 패드면은 항상 수직(평행 pinch, 쐐기 없음). 안쪽에 고무줄 감기 + V컷.`, "y"));
+  shapes.push(disk("Hard 드럼 큰판", 4, h.drum_r, C.straw_d + 0.5, "바깥 축에 풀칠 (큰-작은-큰 = 실 홈). 링크 막대 사이 가운데."));
+  shapes.push(disk("Hard 드럼 작은판", 2, h.drum_r - 3, C.straw_d + 0.5));
+  const ty = Number(d.hard_pivot_y) + h.d - h.drum_r;
+  return {
+    id: "B5",
+    name: p.name,
+    shapes,
+    cutList: [
+      ...finrayCutList(),
+      `일반 빨대 축/핀: 손가락당 4개 × ${h.width + 12} mm (안쪽 축, 바깥 축, E_in 핀, E_out 핀)`,
+      `굵은 빨대 부싱: 손가락당 4개 × 4 mm (브래킷 구멍)`,
+      `텐던 1가닥 연속 루프: 앞 드럼(3바퀴) → 손바닥 구멍 y=+${fx(ty)} → 모터 풀리(또는 손잡이) → 구멍 y=-${fx(ty)} → 뒤 드럼. 풀리에서 루프를 당기면 두 손가락이 같은 장력으로 닫힘`,
+      `복원 고무줄: 손가락당 1개 (바깥 링크 끝 ↔ 브래킷 바깥 위)`,
+      `텐던 장력 ${fx(Number(d.hard_string_T_N))} N (pinch 8 N), 당김 ${fx(Number(d.hard_pull_mm))} mm`,
+    ],
+    steps: [
+      "손바닥 2장(플랩 포함 윗장) 엇갈려 풀칠. 가운데 텐던 구멍 2개.",
+      "Fin Ray·soft 플랩·드럼은 B1 과 같음.",
+      "브래킷 4장: 탭을 접어 손바닥 아랫면에 링크 폭(28)만큼 띄워 2장씩 평행하게 풀칠, 구멍에 굵은 빨대 부싱.",
+      "바깥 축(빨대) = 드럼 + 바깥 링크 막대 2장을 풀칠해 한 몸. 안쪽 축은 안쪽 링크 막대 2장과 풀칠.",
+      "커플러 측판 2장 + 손끝판 3겹 → 'ㄷ' 모양 손끝. 링크 끝 핀 2개로 연결 → 평행사변형 확인(손끝판이 항상 수직인지 손으로 돌려봄).",
+      "손톱 플랩·스토퍼·패드 고무줄. 텐던 루프 감고 복원 고무줄 걸기.",
+    ],
+  };
+}
+
+export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b3(B3op as unknown as typeof B3p, B3oc.derived), b4(), b5()];

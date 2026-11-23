@@ -200,3 +200,53 @@
 | `hard_face_wedge_deg` | 30.0 |
 
 </details>
+
+## B5 평행 링크 — 플랩 Fin Ray + 평행사변형 hard (텐던 1가닥)  —  PASS
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-6.824, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 90.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 33.667 N | [, 40.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
+| H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
+| H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
+| R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 27.897 mm | [10.0, ] | ✅ |
+| H5 | 바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4) | 16.0 mm | [, 20.0] | ✅ |
+| H5b | 앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3) | 43.0 mm | [3.0, ] | ✅ |
+| H6 | 드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2) | 20.0 mm | [18.0, ] | ✅ |
+| H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2 | 8.991 mm | [8.0, ] | ✅ |
+| H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
+| H1 | pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각) | 27.5 N | [, 45.0] | ✅ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 101.0 |
+| `soft_phi_min_deg` | -6.8235 |
+| `soft_x_min` | 18.0 |
+| `soft_phi_battery_deg` | -2.8376 |
+| `soft_phi_chip_deg` | -2.8376 |
+| `soft_phi_sponge_deg` | 2.8376 |
+| `soft_open_half_width` | 131.0 |
+| `soft_pull_mm` | 25.3483 |
+| `soft_string_T_at_limit_N` | 33.6667 |
+| `hard_pivot_y` | 13.5 |
+| `hard_coupler_below_E` | 26.3762 |
+| `rigid_palm_height` | 101.3762 |
+| `rigid_finray_tip_above_floor` | 6.5 |
+| `hard_psi_cable_deg` | -4.6931 |
+| `hard_tip_rise_cable_mm` | 0.1844 |
+| `hard_psi_cap_deg` | 8.3636 |
+| `hard_tip_rise_cap_mm` | 0.5849 |
+| `hard_psi_min_deg` | -7.312 |
+| `soft_mode_hard_above_finray` | 27.8966 |
+| `hard_opening_mm` | 115.9902 |
+| `hard_string_T_N` | 27.5 |
+| `hard_pull_mm` | 21.0311 |
+| `hard_face_wedge_deg` | 0.0 |
+
+</details>

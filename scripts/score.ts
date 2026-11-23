@@ -18,14 +18,15 @@ function opening(id: string): [number, number] {
   const h = p.hard;
   const r = Math.PI / 180;
   const y =
-    h.type === "pivot" ? 2 * (yp + h.len * Math.sin(h.psi_open_deg * r) - face)
+    h.type === "parallel" ? 2 * (h.L * Math.sin(h.psi_open_deg * r) + C.objects.battery.d / 2)
+    : h.type === "pivot" ? 2 * (yp + h.len * Math.sin(h.psi_open_deg * r) - face)
     : h.type === "slot" ? 2 * (h.y_open - face)
     : 2 * (yp + h.l1 * Math.sin(h.theta1_rest_deg * r) + h.l2 * Math.sin((h.theta1_rest_deg + h.theta2_rest_deg) * r) - face);
   return [x, y];
 }
 
 const calc: Record<string, { pass: boolean; derived: Record<string, number | string> }> = {};
-for (const id of ["B1", "B2", "B3", "B3o", "B4"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
+for (const id of ["B1", "B2", "B3", "B3o", "B4", "B5"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
 const baseOf = (id: string) => (id === "V5" ? "B1" : id === "V5b" ? "B3" : id);
 
 const O = common.objects;
@@ -44,6 +45,7 @@ const RISK: Record<string, [number, string]> = {
   B2: [2.0, "골판지 슬롯+빨대 핀은 마찰·비틀림(racking)으로 걸리기 쉬움. 손바닥 120×104 로 가장 큼."],
   B3: [2.5, "텐던 손가락은 '공중에서 말고 → 내리고 → 조임' 순서가 필요(시뮬에서 jam 발견). 고무줄 강성비 튜닝 필요."],
   B3o: [3.0, "예비 말기 불필요(바닥 미끄럼 구동력 ≥1 N, SymPy J5). 대신 원위 휴지 58° 스토퍼·근위 17° 스토퍼와 k1≈40 N·mm/rad 고무줄을 맞춰야 함."],
+  B5: [3.5, "빨대 핀 4개/손가락의 평행사변형 — 핀 구멍 위치 정확도(±1 mm)가 평행도를 좌우. 고무줄 튜닝 없음, 동작 순서 없음."],
   B4: [2.5, "B2 의 슬롯 마찰 미지수 + B3 의 텐던 순서·고무줄 튜닝을 둘 다 가짐. 대신 가운데 경사 벽이 없어 B2 보다 부품이 단순."],
   V5: [3.0, "B1 과 같고, 실 1개라 칩을 쥘 때 S 를 45% 넘기면 hard 가 닫혀 칩을 누름 → 조작 주의."],
   V5b: [2.0, "B3 리스크 + 실 1개라 Fin Ray 가 끝까지 닫혀 Rigid 에서 텐던 손가락과 부딪힘(시뮬 간섭)."],
@@ -53,6 +55,7 @@ const HAND: Record<string, [number, string]> = {
   B2: [2, "평행 그리퍼 인상. 손 모양 가산점 설명이 약함."],
   B3: [5, "2관절 손가락이 말려 들어감 — 영상에서 '손' 으로 가장 잘 읽힘."],
   B3o: [5, "B3 와 같은 2관절 텐던 손가락, 바닥을 쓸며 들어오는 동작이 손과 비슷."],
+  B5: [3, "평행 그리퍼 손끝(항상 수직) — 엄지·검지 pinch 로 설명 가능하나 관절이 손처럼 굽지는 않음."],
   B4: [5, "B3 와 같은 2관절 텐던 손가락."],
   V5: [3, "B1 과 동일."],
   V5b: [5, "B3 과 동일."],
@@ -133,6 +136,7 @@ const recommendation = [
   `<b>선택: B3o</b> (B3 최적화, ${sc.B3o}). B3 에서 원위 휴지각을 바깥으로 젖히고(58°) 손가락 길이·텐던 고리를 SymPy 로 다시 잡아, 예비 말기 없이 '내리고 당기기'만으로 손톱이 바닥을 미끄러져 들어옵니다(미끄럼 구동력 ≥ 1.9 N). 텐던 장력 50 → 28 N.`,
   "B3o 의 실제 파지 방식: 둥글거나 낮은 물체(건전지·뚜껑·케이블)는 손톱이 바닥을 쓸며 물체 밑으로 들어가고 원위 패드가 위를 덮는 '떠서 감싸기'입니다. 설계 목표였던 적도 평행 pinch 와는 다르니, 실물에서 건전지가 굴러 빠지는지 먼저 확인하세요.",
   `B1 (${sc.B1})은 점수 1위로 제작 리스크가 가장 낮습니다. B3o 실물이 미끄럼에서 멈추면(골판지-바닥 마찰이 가정보다 크면) hard 만 B1 피벗으로 바꾸는 것이 대안입니다 — soft(플랩+Fin Ray)는 같습니다.`,
+  `B5 (평행 링크, ${sc.B5}): 손끝판이 항상 수직인 평행사변형 + 텐던 1가닥 루프. 피벗을 안쪽(y=±13.5)에 둬 건전지 pinch 에서 링크가 수직(=손끝 최저점)이라 바닥 파고듦·동작 순서·고무줄 튜닝이 없습니다. 점수는 부품 수(빨대 핀 4개/손가락)와 개구 116 mm 에서 깎였습니다 — 링크 L 을 늘리면 개구↑ 장력↑.`,
   "V5b(B3+1-string)는 Rigid 에서 Fin Ray 와 텐던 손가락이 부딪혀 탈락입니다.",
 ];
 const md = [
