@@ -1,0 +1,33 @@
+{
+  "id": "B3o",
+  "name": "B3o 말림 최적화 — 젖힌 원위 + 바닥 미끄럼 평행 pinch",
+  "palm": {
+    "sx": 60.0,
+    "sy": 80.0
+  },
+  "soft": {
+    "type": "flap",
+    "joint": "axle",
+    "root_len": 8.0,
+    "phi_open_deg": 90.0,
+    "drum_r": 15.0,
+    "drum_y": 33.0
+  },
+  "hard": {
+    "type": "tendon",
+    "l1": 75.0,
+    "l2": 35.0,
+    "width": 28.0,
+    "plies": 3,
+    "nail_len": 9.0,
+    "theta1_rest_deg": 17.0,
+    "theta2_rest_deg": 58.0,
+    "r1": 13.0,
+    "r2": 10.0,
+    "target_tip_y": 9.0,
+    "target_distal_deg": 5.0,
+    "path_ratio": 0.35,
+    "precurl": false,
+    "k1_spec_Nmm_per_rad": 40.0
+  }
+}

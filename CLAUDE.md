@@ -24,7 +24,9 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 ## 구조
 - `src/core/finray.ts` Fin Ray PBD: 플랭크 굽힘(EI) + 핀 리브, 접촉 SDF, 굽힘에너지 미분으로 힘 추정
 - `src/core/modules.ts` soft 플랩/슬롯, 손톱 플랩, 쐐기 패드, whiffletree
-- `src/core/designs.ts` B1/B2/B3/B4/V5/V5b 조립 + 프리셋
+- `src/core/designs.ts` B1/B2/B3/B3o/B4/V5/V5b 조립 + 프리셋
+- `calc/optimize_b3.py` B3 치수 최적화 (랜덤 탐색 + SymPy 재검증) → `params/B3o.json`
+- `calc/capacity.py` 개구 범위 (B1/B2/B3)
 - `src/core/collide.ts` OBB SAT 부품 간섭 + 바닥/물체 관통 + 실 걸림
 - `src/core/pattern.ts` 전개도 부품 (params/calc 에서 생성)
 - `src/viewer/` three.js r128(cdnjs UMD) + IIFE 번들. R3F 는 Artifact CDN 규칙 때문에 쓰지 않음
@@ -37,8 +39,19 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 - V5b(B3+1-string)는 Fin Ray 가 끝까지 닫혀 텐던 손가락과 간섭 → 탈락
 - B4 는 B2 Fin Ray(도달 105)가 텐던 Rigid 높이(101.4)보다 길어 바닥 충돌 → 캐리지 뿌리 10→2 mm (도달 97)
 
+## 선택: B3o (2026-11-23)
+하민 결정: 개구 범위 때문에 직선(B2) 대신 회전·텐던(B3 계열). B3o = B3 최적화.
+- 원위 휴지 58° 젖힘(스토퍼) + 근위 휴지 17°, l1 75 / l2 35 (손톱 9), r1 13 / r2 10, Fin Ray 뿌리 8
+- 예비 말기 불필요: 손톱이 바깥(y≈63)에서 바닥에 닿아 미끄러져 들어옴 (SymPy J1, J2, J5 구동력 ≥1.9 N)
+- 복원 고무줄 k1 = 40 N·mm/rad (상한 203), k2/k1 = 2.2. 너무 센 고무줄이면 바닥에서 멈춤
+- 텐던 장력 하한 28 N (B3 50 N), 개구 175×187 mm
+- 시뮬 파지 방식은 '떠서 감싸기'(손톱이 물체 밑, 원위 패드가 위) — 적도 평행 pinch 아님. 실물로 확인
+- 최적화 중 정식화 4번 수정: (1) 경로 중 바닥 아래 금지 → 불가능, (2) pinch=경로 최저점 → 최저점이 피벗 아래,
+  (3) 평행 pinch 는 θ2_rest>0 필요, (4) 방향(J2)만으론 부족 → 구동력 크기(J5), 손톱 길이(J4)
+- 시뮬 솔버: 경사 하강 → 16방향 패턴 탐색 (좁은 접촉 골짜기에서 멈추던 문제)
+
 ## 다음 할 일
-- [ ] 목요일 실물: Fin Ray 1개 먼저 → EI(현재 600 N·mm² 추정) 보정, B2 슬롯 10분 테스트
+- [ ] 목요일 실물 (B3o): Fin Ray 1개 → EI 보정, 텐던 손가락 1개 → 바닥 미끄럼·고무줄 강성 확인
 - [ ] 실측값 반영: 골판지 두께, 빨대 외경, 고무줄 강성
 - [x] 하이브리드 B4 (B2 soft + B3 텐던 hard): 물체 5/5, 간섭 0, 42.4점
 - [ ] 팀원 R4 팔과 결합 (wrist roll, 텐던 커플링)

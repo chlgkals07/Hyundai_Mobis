@@ -2,10 +2,12 @@ import { Vector3 } from "three";
 import B1p from "../../params/B1.json";
 import B2p from "../../params/B2.json";
 import B3p from "../../params/B3.json";
+import B3op from "../../params/B3o.json";
 import B4p from "../../params/B4.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
+import B3oc from "../../calc/out/B3o.json";
 import B4c from "../../calc/out/B4.json";
 import { DEG, V, boxPart, clamp, cylPart, lerp, segPart } from "./build";
 import { makeObject, sceneSdf } from "./objects";
@@ -381,7 +383,7 @@ export function makeB2(): Design {
 export const TENDON_PRE = 0.6;
 export const TENDON_LIFT = 30;
 
-function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Derived, b: number, sdfScene: (v: Vector3) => number): HardOut {
+function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard & { precurl?: boolean } }, d: Derived, b: number, sdfScene: (v: Vector3) => number): HardOut {
   // 손바닥을 lift 만큼 올린 상황 = 장면을 lift 만큼 내린 것
   let lift = 0;
   const sdf = (v: Vector3) => sdfScene(V(v.x, v.y, v.z + lift));
@@ -393,8 +395,13 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Deriv
   const t1p = num(d, "hard_theta1_pinch_deg") * DEG;
   const k2k1 = num(d, "tendon_k2_over_k1");
   // T 정규화: b=1 일 때 자유 닫힘이 pinch 자세를 12° 넘도록 (물체를 누를 여유)
-  const k1 = h.r1 / (t10 - t1p + 12 * DEG);
+  // 물리 단위 모드(B3o): calc 가 준 복원 고무줄 강성 상한의 70% 를 쓰고 T 는 N (b=1 → pinch 8 N 장력).
+  // 정규화 모드(B3): b=1 의 자유 닫힘이 pinch 자세를 12° 넘도록 k1 을 맞춘 무차원 값.
+  const phys = d["tendon_k1_max_Nmm_per_rad"] !== undefined;
+  const k1 = phys ? ((h as { k1_spec_Nmm_per_rad?: number }).k1_spec_Nmm_per_rad ?? 0.7 * num(d, "tendon_k1_max_Nmm_per_rad")) : h.r1 / (t10 - t1p + 12 * DEG);
   const k2 = k1 * k2k1;
+  const Tscale = phys ? num(d, "hard_string_T_N") : 1;
+  const penK = phys ? 1500 : 40;
   const wedge = -h.target_distal_deg * DEG;
   const P = V(0, yp, Z_TOP);
   const dirAt = (th: number) => V(0, Math.sin(th), -Math.cos(th));
@@ -417,15 +424,15 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Deriv
     return pts;
   };
   const E = (t1: number, t2: number, T: number) => {
-    let e = 0.5 * k1 * (t1 - t10) ** 2 + 0.5 * k2 * (t2 - t20) ** 2 + T * (h.r1 * t1 + h.r2 * t2);
+    let e = 0.5 * k1 * (t1 - t10) ** 2 + 0.5 * k2 * (t2 - t20) ** 2 + Tscale * T * (h.r1 * t1 + h.r2 * t2);
     for (const s of samples(t1, t2)) {
       for (const x of across(h.width)) {
         const pen = 0.3 - sdf(s.clone().setX(x));
-        if (pen > 0) e += 40 * pen * pen;
+        if (pen > 0) e += penK * pen * pen;
       }
       // 대칭면 y=0: 앞·뒤 손가락이 서로 맞닿음 (거울상이므로 y < 0.5 면 상대 손가락 관통)
       const py = 0.5 - s.y;
-      if (py > 0) e += 40 * py * py;
+      if (py > 0) e += penK * py * py;
     }
     return e;
   };
@@ -437,25 +444,37 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Deriv
   // 조작 순서 (시뮬에서 발견한 jam 회피): ① 공중(lift 30 mm)에서 실 B 를 T_pre 까지 당겨 원위지골을 수직 너머로 말고
   //  ② 그 장력을 유지한 채 손바닥을 내린 뒤 ③ 끝까지 당긴다. 바닥에 손톱이 먼저 닿은 채 말면 원위지골이 수직을
   //  넘지 못해 걸린다 (마찰 없는 바닥에서도).
+  // 패턴 탐색(16 방향): 바닥 접촉 시 에너지 골짜기가 좁고 휘어 있어, 경사 하강은 법선 방향만 보고 멈춘다
+  // (B3o 에서 SymPy 는 미끄럼 구동력 1.9 N 인데 시뮬이 접촉점에서 멈춘 원인). 방향을 넓게 시도해 골짜기를 따라감.
+  const DIRS = Array.from({ length: 16 }, (_, i) => [Math.cos((i * Math.PI) / 8), Math.sin((i * Math.PI) / 8)]);
   const relax = (T: number) => {
     let step = 2 * DEG;
-    for (let it = 0; it < 500 && step > 0.005 * DEG; it++) {
-      const e = 1e-5;
-      const e0 = E(t1, t2, T);
-      const g1 = (E(t1 + e, t2, T) - e0) / e;
-      const g2 = (E(t1, t2 + e, T) - e0) / e;
-      const gn = Math.hypot(g1, g2) || 1;
-      const n1 = clamp(t1 - (step * g1) / gn, ...lim1);
-      const n2 = clamp(t2 - (step * g2) / gn, ...lim2);
-      if (E(n1, n2, T) < e0) {
-        t1 = n1;
-        t2 = n2;
-        step = Math.min(step * 1.3, 3 * DEG);
+    let e0 = E(t1, t2, T);
+    for (let it = 0; it < 900 && step > 0.004 * DEG; it++) {
+      let best = e0;
+      let bi = -1;
+      for (let i = 0; i < DIRS.length; i++) {
+        const n1 = clamp(t1 + step * DIRS[i][0], ...lim1);
+        const n2 = clamp(t2 + step * DIRS[i][1], ...lim2);
+        const en = E(n1, n2, T);
+        if (en < best - 1e-9) {
+          best = en;
+          bi = i;
+        }
+      }
+      if (bi >= 0) {
+        t1 = clamp(t1 + step * DIRS[bi][0], ...lim1);
+        t2 = clamp(t2 + step * DIRS[bi][1], ...lim2);
+        e0 = best;
+        step = Math.min(step * 1.25, 3 * DEG);
       } else step *= 0.5;
     }
   };
-  const Tpre = Math.min(Tc, TENDON_PRE);
-  lift = TENDON_LIFT;
+
+  // precurl=false (B3o): 예비 말기 없이 바로 당김 — 바닥 미끄럼으로 pinch 에 도달하도록 SymPy(J1, J2)로 설계됨
+  const pre = h.precurl !== false;
+  const Tpre = pre ? Math.min(Tc, TENDON_PRE) : 0;
+  lift = pre ? TENDON_LIFT : 0;
   for (let st = 1; st <= 8; st++) relax((Tpre * st) / 8);
   for (let st = 1; st <= 10; st++) {
     lift = TENDON_LIFT * (1 - st / 10);
@@ -512,23 +531,25 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard }, d: Deriv
     metrics: { gap: 2 * minInnerY(t1, t2), tipZ: k.tip.z, hardTravel: Tc },
     readouts: [
       { label: "Tendon θ1 / θ2", value: `${(t1 / DEG).toFixed(1)}° / ${(t2 / DEG).toFixed(1)}° (원위 절대각 ${((t1 + t2) / DEG).toFixed(1)}°)` },
-      { label: "텐던 장력 (정규화)", value: `${(Tc * 100).toFixed(0)}%` },
+      { label: phys ? "텐던 장력" : "텐던 장력 (정규화)", value: phys ? `${(Tc * Tscale).toFixed(1)} N (${(Tc * 100).toFixed(0)}%)` : `${(Tc * 100).toFixed(0)}%` },
       { label: "원위 패드 y (중앙)", value: `${faceY.toFixed(1)} mm` },
       { label: "손톱 끝 높이", value: `${(k.tip.z).toFixed(1)} mm (손바닥 기준)` },
     ],
   };
 }
 
-export function makeB3(oneString = false): Design {
-  const p = B3p;
-  const d = B3c.derived as Derived;
-  const id = oneString ? "V5b" : "B3";
+export function makeB3(oneString = false, opt = false): Design {
+  const p = (opt ? B3op : B3p) as typeof B3p & { hard: { precurl?: boolean } };
+  const d = (opt ? B3oc.derived : B3c.derived) as unknown as Derived;
+  const id = oneString ? "V5b" : opt ? "B3o" : "B3";
   return {
     id,
     name: oneString ? "V5b = B3 + 1-string 순차" : p.name,
     summary: oneString
       ? "B3 기구 그대로, 실 1가닥 순차 구동."
-      : "soft 는 B1 과 같지만 플랩을 굵은 빨대 부싱 + 빨대 축으로 단다(score 접힘 대신). hard 는 2마디 텐던 손가락: 안쪽 빨대 고리로 텐던, 바깥 고무줄로 복원. 원위 관절이 늦게 굽도록 스프링비 k2/k1 을 SymPy 로 결정 → 손끝이 바닥을 긁으며 말려 들어간다.",
+      : opt
+        ? `B3 치수 최적화. 원위지골을 스토퍼로 ${p.hard.theta2_rest_deg}° 바깥으로 젖혀 두고 근위 휴지 ${p.hard.theta1_rest_deg}°. 당기면 손톱이 바깥(y≈63)에서 바닥에 먼저 닿아 미끄러져 들어오고, 원위지골이 거의 수직(+${p.hard.target_distal_deg}°)인 자세로 건전지를 평행 pinch. 예비 말기 불필요(SymPy J1·J2·J5: 미끄럼 구동력 ≥ 1 N), 텐던 장력 50→28 N, 근위 복원 고무줄 k1=${(p.hard as { k1_spec_Nmm_per_rad?: number }).k1_spec_Nmm_per_rad} N·mm/rad.`
+        : "soft 는 B1 과 같지만 플랩을 굵은 빨대 부싱 + 빨대 축으로 단다(score 접힘 대신). hard 는 2마디 텐던 손가락: 안쪽 빨대 고리로 텐던, 바깥 고무줄로 복원. 원위 관절이 늦게 굽도록 스프링비 k2/k1 을 SymPy 로 결정 → 손끝이 바닥을 긁으며 말려 들어간다.",
     oneString,
     adjacent: [
       ["palm", "flapR"],
@@ -606,7 +627,7 @@ export function makeB4(): Design {
   };
 }
 
-export const DESIGNS: Design[] = [makeB1(), makeB2(), makeB3(), makeB4()];
+export const DESIGNS: Design[] = [makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4()];
 export const VARIANTS: Design[] = [makeB1(true), makeB3(true)];
 export const ALL: Design[] = [...DESIGNS, ...VARIANTS];
 void lerp;

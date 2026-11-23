@@ -10,6 +10,7 @@ import json
 import math
 from pathlib import Path
 
+import numpy as np
 import sympy as sp
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -261,7 +262,8 @@ def hard_tendon(r: Report, z_top, soft_tip_batt, soft_tip_chip):
     r.put("hard_theta2_pinch_deg", t2p / deg)
     t10, t20 = h["theta1_rest_deg"] * deg, h["theta2_rest_deg"] * deg
     # 자유 닫힘: dθ_i = -T r_i / k_i → 경로 비 c = Δθ2/Δθ1 = (r2/k2)/(r1/k1)
-    ratio = (t2p - t20) / (t1p - t10)
+    # path_ratio 가 있으면(B3o) 공중 경로가 pinch 를 지나지 않고 바닥에 먼저 닿아 미끄러지는 설계 → 그 비를 그대로 사용
+    ratio = h["path_ratio"] if "path_ratio" in h else (t2p - t20) / (t1p - t10)
     r.put("tendon_path_ratio", ratio)
     k2_over_k1 = (h["r2"] / h["r1"]) / ratio
     r.put("tendon_k2_over_k1", k2_over_k1)
@@ -283,10 +285,82 @@ def hard_tendon(r: Report, z_top, soft_tip_batt, soft_tip_chip):
     r.put("hard_string_T_N", T)
     r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한)", T, hi=60, unit="N")
     r.put("hard_face_wedge_deg", -td / deg)
+    if "path_ratio" in h:
+        # J: jam-free — 공중 경로가 pinch 보다 바깥에서 바닥에 닿고, 바닥 미끄럼 구간에서 텐던 당김 → 손톱 안쪽
+        s = sp.symbols("s", real=True)
+        z_path = tip_z.subs({t1: t10 - s, t2: t20 - ratio * s})
+        y_path = tip_y.subs({t1: t10 - s, t2: t20 - ratio * s})
+        s0 = None
+        for k in range(1, 400):
+            sk = k * 0.25 * deg
+            if float(z_path.subs(s, sk)) <= float(z_floor):
+                s0 = sk
+                break
+        r.check("J1", "공중 닫힘 경로의 첫 바닥 접촉이 pinch 보다 바깥 (y0 - pinch y ≥ 2)",
+                (y_path.subs(s, s0) - h["target_tip_y"]) if s0 else -99, lo=2, unit="mm")
+        th1_0 = t10 - s0
+        th12 = sp.acos((z_top - l1 * sp.cos(t1) - z_floor) / l2)
+        dex = sp.diff(h["r1"] * t1 + h["r2"] * (th12 - t1), t1)
+        vals = []
+        for k in range(41):  # 접촉점 근처는 acos 인자가 반올림으로 1 을 살짝 넘을 수 있어 실수 값만 사용
+            v = sp.N(dex.subs(t1, t1p + (th1_0 - t1p) * k / 40))
+            if v.is_real:
+                vals.append(float(v))
+        r.put("slide_dex_min", min(vals))
+        r.check("J2", "바닥 미끄럼 구간 내내 텐던을 당길수록 손톱이 안쪽 (d(r1θ1+r2θ2)/dθ1 > 0, 최소값)", min(vals), lo=0)
+        # J3: 복원 고무줄이 미끄럼을 막지 않을 강성 상한. 바닥 위 1자유도에서 dE/dθ1 > 0 이어야 안쪽으로 진행:
+        #   k1(θ1-θ10) + k2(θ2-θ20)θ2' + T(r1 + r2 θ2') > 0  →  T > k1 · g(θ1),
+        #   g = -[(θ1-θ10) + (k2/k1)(θ2-θ20)θ2'] / (r1 + r2 θ2')
+        th2 = th12 - t1
+        th2p = sp.diff(th2, t1)
+        g = -((t1 - t10) + k2_over_k1 * (th2 - t20) * th2p) / (h["r1"] + h["r2"] * th2p)
+        gv = []
+        for k in range(41):
+            v = sp.N(g.subs(t1, t1p + (th1_0 - t1p) * k / 40))
+            if v.is_real:
+                gv.append(float(v))
+        g_max = max(gv)
+        T_max = c["force"]["pinch_target_N"] * l2 / h["r2"]
+        k1_max = 0.6 * T_max / g_max  # 최대 장력의 60% 로 미끄럼 완료 (여유 40%)
+        r.put("slide_g_max_rad_per_mm", g_max)
+        r.put("tendon_k1_max_Nmm_per_rad", k1_max)
+        r.put("tendon_k2_max_Nmm_per_rad", k1_max * k2_over_k1)
+        # 고무줄 사양으로: J1 에서 휴지→pinch 각 변화 동안 바깥 고무줄 모멘트 (레버 = 손가락 두께 반 + 고리)
+        r.put("J1_rubber_moment_at_pinch_Nmm", k1_max * float(t10 - t1p))
+        # J4: 미끄럼 중 가장 낮은 점이 손톱 끝이어야 함 (원위가 바깥으로 기울면 패드 쪽 모서리가 내려옴)
+        th12_0 = float(sp.N((t10 - s0) + (t20 - ratio * s0)))
+        need = (h["plies"] * c["board_t"] / 2 + c["pad_t"]) * np.tan(max(th12_0, 0)) + 1.0
+        r.put("touchdown_distal_deg", th12_0 * 180 / np.pi)
+        r.check("J4", "손톱 길이 ≥ (반두께+패드)·tan(접촉 시 원위각) + 1 — 패드 모서리가 바닥을 긁지 않음",
+                h["nail_len"], lo=need, unit="mm")
+        # J5: 실제 고무줄 k1_spec 에서 바닥 미끄럼 안쪽 구동력 최소 ≥ 1 N (마찰 여유). 방향(J2)만으로는 부족했음.
+        if "k1_spec_Nmm_per_rad" in h:
+            k1s = h["k1_spec_Nmm_per_rad"]
+            E = sp.Rational(1, 2) * k1s * (t1 - t10) ** 2 + sp.Rational(1, 2) * k1s * k2_over_k1 * (th2 - t20) ** 2 \
+                + T_max * (h["r1"] * t1 + h["r2"] * th2)
+            y_sl = yp + l1 * sp.sin(t1) + l2 * sp.sin(th12)
+            Ft = sp.diff(E, t1) / sp.diff(y_sl, t1)
+            fv = []
+            for k in range(1, 40):
+                v = sp.N(Ft.subs(t1, t1p + (th1_0 - t1p) * k / 40))
+                if v.is_real:
+                    fv.append(float(v))
+            r.put("slide_drive_min_N", min(fv))
+            r.check("J5", f"k1={k1s:g} N·mm/rad 고무줄로 바닥 미끄럼 안쪽 구동력 최소 ≥ 1 N", min(fv), lo=1.0, hi=None, unit="N")
+            r.check("J3", "설계 k1 이 상한 이하 & 휴지 유지 하한(20) 이상", k1s, lo=20, hi=k1_max, unit="N·mm/rad")
+        r.check("J3b", "k1 상한이 고무줄로 구현 가능한 범위 (≥ 20 N·mm/rad: 너무 약하면 휴지 자세 유지 못함)", k1_max, lo=20, unit="N·mm/rad")
 
 
 def b3():
     c, d = load("common"), load("B3")
+    r = Report(d, c)
+    s = soft_flap(r, d["hard"]["width"])
+    hard_tendon(r, s["z_top"], s["tip_z"].subs(s["phi"], s["phi_b"]), s["tip_z"].subs(s["phi"], s["phi_c"]))
+    return r.dump()
+
+
+def b3o():
+    c, d = load("common"), load("B3o")
     r = Report(d, c)
     s = soft_flap(r, d["hard"]["width"])
     hard_tendon(r, s["z_top"], s["tip_z"].subs(s["phi"], s["phi_b"]), s["tip_z"].subs(s["phi"], s["phi_c"]))
@@ -317,7 +391,7 @@ def b4():
 
 
 def main():
-    res = [b1(), b2(), b3(), b4()]
+    res = [b1(), b2(), b3(), b3o(), b4()]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",

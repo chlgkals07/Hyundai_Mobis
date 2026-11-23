@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<defs><pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2" stroke="#e08a00" stroke-width=".35"/></pattern></defs>
+<style>
+.cut{fill:none;stroke:#000;stroke-width:.3}
+.score{fill:none;stroke:#1565c0;stroke-width:.35;stroke-dasharray:2 1.2}
+.mark{fill:none;stroke:#777;stroke-width:.25;stroke-dasharray:3 1 .6 1}
+.glue{fill:url(#hatch);stroke:none}
+.hole{fill:none;stroke:#c62828;stroke-width:.3}
+.cross{stroke:#c62828;stroke-width:.2}
+.flute{fill:none;stroke:#2e7d32;stroke-width:.35}
+text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#222}
+.lbl{font-size:3.1px;font-weight:bold}.dim{font-size:2.6px;fill:#666}
+.hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
+</style>
+<rect width="210" height="297" fill="#fff"/>
+<text class="hdr" x="10" y="14">B3o 말림 최적화 — 젖힌 원위 + 바닥 미끄럼 평행 pinch — 전개도 1/3</text>
+<text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
+<polygon class="cut" points="10,24 70,24 70,104 10,104"/>
+<polygon class="cut" points="10,92 25,92 25,102 10,102"/>
+<polygon class="cut" points="55,92 70,92 70,102 55,102"/>
+<circle class="hole" cx="40" cy="32.5" r="1.5"/>
+<path class="cross" d="M39 32.5h2M40 31.5v2"/>
+<circle class="hole" cx="40" cy="95.5" r="1.5"/>
+<path class="cross" d="M39 95.5h2M40 94.5v2"/>
+<path class="flute" d="M56 33H66M64 31L66 33L64 35M58 31L56 33L58 35"/>
+<text class="lbl" x="10" y="108">1. 손바닥 윗장 ×1</text>
+<text class="dim" x="10" y="111.6">60×80 · B골 3 mm</text>
+<polygon class="cut" points="76,24 136,24 136,104 76,104"/>
+<polygon class="cut" points="76,92 91,92 91,102 76,102"/>
+<polygon class="cut" points="121,92 136,92 136,102 121,102"/>
+<circle class="hole" cx="106" cy="32.5" r="1.5"/>
+<path class="cross" d="M105 32.5h2M106 31.5v2"/>
+<circle class="hole" cx="106" cy="95.5" r="1.5"/>
+<path class="cross" d="M105 95.5h2M106 94.5v2"/>
+<path class="flute" d="M127 28V38M125 36L127 38L129 36M125 30L127 28L129 30"/>
+<text class="lbl" x="76" y="108">2. 손바닥 아랫장 ×1</text>
+<text class="dim" x="76" y="111.6">60×80 · B골 3 mm</text>
+<polygon class="cut" points="142,24 170,24 170,105 142,105"/>
+<polyline class="mark" points="144,42 168,42"/>
+<polyline class="mark" points="144,97 168,97"/>
+<circle class="hole" cx="156" cy="30" r="3.25"/>
+<path class="cross" d="M155 30h2M156 29v2"/>
+<text x="144" y="46" font-size="3" >텐던 고리 (안쪽 13 mm 띄움)</text>
+<path class="flute" d="M161 28V38M159 36L161 38L163 36M159 30L161 28L163 30"/>
+<text class="lbl" x="142" y="109">3. 텐던 근위지골 판 ×6</text>
+<text class="dim" x="142" y="112.6">28×81 · B골 3 mm</text>
+<polygon class="cut" points="40,134 39.87,135.96 39.49,137.88 38.86,139.74 37.99,141.5 36.9,143.13 35.61,144.61 34.13,145.9 32.5,146.99 30.74,147.86 28.88,148.49 26.96,148.87 25,149 23.04,148.87 21.12,148.49 19.26,147.86 17.5,146.99 15.87,145.9 14.39,144.61 13.1,143.13 12.01,141.5 11.14,139.74 10.51,137.88 10.13,135.96 10,134 10.13,132.04 10.51,130.12 11.14,128.26 12.01,126.5 13.1,124.87 14.39,123.39 15.87,122.1 17.5,121.01 19.26,120.14 21.12,119.51 23.04,119.13 25,119 26.96,119.13 28.88,119.51 30.74,120.14 32.5,121.01 34.13,122.1 35.61,123.39 36.9,124.87 37.99,126.5 38.86,128.26 39.49,130.12 39.87,132.04"/>
+<text class="lbl" x="10" y="153">4. Soft 드럼 큰판 ×4</text>
+<text class="dim" x="10" y="156.6">30×30 · B골 3 mm</text>
+<polygon class="cut" points="55.51,119 69.51,119 69.51,183 55.51,183"/>
+<polyline class="score" points="61.51,119 61.51,183"/>
+<path class="flute" d="M55.51 128H65.51M63.51 126L65.51 128L63.51 130M57.51 126L55.51 128L57.51 130"/>
+<text class="lbl" x="55.51" y="187">5. Soft 플랩 (분리형) ×2</text>
+<text class="dim" x="55.51" y="190.6">14×64 · B골 3 mm 2겹</text>
+<polygon class="cut" points="10,198 90,198 90,208 10,208"/>
+<circle class="hole" cx="15" cy="203" r="1.5"/>
+<path class="cross" d="M14 203h2M15 202v2"/>
+<circle class="hole" cx="50" cy="203" r="1.5"/>
+<path class="cross" d="M49 203h2M50 202v2"/>
+<circle class="hole" cx="85" cy="203" r="1.5"/>
+<path class="cross" d="M84 203h2M85 202v2"/>
+<text class="lbl" x="10" y="212">6. 균형막대 (whiffletree) ×2</text>
+<text class="dim" x="10" y="215.6">80×10 · B골 3 mm 2겹</text>
+<polygon class="glue" points="142,120 150,120 150,142 142,142"/>
+<polygon class="cut" points="142,120 178,120 178,142 142,142"/>
+<polyline class="score" points="150,120 150,142"/>
+<path class="flute" d="M164 129H174M172 127L174 129L172 131M166 127L164 129L166 131"/>
+<text class="lbl" x="142" y="146">7. Fin Ray 밑판 ×4</text>
+<text class="dim" x="142" y="149.6">36×22 · B골 3 mm</text>
+<polygon class="cut" points="142,157 170,157 170,183 142,183"/>
+<polyline class="mark" points="144,165 168,165"/>
+<polyline class="mark" points="144,171 168,171"/>
+<path class="flute" d="M161 161V171M159 169L161 171L163 169M159 163L161 161L163 163"/>
+<text class="lbl" x="142" y="187">8. 텐던 원위지골 판 ×6</text>
+<text class="dim" x="142" y="190.6">28×26 · B골 3 mm</text>
+<polygon class="cut" points="120,210 119.9,211.57 119.59,213.11 119.09,214.59 118.39,216 117.52,217.31 116.49,218.49 115.31,219.52 114,220.39 112.59,221.09 111.11,221.59 109.57,221.9 108,222 106.43,221.9 104.89,221.59 103.41,221.09 102,220.39 100.69,219.52 99.51,218.49 98.48,217.31 97.61,216 96.91,214.59 96.41,213.11 96.1,211.57 96,210 96.1,208.43 96.41,206.89 96.91,205.41 97.61,204 98.48,202.69 99.51,201.51 100.69,200.48 102,199.61 103.41,198.91 104.89,198.41 106.43,198.1 108,198 109.57,198.1 111.11,198.41 112.59,198.91 114,199.61 115.31,200.48 116.49,201.51 117.52,202.69 118.39,204 119.09,205.41 119.59,206.89 119.9,208.43"/>
+<text class="lbl" x="96" y="226">9. Soft 드럼 작은판 ×2</text>
+<text class="dim" x="96" y="229.6">24×24 · B골 3 mm</text>
+<polygon class="cut" points="144.85,198 162.85,198 144.85,226.81"/>
+<text class="lbl" x="144.85" y="230.81">10. 원위 젖힘 스토퍼 (58°) ×2</text>
+<text class="dim" x="144.85" y="234.41">18×28.81 · B골 3 mm 3겹 적층</text>
+<polygon class="cut" points="10,164 25,164 10,179"/>
+<text class="lbl" x="10" y="183">11. 드럼 삼각 보강 ×4</text>
+<text class="dim" x="10" y="186.6">15×15 · B골 3 mm</text>
+<polygon class="cut" points="10,223 30,223 10,229.11"/>
+<text class="lbl" x="10" y="233.11">12. 근위 휴지 스토퍼 (17°) ×2</text>
+<text class="dim" x="10" y="236.71">20×6.11 · B골 3 mm 3겹 적층</text>
+<polygon class="cut" points="96,237 104,237 104,250 96,250"/>
+<path class="flute" d="M90 246H100M98 244L100 246L98 248M92 244L90 246L92 248"/>
+<text class="lbl" x="96" y="254">13. 텐던 고리 받침 ×8</text>
+<text class="dim" x="96" y="257.6">8×13 · B골 3 mm 적층</text>
+<polygon class="cut" points="144.85,241.81 166.85,241.81 166.85,239.88 144.85,242.41"/>
+<text class="lbl" x="144.85" y="243.88">14. 원위 쐐기 받침 (-5°) ×2</text>
+<text class="dim" x="144.85" y="247.48">22×-1.92 · B골 3 mm 적층</text>
+<path class="cut" d="M10 281h100"/>
+<path class="cut" d="M10 281v-4"/>
+<path class="cut" d="M20 281v-2.5"/>
+<path class="cut" d="M30 281v-2.5"/>
+<path class="cut" d="M40 281v-2.5"/>
+<path class="cut" d="M50 281v-2.5"/>
+<path class="cut" d="M60 281v-4"/>
+<path class="cut" d="M70 281v-2.5"/>
+<path class="cut" d="M80 281v-2.5"/>
+<path class="cut" d="M90 281v-2.5"/>
+<path class="cut" d="M100 281v-2.5"/>
+<path class="cut" d="M110 281v-4"/>
+<text class="small" x="10" y="285">100 mm — 인쇄 후 자로 재서 100 mm 가 아니면 배율(실제 크기 100%) 확인</text>
+</svg>

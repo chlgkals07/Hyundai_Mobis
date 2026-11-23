@@ -115,6 +115,58 @@
 
 </details>
 
+## B3o 말림 최적화 — 젖힌 원위 + 바닥 미끄럼 평행 pinch  —  PASS
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -3.082 deg | [-7.414, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 3.082 deg | [, 90.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 31.0 N | [, 40.0] | ✅ |
+| H3 | 원위 관절 스프링이 근위보다 강하지 않아도 됨 (0.2 ≤ k2/k1 ≤ 5, 고무줄로 구현 가능) | 2.198  | [0.2, 5.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.335 mm | [3.0, 10.0] | ✅ |
+| R1 | Soft 모드: 펴진(휴지) hard 손끝이 Fin Ray 끝보다 위 (≥ margin_soft) | 12.084 mm | [10.0, ] | ✅ |
+| H1 | pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한) | 28.0 N | [, 60.0] | ✅ |
+| J1 | 공중 닫힘 경로의 첫 바닥 접촉이 pinch 보다 바깥 (y0 - pinch y ≥ 2) | 54.312 mm | [2.0, ] | ✅ |
+| J2 | 바닥 미끄럼 구간 내내 텐던을 당길수록 손톱이 안쪽 (d(r1θ1+r2θ2)/dθ1 > 0, 최소값) | 5.481  | [0.0, ] | ✅ |
+| J4 | 손톱 길이 ≥ (반두께+패드)·tan(접촉 시 원위각) + 1 — 패드 모서리가 바닥을 긁지 않음 | 9.0 mm | [7.646, ] | ✅ |
+| J5 | k1=40 N·mm/rad 고무줄로 바닥 미끄럼 안쪽 구동력 최소 ≥ 1 N | 1.904 N | [1.0, ] | ✅ |
+| J3 | 설계 k1 이 상한 이하 & 휴지 유지 하한(20) 이상 | 40.0 N·mm/rad | [20.0, 203.356] | ✅ |
+| J3b | k1 상한이 고무줄로 구현 가능한 범위 (≥ 20 N·mm/rad: 너무 약하면 휴지 자세 유지 못함) | 203.356 N·mm/rad | [20.0, ] | ✅ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 93.0 |
+| `soft_phi_min_deg` | -7.4137 |
+| `soft_x_min` | 18.0 |
+| `soft_phi_battery_deg` | -3.0819 |
+| `soft_phi_chip_deg` | -3.0819 |
+| `soft_phi_sponge_deg` | 3.0819 |
+| `soft_open_half_width` | 123.0 |
+| `soft_pull_mm` | 25.5028 |
+| `soft_string_T_at_limit_N` | 31.0 |
+| `hard_theta1_pinch_deg` | -30.931 |
+| `hard_theta2_pinch_deg` | 35.931 |
+| `tendon_path_ratio` | 0.35 |
+| `tendon_k2_over_k1` | 2.1978 |
+| `rigid_palm_height` | 93.2008 |
+| `rigid_finray_tip_above_floor` | 6.3353 |
+| `soft_mode_hard_above_finray` | 12.084 |
+| `hard_pull_mm` | 14.727 |
+| `hard_string_T_N` | 28.0 |
+| `hard_face_wedge_deg` | -5.0 |
+| `slide_dex_min` | 5.4807 |
+| `slide_g_max_rad_per_mm` | 0.0826 |
+| `tendon_k1_max_Nmm_per_rad` | 203.3556 |
+| `tendon_k2_max_Nmm_per_rad` | 446.9353 |
+| `J1_rubber_moment_at_pinch_Nmm` | 170.118 |
+| `touchdown_distal_deg` | 45.6375 |
+| `slide_drive_min_N` | 1.9043 |
+
+</details>
+
 ## B4 하이브리드 — 슬롯 캐리지 soft + 텐던 hard  —  PASS
 
 | ID | 조건 | 값 | 범위 | 결과 |

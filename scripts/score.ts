@@ -6,8 +6,26 @@ import { PATTERNS } from "../src/core/pattern";
 import type { ModeName, ObjName } from "../src/core/types";
 import common from "../params/common.json";
 
+/** 휴지(완전 개방) 개구 [x, y] mm — calc/capacity.py 와 같은 식 */
+function opening(id: string): [number, number] {
+  const base = id === "V5" ? "B1" : id === "V5b" ? "B3" : id;
+  const p = JSON.parse(readFileSync(`params/${base}.json`, "utf8"));
+  const C = common;
+  const halfT = (p.hard.plies * C.board_t) / 2;
+  const face = halfT + C.pad_t;
+  const yp = p.palm.sy / 2 + halfT;
+  const x = p.soft.type === "slot" ? 2 * p.soft.x_open : 2 * (p.palm.sx / 2 + p.soft.root_len + C.finray.L);
+  const h = p.hard;
+  const r = Math.PI / 180;
+  const y =
+    h.type === "pivot" ? 2 * (yp + h.len * Math.sin(h.psi_open_deg * r) - face)
+    : h.type === "slot" ? 2 * (h.y_open - face)
+    : 2 * (yp + h.l1 * Math.sin(h.theta1_rest_deg * r) + h.l2 * Math.sin((h.theta1_rest_deg + h.theta2_rest_deg) * r) - face);
+  return [x, y];
+}
+
 const calc: Record<string, { pass: boolean; derived: Record<string, number | string> }> = {};
-for (const id of ["B1", "B2", "B3", "B4"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
+for (const id of ["B1", "B2", "B3", "B3o", "B4"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
 const baseOf = (id: string) => (id === "V5" ? "B1" : id === "V5b" ? "B3" : id);
 
 const O = common.objects;
@@ -25,6 +43,7 @@ const RISK: Record<string, [number, string]> = {
   B1: [3.5, "드럼을 접힘 플랩에 직각으로 붙이는 접착부가 약점. 그 외 회전 관절은 빨대 부싱 1종으로 단순."],
   B2: [2.0, "골판지 슬롯+빨대 핀은 마찰·비틀림(racking)으로 걸리기 쉬움. 손바닥 120×104 로 가장 큼."],
   B3: [2.5, "텐던 손가락은 '공중에서 말고 → 내리고 → 조임' 순서가 필요(시뮬에서 jam 발견). 고무줄 강성비 튜닝 필요."],
+  B3o: [3.0, "예비 말기 불필요(바닥 미끄럼 구동력 ≥1 N, SymPy J5). 대신 원위 휴지 58° 스토퍼·근위 17° 스토퍼와 k1≈40 N·mm/rad 고무줄을 맞춰야 함."],
   B4: [2.5, "B2 의 슬롯 마찰 미지수 + B3 의 텐던 순서·고무줄 튜닝을 둘 다 가짐. 대신 가운데 경사 벽이 없어 B2 보다 부품이 단순."],
   V5: [3.0, "B1 과 같고, 실 1개라 칩을 쥘 때 S 를 45% 넘기면 hard 가 닫혀 칩을 누름 → 조작 주의."],
   V5b: [2.0, "B3 리스크 + 실 1개라 Fin Ray 가 끝까지 닫혀 Rigid 에서 텐던 손가락과 부딪힘(시뮬 간섭)."],
@@ -33,11 +52,12 @@ const HAND: Record<string, [number, string]> = {
   B1: [3, "엄지·검지 pinch + 손바닥 감싸기 구도는 손 같지만 손가락이 1관절."],
   B2: [2, "평행 그리퍼 인상. 손 모양 가산점 설명이 약함."],
   B3: [5, "2관절 손가락이 말려 들어감 — 영상에서 '손' 으로 가장 잘 읽힘."],
+  B3o: [5, "B3 와 같은 2관절 텐던 손가락, 바닥을 쓸며 들어오는 동작이 손과 비슷."],
   B4: [5, "B3 와 같은 2관절 텐던 손가락."],
   V5: [3, "B1 과 동일."],
   V5b: [5, "B3 과 동일."],
 };
-const WEIGHTS = { cover: 3, verify: 2, build: 2, drive: 1, risk: 2, hand: 1 };
+const WEIGHTS = { cover: 3, open: 2, verify: 2, build: 2, drive: 1, risk: 2, hand: 1 };
 
 const rows = [];
 const partCount = (id: string) => PATTERNS.find((p) => p.id === baseOf(id))!.shapes.reduce((a, s) => a + s.qty, 0);
@@ -66,8 +86,10 @@ for (const d of ALL) {
   const softT = Number(cd.derived.soft_string_T_at_limit_N);
   const hardT = Number(cd.derived.hard_string_T_N);
   const Tmax = d.oneString ? softT + hardT : Math.max(softT, hardT);
+  const [ox, oy] = opening(d.id);
   const scores = {
     cover: (5 * okN) / CASES.length,
+    open: Math.min(5, (5 * Math.min(ox, oy)) / 150),
     verify: (cd.pass ? 3 : 0) + (colN === 0 ? 2 : Math.max(0, 2 - colN * 0.5)),
     build: cMax === cMin ? 5 : 5 - (3 * (pc - cMin)) / (cMax - cMin),
     drive: Math.max(0, Math.min(5, (5 * (70 - Tmax)) / 50)),
@@ -83,6 +105,7 @@ for (const d of ALL) {
     cells: {
       "물체 5종 (시뮬)": `${okN}/5 · ${res.join(" ")}`,
       "간섭 (6자세)": `${colN}건`,
+      "개구 x×y": `${ox.toFixed(0)}×${oy.toFixed(0)} mm`,
       "SymPy": cd.pass ? "전부 통과" : "실패 있음",
       "부품 수 (자르는 판)": `${pc}`,
       "최대 실 장력": `${Tmax.toFixed(0)} N${d.oneString ? " (실 1개 합)" : ""}`,
@@ -96,6 +119,7 @@ rows.sort((a, b) => b.total - a.total);
 rows.forEach((r, i) => (r.verdict = i === 0 ? "1순위" : i === 1 ? "2순위" : ""));
 const criteria = [
   { key: "cover", label: "물체 커버리지", weight: WEIGHTS.cover, how: "시뮬에서 칩·스펀지·건전지·뚜껑·케이블 프리셋 파지 성공 수 ×5/5 (기준은 표 아래)" },
+  { key: "open", label: "개구 범위", weight: WEIGHTS.open, how: "완전 개방 시 좁은 쪽 개구 150 mm 이상 5점, 비례 감점 (당일 미지 물체·주방 스펀지 110×70 대비)" },
   { key: "verify", label: "검증", weight: WEIGHTS.verify, how: "SymPy 전 조건 통과 3점 + 6자세 간섭 0건 2점 (건당 −0.5)" },
   { key: "build", label: "제작 용이", weight: WEIGHTS.build, how: "자를 판 개수(수량 합) 최소 5점 → 최대 2점 선형" },
   { key: "drive", label: "손 구동", weight: WEIGHTS.drive, how: "최대 실 장력 20 N 이하 5점 → 70 N 0점 선형" },
@@ -105,13 +129,11 @@ const criteria = [
 const top = rows[0];
 const sc = Object.fromEntries(rows.map((r) => [r.id, r.total.toFixed(1)]));
 const recommendation = [
-  `<b>점수:</b> ${rows.map((r) => `${r.id} ${r.total.toFixed(1)}`).join(" · ")}. B1·B2·B3·B4 는 모두 물체 5종을 시뮬에서 잡고 간섭 0건이라, 차이는 제작·구동·리스크에서 났습니다.`,
-  `<b>목요일 결정 규칙:</b> Fin Ray 4개는 모든 안에 공통이니 먼저 만든다 → B2 슬롯 벽 1장 + 빨대 핀만 잘라 10분 미끄럼 테스트 → 핀이 손가락 힘으로 걸림 없이 왕복하면 B2(${sc.B2}), 걸리면 B1(${sc.B1}).`,
-  "B2 가 점수 1위인 이유: 슬롯 직선 구동이라 레버 손해가 없어 실 장력이 가장 낮고(마찰 제외 9 N vs B1 36 N), 자를 판 수도 가장 적고, 경사 슬롯 덕에 '닫히면 손끝이 내려가는' 높이 순서가 기구적으로 보장됩니다. 대신 골판지 슬롯 마찰·비틀림은 시뮬로 검증할 수 없는 가장 큰 미지수입니다.",
-  "B1 은 회전 관절이 '빨대 부싱 + 빨대 축' 한 종류라 제작 리스크가 가장 낮은 안전한 선택입니다. 약점은 hard 손가락 레버(112 mm)를 드럼(25 mm)으로 돌려 실 장력이 큰 것과 드럼 직각 접착부입니다.",
-  "B3 는 영상 가산점(핸드형)이 가장 크지만 텐던 손가락이 바닥에서 걸리는 문제가 시뮬에서 드러났고, '공중에서 실 B 60% → 내림 → 조임' 순서로만 동작합니다. B1/B2 가 돌아가면 hard 만 B3 식 텐던으로 바꾸는 하이브리드가 다음 iteration 후보입니다.",
-  `B4(하이브리드, ${sc.B4})는 B2 soft + B3 텐던 hard 입니다. 물체 5종·간섭 0건을 유지하면서 핸드형 가산점을 B3 수준으로 올렸지만, 텐던 장력(하한 50 N)이 구동 점수를 깎고 B2·B3 의 미지수(슬롯 마찰, 텐던 순서)를 둘 다 가집니다. 영상용 '손' 연출이 중요하면 B2 슬롯 테스트 통과 후 hard 만 텐던으로 바꾸는 경로로 쓰면 됩니다.`,
-  "V5(1-string)는 B1 위에서 간섭 없이 동작합니다(실 1개 장력 합이 커서 구동 점수는 낮음). 본선 액추에이터가 1개로 확정되면 V5 방식이 기본안입니다. V5b(B3+1-string)는 Rigid 에서 Fin Ray 와 텐던 손가락이 부딪혀 탈락입니다.",
+  `<b>점수:</b> ${rows.map((r) => `${r.id} ${r.total.toFixed(1)}`).join(" · ")}. '개구 범위'(×2)를 넣자 직선 구동 B2·B4 가 내려갔습니다 — B2 는 90×71 mm, 높이 59 mm 까지만 들어가 주방 스펀지(110×70)도 못 잡습니다.`,
+  `<b>선택: B3o</b> (B3 최적화, ${sc.B3o}). B3 에서 원위 휴지각을 바깥으로 젖히고(58°) 손가락 길이·텐던 고리를 SymPy 로 다시 잡아, 예비 말기 없이 '내리고 당기기'만으로 손톱이 바닥을 미끄러져 들어옵니다(미끄럼 구동력 ≥ 1.9 N). 텐던 장력 50 → 28 N.`,
+  "B3o 의 실제 파지 방식: 둥글거나 낮은 물체(건전지·뚜껑·케이블)는 손톱이 바닥을 쓸며 물체 밑으로 들어가고 원위 패드가 위를 덮는 '떠서 감싸기'입니다. 설계 목표였던 적도 평행 pinch 와는 다르니, 실물에서 건전지가 굴러 빠지는지 먼저 확인하세요.",
+  `B1 (${sc.B1})은 점수 1위로 제작 리스크가 가장 낮습니다. B3o 실물이 미끄럼에서 멈추면(골판지-바닥 마찰이 가정보다 크면) hard 만 B1 피벗으로 바꾸는 것이 대안입니다 — soft(플랩+Fin Ray)는 같습니다.`,
+  "V5b(B3+1-string)는 Rigid 에서 Fin Ray 와 텐던 손가락이 부딪혀 탈락입니다.",
 ];
 const md = [
   "# 설계안 비교 (자동 생성)",

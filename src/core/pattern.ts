@@ -7,10 +7,12 @@ import common from "../../params/common.json";
 import B1p from "../../params/B1.json";
 import B2p from "../../params/B2.json";
 import B3p from "../../params/B3.json";
+import B3op from "../../params/B3o.json";
 import B4p from "../../params/B4.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
+import B3oc from "../../calc/out/B3o.json";
 import B4c from "../../calc/out/B4.json";
 
 export type P2 = [number, number];
@@ -356,16 +358,41 @@ function b3(pIn: typeof B3p = B3p, dIn: Record<string, unknown> = B3c.derived): 
   wsh.cut.push({ pts: [[0, 0], [wl, 0], [wl, wt], [0, 0.6]], closed: true });
   shapes.push(wsh);
   shapes.push(rect("텐던 고리 받침", 8, "B골 3 mm 적층", 8, p.hard.r1, `빨대 토막(8 mm)을 이 받침 끝에 붙여 텐던 고리로. 근위 ${p.hard.r1} mm / 원위 ${p.hard.r2} mm 로 높이 맞춤.`, "x"));
+  const t20 = p.hard.theta2_rest_deg;
+  const stopParts: Shape[] = [];
+  const extraCut: string[] = [];
+  if (t20 > 0) {
+    // 원위 젖힘 스토퍼: 근위 끝 바깥면에 붙이는 삼각 블록, 빗변에 원위가 기대어 θ2 = t20 에서 멈춤
+    const a = 18;
+    const st = blank(`원위 젖힘 스토퍼 (${t20}°)`, 2, "B골 3 mm 3겹 적층", a, a * Math.tan((t20 * Math.PI) / 180), `근위지골 끝 바깥면(J2 바로 위)에 직각변을 붙임. 원위지골이 빗변에 닿아 휴지 θ2=${t20}° 유지.`);
+    st.cut.push({ pts: [[0, 0], [a, 0], [0, a * Math.tan((t20 * Math.PI) / 180)]], closed: true });
+    stopParts.push(st);
+  }
+  const t10s = p.hard.theta1_rest_deg;
+  const st1 = blank(`근위 휴지 스토퍼 (${t10s}°)`, 2, "B골 3 mm 3겹 적층", 20, 20 * Math.tan((t10s * Math.PI) / 180), `손바닥 앞·뒤 모서리 바깥에 붙임. 근위지골이 ${t10s}° 에서 기대어 멈춤 (복원 고무줄이 여기로 당김).`);
+  st1.cut.push({ pts: [[0, 0], [20, 0], [0, 20 * Math.tan((t10s * Math.PI) / 180)]], closed: true });
+  stopParts.push(st1);
+  const k1s = (p.hard as { k1_spec_Nmm_per_rad?: number }).k1_spec_Nmm_per_rad;
+  if (k1s) {
+    const k2s = k1s * Number(d.tendon_k2_over_k1);
+    const arm1 = 10;
+    const arm2 = 8;
+    extraCut.push(
+      `복원 고무줄 강성 (SymPy J3·J5): J1 k1=${fx(k1s)} N·mm/rad → 레버 ${arm1} mm 에서 고무줄 ${fx(k1s / arm1 ** 2)} N/mm, J2 k2=${fx(k2s)} N·mm/rad → 레버 ${arm2} mm 에서 ${fx(k2s / arm2 ** 2)} N/mm. 상한 k1 ≤ ${fx(Number(d.tendon_k1_max_Nmm_per_rad))} — 너무 센 고무줄이면 바닥에서 안 미끄러짐.`,
+      "조작: 손바닥을 내려 손톱을 바닥에 대고 실 B 를 당기기만 하면 됨 (예비 말기 불필요)",
+    );
+  }
   return {
-    id: "B3",
+    id: (p as { id?: string }).id ?? "B3",
     name: p.name,
-    shapes,
+    shapes: [...shapes, ...stopParts],
     cutList: [
+      ...extraCut,
       ...finrayCutList(),
       `굵은 빨대 부싱: soft 플랩 ${yHi - yLo} mm × 2, hard 7 mm × 4`,
       `일반 빨대 축: soft ${yHi - yLo + 10} mm × 2, hard ${w + 14} mm × 2, 텐던 고리 8 mm × 8`,
       `고무줄: J1 복원 2, J2 복원 2 (k2/k1 ≈ ${fx(Number(d.tendon_k2_over_k1))} → J2 쪽을 두 겹)`,
-      "조작 순서: 공중에서 실 B 60% → 내림 → 끝까지 (바닥에서 말면 원위지골이 걸림, 시뮬 확인)",
+      ...((p.hard as { precurl?: boolean }).precurl === false ? [] : ["조작 순서: 공중에서 실 B 60% → 내림 → 끝까지 (바닥에서 말면 원위지골이 걸림, 시뮬 확인)"]),
     ],
     steps: [
       "손바닥 2장 엇갈려 풀칠. 모서리에 굵은 빨대 부싱(플랩용)·짧은 부싱(hard용) 풀칠.",
@@ -423,4 +450,4 @@ function b4(): DesignPattern {
   };
 }
 
-export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b4()];
+export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b3(B3op as unknown as typeof B3p, B3oc.derived), b4()];
