@@ -1,0 +1,36 @@
+{
+  "id": "B5F",
+  "name": "B5F 플로팅 — 평행 링크 브래킷을 빨대 텔레스코프에 띄움",
+  "palm": {
+    "sx": 60.0,
+    "sy": 88.0
+  },
+  "soft": {
+    "type": "flap",
+    "joint": "score",
+    "root_len": 16.0,
+    "phi_open_deg": 90.0,
+    "drum_r": 13.0,
+    "drum_y": 33.0
+  },
+  "hard": {
+    "type": "parallel",
+    "_doc": "평행사변형: 손바닥 아래 브래킷의 안쪽·바깥 피벗(P_in, P_out, 수평 간격 d) → 같은 길이 L 링크 2개 → 수평 커플러 + 수직 손끝판(항상 수직). 피벗 y 는 건전지 pinch 에서 링크가 수직이 되도록 SymPy 가 정함. 드럼은 바깥 피벗.",
+    "L": 55.0,
+    "d": 24.0,
+    "width": 24.0,
+    "plies": 3,
+    "link_plies": 2,
+    "nail_len": 5.0,
+    "psi_open_deg": 68.0,
+    "drum_r": 16.0,
+    "bracket_drop": 20.0,
+    "compliance": {
+      "type": "float",
+      "travel": 13.0,
+      "engage_N": 3.0,
+      "force_at_travel_N": 6.0,
+      "sleeve_len": 30.0
+    }
+  }
+}

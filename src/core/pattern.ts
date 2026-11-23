@@ -10,12 +10,16 @@ import B3p from "../../params/B3.json";
 import B3op from "../../params/B3o.json";
 import B4p from "../../params/B4.json";
 import B5p from "../../params/B5.json";
+import B5Fp from "../../params/B5F.json";
+import B5Np from "../../params/B5N.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
 import B3oc from "../../calc/out/B3o.json";
 import B4c from "../../calc/out/B4.json";
 import B5c from "../../calc/out/B5.json";
+import B5Fc from "../../calc/out/B5F.json";
+import B5Nc from "../../calc/out/B5N.json";
 
 export type P2 = [number, number];
 export interface Shape {
@@ -470,11 +474,12 @@ function linkBar(label: string, qty: number, L: number, h: number, note: string,
   return s;
 }
 
-function b5(): DesignPattern {
-  const p = B5p;
-  const d = B5c.derived as unknown as Record<string, number>;
-  const h = p.hard;
-  const base = b1(p, B5c.derived);
+function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): DesignPattern {
+  const p = pIn;
+  const d = dIn as unknown as Record<string, number>;
+  const h = p.hard as typeof B5p.hard & { compliance?: { type: string; travel?: number; sleeve_len?: number; engage_N?: number } };
+  const comp = h.compliance;
+  const base = b1(p, dIn);
   const keep = base.shapes.filter((s) => /^(손바닥|Fin Ray|Soft|드럼 삼각|균형막대|손톱)/.test(s.label));
   const halfT = (h.plies * T) / 2;
   const Lc = Number(d.hard_coupler_below_E);
@@ -482,7 +487,9 @@ function b5(): DesignPattern {
   // 브래킷: 위 8 mm 탭(손바닥 접착), 피벗 구멍 2개(굵은 빨대 부싱 Ø12)
   const bh = h.bracket_drop + 8 + 8;
   const bw = h.d + 16;
-  const br = blank("링크 브래킷", 4, "B골 3 mm 2겹", bw, bh, `손가락당 2장(링크 양옆 x=±${fx(h.width / 2 + 2.5)}). 위 8 mm 탭을 꺾어 손바닥 아랫면 y=±${fx(Number(d.hard_pivot_y))}~${fx(Number(d.hard_pivot_y) + h.d)} 에 풀칠. 구멍엔 굵은 빨대 부싱.`);
+  const br = blank("링크 브래킷", 4, "B골 3 mm 2겹", bw, bh, comp?.type === "float"
+    ? `손가락당 2장(x=±${fx(h.width / 2 + 2.5)}). 손바닥에 붙이지 않음: 위 탭을 꺾어 두 브래킷을 잇는 '다리'로 쓰고, 다리 위에 슬라이더 빨대 2개를 세워 손바닥 구멍으로 올림. 브래킷은 손바닥 슬롯 안에서 ${comp.travel} mm 오르내림.`
+    : `손가락당 2장(링크 양옆 x=±${fx(h.width / 2 + 2.5)}). 위 8 mm 탭을 꺾어 손바닥 아랫면 y=±${fx(Number(d.hard_pivot_y))}~${fx(Number(d.hard_pivot_y) + h.d)} 에 풀칠. 구멍엔 굵은 빨대 부싱.`);
   rectCut(br, 0, 0, bw, bh);
   br.score.push([[0, 8], [bw, 8]]);
   br.glue.push({ x: 0, y: 0, w: bw, h: 8 });
@@ -504,13 +511,36 @@ function b5(): DesignPattern {
   shapes.push(disk("Hard 드럼 큰판", 4, h.drum_r, C.straw_d + 0.5, "바깥 축에 풀칠 (큰-작은-큰 = 실 홈). 링크 막대 사이 가운데."));
   shapes.push(disk("Hard 드럼 작은판", 2, h.drum_r - 3, C.straw_d + 0.5));
   const ty = Number(d.hard_pivot_y) + h.d - h.drum_r;
+  const compCut: string[] = [];
+  if (comp?.type === "float") {
+    // 손바닥 슬롯(브래킷 통과) + 슬라이더 구멍
+    const yp0 = Number(d.hard_pivot_y);
+    const bxx = h.width / 2 + 2.5;
+    for (const sh of shapes.filter((x) => x.label.startsWith("손바닥"))) {
+      const ox = sh.label.includes("윗장") ? p.soft.root_len : 0;
+      for (const sx of [1, -1]) for (const t of [1, -1]) {
+        const cx = ox + p.palm.sx / 2 + sx * bxx;
+        const y0 = p.palm.sy / 2 + t * (yp0 - 6);
+        const y1 = p.palm.sy / 2 + t * (yp0 + h.d + 6);
+        rectCut(sh, cx - 2.5, Math.min(y0, y1), 5, Math.abs(y1 - y0));
+        sh.holes.push({ c: [cx, p.palm.sy / 2 + t * (yp0 + 2)], d: C.straw_d + 1 });
+      }
+      sh.note = (sh.note ?? "") + " 플로팅: 브래킷 슬롯 4개(폭 5)·슬라이더 구멍 4개.";
+    }
+    compCut.push(
+      `플로팅 텔레스코프: 굵은 빨대 슬리브 ${comp.sleeve_len} mm × 4 (손바닥 윗면에 세워 풀칠), 일반 빨대 슬라이더 ${(comp.sleeve_len ?? 30) + 12} mm × 4 (브래킷 다리에 세움)`,
+      `프리로드 고무줄: 슬리브 위끝 ↔ 슬라이더 아래, ${comp.engage_N} N 에서 뜨기 시작, 10 mm 에서 6 N (≈ ${fx(Number(d.float_k_N_per_mm))} N/mm, 손가락당 2개 합)`,
+    );
+  }
+  if (comp?.type === "nail") compCut.push(`긴 손톱 ${h.nail_len} mm: 테이프 힌지 + 안쪽 스토퍼. 접히면 최대 ${fx(Number(d.vertical_compliance_mm))} mm 순응. 손톱 안쪽에도 고무줄 감기(접히기 전엔 쥐는 면)`);
   return {
-    id: "B5",
+    id: (p as { id?: string }).id ?? "B5",
     name: p.name,
     shapes,
     cutList: [
+      ...compCut,
       ...finrayCutList(),
-      `일반 빨대 축/핀: 손가락당 4개 × ${h.width + 12} mm (안쪽 축, 바깥 축, E_in 핀, E_out 핀)`,
+      `일반 빨대 축/핀: 손가락당 4개 × ${h.width + 8} mm (안쪽 축, 바깥 축, E_in 핀, E_out 핀)`,
       `굵은 빨대 부싱: 손가락당 4개 × 4 mm (브래킷 구멍)`,
       `텐던 1가닥 연속 루프: 앞 드럼(3바퀴) → 손바닥 구멍 y=+${fx(ty)} → 모터 풀리(또는 손잡이) → 구멍 y=-${fx(ty)} → 뒤 드럼. 풀리에서 루프를 당기면 두 손가락이 같은 장력으로 닫힘`,
       `복원 고무줄: 손가락당 1개 (바깥 링크 끝 ↔ 브래킷 바깥 위)`,
@@ -527,4 +557,13 @@ function b5(): DesignPattern {
   };
 }
 
-export const PATTERNS: DesignPattern[] = [b1(), b2(), b3(), b3(B3op as unknown as typeof B3p, B3oc.derived), b4(), b5()];
+export const PATTERNS: DesignPattern[] = [
+  b5(B5Np as unknown as typeof B5p, B5Nc.derived),
+  b5(B5Fp as unknown as typeof B5p, B5Fc.derived),
+  b5(),
+  b1(),
+  b2(),
+  b3(),
+  b3(B3op as unknown as typeof B3p, B3oc.derived),
+  b4(),
+];

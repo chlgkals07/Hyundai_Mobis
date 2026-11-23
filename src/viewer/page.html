@@ -51,6 +51,11 @@ nav.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--line); 
 .designs { display: grid; gap: 6px; }
 .designs button { text-align: left; font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; cursor: pointer; display: grid; gap: 1px; }
 .designs button small { color: var(--muted); font-size: 12px; }
+.oldlist { display: grid; gap: 6px; border-top: 1px dashed var(--line); padding-top: 6px; }
+.oldlist summary { cursor: pointer; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.oldlist[open] { gap: 6px; }
+.oldlist button { opacity: 0.75; }
+details.box.old summary { cursor: pointer; }
 .designs button[aria-pressed="true"] { border-color: var(--mat); background: var(--mat-soft); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips button { font: inherit; font-size: 13px; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; cursor: pointer; }
@@ -113,7 +118,7 @@ table.cmp td.n { font-family: var(--font-num); font-variant-numeric: tabular-num
   <section class="page" id="page-bench">
     <div class="bench">
       <div class="rail">
-        <div class="box"><h2>설계안</h2><div class="designs" id="designs"></div></div>
+        <div class="box"><h2>현재 후보</h2><div class="designs" id="designs"></div></div>
         <div class="box">
           <h2>모드 프리셋</h2>
           <div class="chips" id="modes"></div>

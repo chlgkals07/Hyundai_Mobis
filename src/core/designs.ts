@@ -5,18 +5,25 @@ import B3p from "../../params/B3.json";
 import B3op from "../../params/B3o.json";
 import B4p from "../../params/B4.json";
 import B5p from "../../params/B5.json";
+import B5Tp from "../../params/B5T.json";
+import B5Fp from "../../params/B5F.json";
+import B5Np from "../../params/B5N.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
 import B3oc from "../../calc/out/B3o.json";
 import B4c from "../../calc/out/B4.json";
 import B5c from "../../calc/out/B5.json";
+import B5Tc from "../../calc/out/B5T.json";
+import B5Fc from "../../calc/out/B5F.json";
+import B5Nc from "../../calc/out/B5N.json";
 import { DEG, V, boxPart, clamp, cylPart, lerp, segPart } from "./build";
 import { makeObject, sceneSdf } from "./objects";
 import {
   C,
   X,
   Y,
+  Z,
   Z_TOP,
   across,
   firstContact,
@@ -633,19 +640,30 @@ export function makeB4(): Design {
   };
 }
 
-// ================================================================== B5 (평행사변형 링크 hard, 텐던 1가닥 루프)
+// ================================================================== B5 계열 (평행사변형 링크 hard, 텐던 1가닥 루프) + 수직 순응 옵션
+
+interface CompCfg {
+  type: "tip" | "float" | "nail";
+  theta_max_deg?: number;
+  travel?: number;
+  engage_N?: number;
+  force_at_travel_N?: number;
+  sleeve_len?: number;
+}
 
 function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3) => number, floorZ: number): HardOut {
-  const h = p.hard;
+  const h = p.hard as typeof B5p.hard & { compliance?: CompCfg };
+  const comp = h.compliance;
   const halfT = (h.plies * C.board_t) / 2;
   const linkT = h.link_plies * C.board_t;
   const yp = num(d, "hard_pivot_y");
   const Lc = num(d, "hard_coupler_below_E");
-  const zP = -h.bracket_drop;
   const psiOpen = h.psi_open_deg * DEG;
   const psiMin = (num(d, "hard_psi_min_deg") + 0.3) * DEG;
   const qmax = psiOpen - psiMin;
+  let lift = 0; // float: 브래킷 전체가 위로 밀려 올라간 양
   const at = (q: number) => {
+    const zP = -h.bracket_drop + lift;
     const psi = psiOpen - q;
     const u = V(0, Math.sin(psi), -Math.cos(psi));
     const P1 = V(0, yp, zP); // 안쪽 피벗
@@ -653,9 +671,9 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
     const E1 = P1.clone().addScaledVector(u, h.L);
     const E2 = P2.clone().addScaledVector(u, h.L);
     const tip = E1.clone().add(V(0, 0, -Lc));
-    return { psi, P1, P2, E1, E2, tip };
+    return { psi, zP, P1, P2, E1, E2, tip };
   };
-  // 손끝판 안쪽 면(패드면, 수직)과 손톱이 물체에 닿는 첫 q
+  // 손끝판 패드면 + 손톱 안쪽 면이 물체에 닿는 첫 q (손톱은 안쪽 스토퍼로 쥐는 방향 강성 → 쥐는 면의 일부)
   const pen = (q: number) => {
     const g = at(q);
     for (const x of across(h.width)) {
@@ -663,44 +681,92 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
         const s = V(x, g.tip.y - halfT - C.pad_t, g.tip.z + h.nail_len + ((g.E1.z - 3 - g.tip.z - h.nail_len) * k) / 8);
         if (objSdf(s) < 0.2) return true;
       }
-      if (objSdf(V(x, g.tip.y - halfT, g.tip.z + 1)) < 0.2) return true;
+      for (let k = 0; k <= 4; k++) if (objSdf(V(x, g.tip.y - halfT, g.tip.z + 0.5 + (h.nail_len * k) / 4)) < 0.2) return true;
     }
     return false;
   };
   const qcmd = clamp(b, 0, 1) * qmax;
-  const q = firstContact(qcmd, pen);
+  let q = firstContact(qcmd, pen);
+  if (comp?.type === "float") {
+    // 접근 중 손끝이 바닥을 누르면 브래킷이 텔레스코프 따라 올라감 (손톱 플랩은 그 위 잔여분만)
+    lift = clamp(floorZ + 0.3 - at(q).tip.z, 0, comp.travel ?? 0);
+    if (lift > 0) q = firstContact(qcmd, pen);
+  }
   const g = at(q);
+  const zP = g.zP;
+  // 손끝판 관절 (tip): 피벗 Pv = E_in 아래 4.5. 바닥이 밀면 아래쪽 끝이 안쪽·위로 꺾임 (반대 방향은 스토퍼)
+  const Pv = g.E1.clone().add(V(0, 0, -4.5));
+  let theta = 0;
+  const rotV = (v: Vector3) => V(v.x, v.y * Math.cos(theta) + v.z * Math.sin(theta), -v.y * Math.sin(theta) + v.z * Math.cos(theta));
+  const rotP = (pt: Vector3) => Pv.clone().add(rotV(pt.clone().sub(Pv)));
+  if (comp?.type === "tip") {
+    const thMax = (comp.theta_max_deg ?? 50) * DEG;
+    for (let k = 0; k <= 200; k++) {
+      theta = (thMax * k) / 200;
+      if (rotP(g.tip).z >= floorZ + 0.3) break;
+    }
+  }
+  const plateAxis = rotV(V(0, 0, -1));
+  const plateN = rotV(V(0, 1, 0)); // 바깥 법선 (앞 손가락)
+  const tipR = rotP(g.tip);
   const R: Part[] = [];
   const W = h.width - 2;
-  // 링크: 안쪽(link_in) / 바깥(link_out, 드럼 일체). 폭을 나눠 같은 x 에서 겹치지 않게 할 필요 없음 (평행, 수직거리 d·cosψ)
+  const plateBody = comp?.type === "tip" ? "hard_t" : "hard_c";
+  const brBody = comp?.type === "float" ? "hard_br" : "palm";
   // 안쪽 링크는 두 갈래(x=±fx)로 나눠 가운데의 바깥 피벗 드럼(두께 9)을 비켜 감 — 열릴 때 d·cosψ < r 이라 일체형이면 드럼과 부딪힘
-  const forkW = (W - 12) / 2;
-  const fxo = 6 + forkW / 2;
+  const forkW = (W - 11) / 2;
+  const fxo = 5.5 + forkW / 2;
   for (const sx of [1, -1]) R.push(segPart(`linkIn${sx}`, "hard_l2", "board", g.P1.clone().setX(sx * fxo), g.E1.clone().setX(sx * fxo), forkW, linkT, X));
   R.push(segPart("linkOut", "hard", "board", g.P2, g.E2, W, linkT, X));
   R.push(cylPart("drum", "hard", "disk", g.P2.clone(), X, 9, h.drum_r * 2));
-  // 커플러(수평, E_in–E_out) + 손끝판(수직, E_in 에서 아래로)
   R.push(segPart("couplerBar", "hard_c", "board", g.E1.clone().add(V(0, -halfT, 0)), g.E2.clone().add(V(0, 4, 0)), h.width, 2 * halfT, X));
-  R.push(segPart("tipPlate", "hard_c", "board", g.E1.clone().add(V(0, 0, -4.5)), g.tip.clone().add(V(0, 0, h.nail_len)), h.width, 2 * halfT, X));
   for (const [n, e] of [["pinIn", g.E1], ["pinOut", g.E2]] as const) R.push(cylPart(n, "hard_c", "straw", e.clone(), X, h.width + 6, C.straw_d));
-  const padTop = Math.min(g.E1.z - 8, g.tip.z + h.nail_len + 22);
-  const padBot = g.tip.z + h.nail_len;
-  R.push(boxPart("pad", "hard_c", "pad", [h.width - 4, C.pad_t, padTop - padBot], V(0, g.tip.y - halfT - C.pad_t / 2, (padTop + padBot) / 2)));
-  const hinge = V(0, g.tip.y - halfT + 1, padBot);
-  const nail = nailFold(hinge, V(0, 0, -1), V(0, 1, 0), h.nail_len, floorZ);
-  R.push(segPart("nail", "hard_c", "nail", hinge, nail.tip, h.width - 2, 2, X));
-  // 브래킷 (손바닥에 접착, 링크 양옆) + 고정 축 2개
+  // 손끝판 + 패드 + 손톱 (tip 옵션이면 Pv 기준 회전)
+  const plateTop = Pv.clone();
+  const plateBot = rotP(g.tip.clone().add(V(0, 0, h.nail_len)));
+  R.push(segPart("tipPlate", plateBody, "board", plateTop.clone().addScaledVector(plateAxis, comp?.type === "tip" ? 3.5 : 0), plateBot, h.width, 2 * halfT, X));
+  const padLen = Math.min(22, Pv.z - 8 - (g.tip.z + h.nail_len));
+  const padBotP = plateBot.clone().addScaledVector(plateN, -halfT - C.pad_t / 2);
+  R.push(segPart("pad", plateBody, "pad", padBotP.clone().addScaledVector(plateAxis, -padLen), padBotP, h.width - 4, C.pad_t, X));
+  const hinge = plateBot.clone().addScaledVector(plateN, -halfT + 1);
+  const nail = nailFold(hinge, plateAxis, plateN, h.nail_len, floorZ);
+  R.push(segPart("nail", plateBody, "nail", hinge, nail.tip, h.width - 2, 2, X));
+  if (comp?.type === "tip") {
+    R.push(cylPart("tipPin", plateBody, "straw", Pv.clone(), X, h.width + 6, C.straw_d));
+    // 스토퍼 블록 (커플러 바 아래 바깥쪽): 손끝판이 pinch 반력으로 바깥으로 도는 것을 막음
+    R.push(boxPart("tipStop", "hard_c", "board", [h.width - 6, 4, 6], g.E1.clone().add(V(0, halfT + 2.5, -7))));
+  }
+  // 브래킷 + 고정 축 2개 (float 면 브래킷도 함께 움직임)
   const bx = h.width / 2 + 2.5;
-  for (const sx of [1, -1]) R.push(boxPart(`bracket${sx}`, "palm", "board", [3, h.d + 12, -zP + 7], V(sx * bx, yp + h.d / 2, (zP - 7) / 2)));
-  R.push(cylPart("axleIn", "palm", "straw", g.P1.clone(), X, h.width + 12, C.straw_d));
-  R.push(cylPart("axleOut", "palm", "straw", g.P2.clone(), X, h.width + 12, C.straw_d));
+  const brH = h.bracket_drop + 7;
+  for (const sx of [1, -1]) R.push(boxPart(`bracket${sx}`, brBody, "board", [3, h.d + 12, brH], V(sx * bx, yp + h.d / 2, -brH / 2 + lift)));
+  R.push(cylPart("axleIn", brBody, "straw", g.P1.clone(), X, h.width + 8, C.straw_d));
+  R.push(cylPart("axleOut", brBody, "straw", g.P2.clone(), X, h.width + 8, C.straw_d));
+  if (comp?.type === "float") {
+    // 텔레스코프 2쌍은 손바닥 '위'(y=yp+2): 굵은 빨대 슬리브(손바닥 윗면 고정) ↔ 일반 빨대(브래킷 위끝에서 손바닥 구멍 통과).
+    // (손바닥 아래 브래킷 옆에 두었더니 Fin Ray 와 간섭 → 위로 옮김). 브래킷 윗부분은 손바닥 슬롯을 지나 함께 올라감.
+    const sl = comp.sleeve_len ?? 30;
+    const sy = yp + 2;
+    for (const sx of [1, -1]) {
+      R.push(cylPart(`sleeve${sx}`, "palm", "bubble", V(sx * bx, sy, Z_TOP + sl / 2), Z, sl, C.bubble_d));
+      R.push(cylPart(`slider${sx}`, brBody, "straw", V(sx * bx, sy, Z_TOP + sl / 2 - 6 + lift), Z, sl + 12, C.straw_d));
+    }
+  }
   const RL: Line[] = [];
   RL.push({
     id: "returnB",
     kind: "rubber",
     pts: [V(h.width / 2 - 4, g.E2.y + 4, g.E2.z), V(h.width / 2 - 4, yp + h.d + 6, zP + 6)],
-    attached: ["hard_c", "palm", "hard"],
+    attached: ["hard_c", "palm", "hard", "hard_br"],
   });
+  if (comp?.type === "tip") {
+    RL.push({ id: "tipRubber", kind: "rubber", pts: [g.E1.clone().add(V(h.width / 2 - 3, halfT + 4, -2)), rotP(g.E1.clone().add(V(h.width / 2 - 3, halfT + 1, -24)))], attached: ["hard_c", "hard_t"] });
+  }
+  if (comp?.type === "float") {
+    // 프리로드 고무줄: 슬리브 위끝 ↔ 슬라이더 아래 (브래킷을 아래로 당김)
+    const sl = comp.sleeve_len ?? 30;
+    RL.push({ id: "floatRubber", kind: "rubber", pts: [V(bx + 7, yp + 2, Z_TOP + sl), V(bx + 7, yp + 2, Z_TOP + 2)], attached: ["palm", "hard_br"] });
+  }
   const parts: Part[] = [];
   const lines: Line[] = [];
   const bodyF = (b0: string) => (b0 === "palm" ? "palm" : b0.replace("hard", "hardF"));
@@ -709,59 +775,82 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
     parts.push({ ...pp, id: pp.id + ".F", body: bodyF(pp.body) });
     parts.push(mirrorPart(pp, 1, -1, ".B", bodyB(pp.body)));
   }
+  const attF = ["hardF_c", "hardF", "hardF_l2", "hardF_t", "hardF_br", "palm"];
   for (const l of RL) {
-    lines.push({ ...l, id: l.id + ".F", attached: ["hardF_c", "hardF", "hardF_l2", "palm"] });
-    lines.push(mirrorLine(l, 1, -1, ".B", ["hardB_c", "hardB", "hardB_l2", "palm"]));
+    lines.push({ ...l, id: l.id + ".F", attached: attF });
+    lines.push(mirrorLine(l, 1, -1, ".B", attF.map((s) => s.replace("F", "B"))));
   }
   // 텐던 1가닥 연속 루프: 앞 드럼 안쪽 접선 → 위 → 모터 풀리 → 아래 → 뒤 드럼. 양쪽 장력이 같아 자동 균형.
-  const ty = yp + h.d - h.drum_r; // 바깥 피벗 드럼의 안쪽 접선
+  const ty = yp + h.d - h.drum_r;
   const zTopLoop = Z_TOP + 40;
   lines.push({
     id: "tendonLoop",
     kind: "tendon",
     pts: [V(0, ty, zP), V(0, ty, zTopLoop), V(0, 0, zTopLoop + 6), V(0, -ty, zTopLoop), V(0, -ty, zP)],
-    attached: ["hardF", "hardB", "palm", "motor"],
+    attached: ["hardF", "hardB", "hardF_br", "hardB_br", "palm", "motor"],
   });
   const motor = cylPart("motorPulley", "motor", "disk", V(0, 0, zTopLoop + 3), X, 6, 2 * ty + 6);
   motor.ghost = true;
   parts.push(motor);
-  const faceY = g.tip.y - halfT - C.pad_t;
+  // 쥐는 면 간격: 패드면·손톱 안쪽 면 중 가장 안쪽
+  const facePts = [padBotP.clone().addScaledVector(plateN, -C.pad_t / 2), padBotP.clone().addScaledVector(plateN, -C.pad_t / 2).addScaledVector(plateAxis, -padLen), nail.tip.clone().addScaledVector(plateN, -1)];
+  const faceY = Math.min(...facePts.map((v) => v.y));
+  let vdef = 0;
+  let floorF = 0;
+  const compRead: Readout[] = [];
+  if (comp?.type === "tip") {
+    vdef = rotP(g.tip).z - g.tip.z;
+    floorF = theta > 0 ? (num(d, "tip_preload_Nmm") + num(d, "tip_rubber_k_Nmm_per_rad") * theta) / halfT : 0;
+    compRead.push({ label: "손끝판 꺾임 (바닥 순응)", value: `${(theta / DEG).toFixed(1)}° → 손끝 ${vdef.toFixed(1)} mm 상승, 바닥 누름 ≈ ${floorF.toFixed(1)} N`, warn: theta >= ((comp.theta_max_deg ?? 50) - 0.5) * DEG });
+  } else if (comp?.type === "float") {
+    vdef = lift;
+    floorF = lift > 0 ? (comp.engage_N ?? 0) + num(d, "float_k_N_per_mm") * lift : 0;
+    compRead.push({ label: "브래킷 떠오름 (텔레스코프)", value: `${lift.toFixed(1)} / ${comp.travel} mm, 바닥 누름 ≈ ${floorF.toFixed(1)} N`, warn: lift >= (comp.travel ?? 0) - 0.1 });
+  }
+  const nailRise = h.nail_len * (1 - Math.cos(nail.al));
+  compRead.push({ label: "손톱 플랩 접힘", value: `${(nail.al / DEG).toFixed(0)}° (${nailRise.toFixed(1)} mm)`, warn: nail.al > 79 * DEG });
   return {
     parts,
     lines,
     tops: [],
-    metrics: { gap: 2 * faceY, tipZ: nail.tip.z - floorZ, hardTravel: q / qmax },
+    metrics: { gap: 2 * faceY, tipZ: Math.min(nail.tip.z, tipR.z + 0) - floorZ, hardTravel: q / qmax, vdef: vdef + nailRise },
     readouts: [
       { label: "링크 각 ψ (0 = 수직)", value: `${(g.psi / DEG).toFixed(1)}° (지령 ${((psiOpen - qcmd) / DEG).toFixed(1)}°)` },
-      { label: "손끝 간격 (패드면, 항상 평행)", value: `${(2 * faceY).toFixed(1)} mm` },
+      { label: "손끝 간격 (쥐는 면)", value: `${(2 * faceY).toFixed(1)} mm` },
       { label: "손톱 끝 높이 (바닥 위)", value: `${(nail.tip.z - floorZ).toFixed(1)} mm` },
+      ...compRead,
       { label: "텐던 루프 당김", value: `${(h.drum_r * q).toFixed(1)} mm (모터 풀리 기준, 손가락당)` },
     ],
   };
 }
 
-export function makeB5(): Design {
-  const p = B5p;
-  const d = B5c.derived as unknown as Derived;
+const B5_SUMMARY: Record<string, string> = {
+  B5: "soft 는 B1(접는 플랩 + Fin Ray). hard 는 평행사변형 4절 링크: 손바닥 아래 브래킷의 안쪽·바깥 피벗(간격 24) → 같은 길이 링크 2개 → 수평 커플러 + 항상 수직인 손끝판. 피벗을 안쪽(y=±13.5)에 둬 건전지 pinch 때 링크가 수직 = 손끝 궤적 최저점. 텐던 1가닥 연속 루프(모터 풀리 1개). 수직 순응은 손톱 플랩 5 mm 뿐.",
+  B5T: "B5 + 손끝판 관절: 손끝판을 커플러에 빨대 핀으로 달고 고무줄로 스토퍼에 눌러 둠. pinch 반력은 스토퍼 쪽, 바닥 힘은 반대쪽으로 돌림(SymPy C1) → 공중에선 평행 pinch, 바닥에선 손끝이 안쪽·위로 꺾임(10 mm 에 46°, 안쪽 14 mm). 꺾이면 패드면이 기움.",
+  B5F: "B5 + 플로팅 브래킷: 손가락 전체(브래킷·링크·손끝)를 손바닥 위 굵은 빨대 슬리브 2개에 일반 빨대로 꽂아(손바닥 구멍 통과) 수직 13 mm 이동, 고무줄 프리로드 3 N. 손끝이 기울지 않고 평행 유지. 쥐는 순간 슬리브 마찰로 잠겨 들어올릴 때 처지지 않음.",
+  B5N: "B5 + 긴 손톱(14 mm): 손톱 플랩이 바깥·위로 접히며 최대 11.6 mm 순응. 추가 부품 없음. 접히기 전에는 손톱 안쪽 면이 쥐는 면(안쪽 스토퍼).",
+};
+const B5P: Record<string, typeof B5p> = { B5: B5p, B5T: B5Tp as unknown as typeof B5p, B5F: B5Fp as unknown as typeof B5p, B5N: B5Np as unknown as typeof B5p };
+const B5C: Record<string, unknown> = { B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc };
+
+export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
+  const p = B5P[id];
+  const d = (B5C[id] as { derived: unknown }).derived as Derived;
+  const adj: [string, string][] = [
+    ["palm", "flapR"],
+    ["palm", "flapL"],
+    ["palm", "motor"],
+  ];
+  for (const s of ["F", "B"]) {
+    adj.push([`hard${s}`, `hard${s}_c`], [`hard${s}_l2`, `hard${s}_c`], [`hard${s}_c`, `hard${s}_t`], [`hard${s}`, `hard${s}_t`]);
+    adj.push(["palm", `hard${s}`], ["palm", `hard${s}_l2`], ["palm", `hard${s}_br`], [`hard${s}_br`, `hard${s}`], [`hard${s}_br`, `hard${s}_l2`]);
+  }
   return {
-    id: "B5",
+    id,
     name: p.name,
-    summary:
-      "soft 는 B1(접는 플랩 + Fin Ray). hard 는 평행사변형 4절 링크: 손바닥 아래 브래킷의 안쪽·바깥 피벗(간격 24) → 같은 길이 링크 2개 → 수평 커플러 + 항상 수직인 손끝판. 피벗을 안쪽(y=±13.5)에 둬서 건전지 pinch 때 링크가 수직 = 손끝 궤적 최저점 → 닫는 도중 바닥 파고듦 없음. 앞·뒤 손가락은 텐던 1가닥 연속 루프(모터 풀리 1개)로 동시에 닫히고 자동 균형.",
+    summary: B5_SUMMARY[id],
     oneString: false,
-    adjacent: [
-      ["palm", "flapR"],
-      ["palm", "flapL"],
-      ["palm", "hardF"],
-      ["palm", "hardB"],
-      ["palm", "hardF_l2"],
-      ["palm", "hardB_l2"],
-      ["hardF", "hardF_c"],
-      ["hardF_l2", "hardF_c"],
-      ["hardB", "hardB_c"],
-      ["hardB_l2", "hardB_c"],
-      ["palm", "motor"],
-    ],
+    adjacent: adj,
     preset: (mode, obj) => presetFlap(d, d, mode, obj, false, p.soft.phi_open_deg),
     build(ctrl) {
       const floorZ = -ctrl.palmH;
@@ -782,12 +871,24 @@ export function makeB5(): Design {
         sdf,
       );
       const hard = hardParallel(p, d, ctrl.b, obj ? obj.sdf : () => 1e9, floorZ);
-      return assemble({ id: "B5", oneString: false }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, []);
+      return assemble({ id, oneString: false }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, []);
     },
   };
 }
 
-export const DESIGNS: Design[] = [makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB5()];
-export const VARIANTS: Design[] = [makeB1(true), makeB3(true)];
-export const ALL: Design[] = [...DESIGNS, ...VARIANTS];
+/** 현재 후보 (B5 계열: 평행 링크 hard + 수직 순응 옵션) */
+export const CURRENT: Design[] = [makeB5("B5N"), makeB5("B5F"), makeB5("B5")];
+/** 보관 (old): 하민 피드백으로 내려간 안. 비교용으로만 유지 */
+export const OLD: Design[] = [makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
+export const OLD_REASON: Record<string, string> = {
+  B5T: "손끝판 관절 — 바닥 힘이 손끝을 물체 쪽으로 돌려, 쥐고 있을 때 물체가 막아 순응 안 됨. 반대로 돌리면 pinch 반력과 분리 불가 (SymPy C1·C3)",
+  B1: "단일 피벗 hard — 손끝이 비스듬(쐐기 패드 필요), 수직 순응은 손톱 5 mm",
+  B2: "직선 슬롯 — 개구 90×71 mm·높이 59 mm 제한 (주방 스펀지 불가)",
+  B3: "텐던 2마디 — 수직 순응·개구는 가장 좋지만(점수 최상위) 예비 말기 순서 필요, 장력 50 N. 하민이 링크 기반 단순 구조로 방향 전환",
+  B3o: "B3 최적화 — 원위를 58° 젖힌 '벌어진 끝' 이 어색, 스토퍼·고무줄 튜닝 의존",
+  B4: "B2 soft + B3 hard — 두 안의 약점(슬롯 마찰·텐던 튜닝)을 모두 가짐",
+  V5: "B1 + 실 1개 — B1 이 보관으로 감",
+  V5b: "B3 + 실 1개 — B3 계열과 함께 보관 (전에 보고한 Fin Ray↔텐던 간섭은 Fin Ray 솔버 터널링 버그였고 수정 후 사라짐)",
+};
+export const ALL: Design[] = [...CURRENT, ...OLD];
 void lerp;

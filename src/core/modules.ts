@@ -84,7 +84,7 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     return { O: hinge(1).add(V(0, yf, 0)).addScaledVector(A, cfg.rootLen), A, N: outAt(phi), W: Y };
   };
   const forceAt = (q: number) => {
-    const { res, Q } = finrayGenForce(FINRAY, frameAt, 0, q, 0.004, sdf);
+    const { res, Q } = finrayGenForce(FINRAY, frameAt, 0, q, 0.004, sdf, 2 * DEG);
     let F = 0;
     if (res.contactCentroid) {
       const h = hinge(1).add(V(0, yf, 0));
@@ -190,7 +190,7 @@ export function softSlot(cfg: SlotSoftCfg, a: number, sdf: Sdf): SoftOut {
     W: Y,
   });
   const forceAt = (q: number) => {
-    const { res, Q } = finrayGenForce(FINRAY, frameAt, 0, q, 0.05, sdf);
+    const { res, Q } = finrayGenForce(FINRAY, frameAt, 0, q, 0.05, sdf, 2);
     return { res, F: Q, Q };
   };
   let q = qcmd;

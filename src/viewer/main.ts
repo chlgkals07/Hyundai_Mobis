@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ALL } from "../core/designs";
+import { ALL, CURRENT, OLD, OLD_REASON } from "../core/designs";
 import { findCollisions } from "../core/collide";
 import type { Assembly, Controls, Design, ModeName, ObjName, Part } from "../core/types";
 import B1c from "../../calc/out/B1.json";
@@ -8,11 +8,14 @@ import B3c from "../../calc/out/B3.json";
 import B4c from "../../calc/out/B4.json";
 import B3oc from "../../calc/out/B3o.json";
 import B5c from "../../calc/out/B5.json";
+import B5Tc from "../../calc/out/B5T.json";
+import B5Fc from "../../calc/out/B5F.json";
+import B5Nc from "../../calc/out/B5N.json";
 import viewerData from "../../out/viewer-data.json";
 import { renderCompare, renderPatterns } from "./pages";
 
 interface CalcOut { checks: { id: string; desc: string; value: number; unit: string; pass: boolean }[] }
-const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, B3o: B3oc, B4: B4c, B5: B5c, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
+const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, B3o: B3oc, B4: B4c, B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -197,20 +200,26 @@ for (const [k, [label]] of Object.entries(VIEWS)) {
 
 // ----------------------------------------------------------- UI
 const designsEl = $("designs");
-for (const d of ALL) {
+function designButton(d: Design, old: boolean) {
   const b = document.createElement("button");
   b.type = "button";
   b.dataset.id = d.id;
   const [head, ...rest] = d.name.split(" — ");
-  b.innerHTML = `<span>${head}</span><small>${rest.join(" — ") || ""}</small>`;
+  b.innerHTML = `<span>${head}</span><small>${old ? OLD_REASON[d.id] ?? "" : rest.join(" — ")}</small>`;
   b.onclick = () => {
     design = d;
     ctrl = d.preset(mode, ctrl.obj);
     syncUI();
     update();
   };
-  designsEl.append(b);
+  return b;
 }
+for (const d of CURRENT) designsEl.append(designButton(d, false));
+const oldBox = document.createElement("details");
+oldBox.className = "oldlist";
+oldBox.innerHTML = `<summary>보관 (old) ${OLD.length}개</summary>`;
+for (const d of OLD) oldBox.append(designButton(d, true));
+designsEl.append(oldBox);
 const MODES: [ModeName, string][] = [
   ["open", "열림"],
   ["soft", "Soft"],
@@ -244,6 +253,7 @@ objSel.onchange = () => ((ctrl.obj = (objSel.value || null) as ObjName | null), 
 
 function syncUI() {
   for (const b of designsEl.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.id === design.id));
+  if (OLD.some((x) => x.id === design.id)) (designsEl.querySelector(".oldlist") as HTMLDetailsElement).open = true;
   for (const b of modesEl.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.m === mode));
   sa.value = String(ctrl.a);
   sb.value = String(ctrl.b);
@@ -254,7 +264,7 @@ function syncUI() {
   $("lb").hidden = design.oneString;
   $("ls").hidden = !design.oneString;
   $("summary").textContent = design.summary;
-  const c = CALC[design.id];
+  const c = CALC[design.id] ?? { checks: [] };
   $("checks").innerHTML = c.checks
     .map((k) => `<tr><td><span class="${k.pass ? "mark-ok" : "mark-bad"}">${k.pass ? "✓" : "✗"}</span> ${k.id}</td><td>${k.desc}</td><td class="v">${k.value} ${k.unit}</td></tr>`)
     .join("");

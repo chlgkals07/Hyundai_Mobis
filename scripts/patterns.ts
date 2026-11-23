@@ -2,6 +2,8 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import { PATTERNS, type Shape, type P2 } from "../src/core/pattern";
+import { CURRENT } from "../src/core/designs";
+const isCurrent = (id: string) => CURRENT.some((d) => d.id === id);
 
 const A4 = { w: 210, h: 297 };
 const M = 10; // 여백
@@ -134,11 +136,11 @@ ${ruler.join("\n")}
 </svg>`;
 }
 
-const viewerPatterns: { id: string; name: string; sheets: string[]; bom: string[]; steps: string[] }[] = [];
+const viewerPatterns: { id: string; name: string; group: string; sheets: string[]; bom: string[]; steps: string[] }[] = [];
 const require = createRequire(import.meta.url);
 const pdfJobs: { html: string; pdf: string }[] = [];
 for (const dp of PATTERNS) {
-  const dir = `patterns/${dp.id}`;
+  const dir = isCurrent(dp.id) ? `patterns/${dp.id}` : `patterns/old/${dp.id}`;
   mkdirSync(dir, { recursive: true });
   const pages = pack(dp.shapes);
   const svgs: string[] = [];
@@ -173,7 +175,7 @@ for (const dp of PATTERNS) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${svgs.join("\n")}</body></html>`;
   writeFileSync(`${dir}/print.html`, html);
   pdfJobs.push({ html: `${dir}/print.html`, pdf: `${dir}/${dp.id}-전개도-A4.pdf` });
-  viewerPatterns.push({ id: dp.id, name: dp.name, sheets: svgs.map((s) => s.replace(/width="210mm" height="297mm"/, "")), bom: dp.cutList, steps: dp.steps });
+  viewerPatterns.push({ id: dp.id, name: dp.name, group: isCurrent(dp.id) ? "current" : "old", sheets: svgs.map((s) => s.replace(/width="210mm" height="297mm"/, "")), bom: dp.cutList, steps: dp.steps });
   console.log(dp.id, `${dp.shapes.length} 부품, ${pages.length} 장`);
 }
 

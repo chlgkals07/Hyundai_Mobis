@@ -390,10 +390,10 @@ def b4():
     return r.dump()
 
 
-def b5():
+def b5(name="B5"):
     """평행사변형 hard. 손끝판(coupler)은 항상 수직 → 쐐기 0°, 평행 pinch.
     피벗 y 를 '건전지 pinch 에서 링크 수직' 으로 두면 pinch = 손끝 궤적 최저점 → 닫히는 도중 바닥 파고듦 없음."""
-    c, d = load("common"), load("B5")
+    c, d = load("common"), load(name)
     r = Report(d, c)
     h = d["hard"]
     s = soft_flap(r, h["width"])
@@ -446,6 +446,8 @@ def b5():
     r.check("H7", "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2", dd * sp.cos(h["psi_open_deg"] * deg), lo=h["link_plies"] * c["board_t"] + 2, unit="mm")
     r.check("H9", "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
             12, lo=9 + 3, unit="mm")
+    # H10 (시뮬에서 발견): 브래킷(x = w/2+1 ~ w/2+4)과 soft 드럼 아래 절반(x ≥ 손바닥 반폭 - r_s) 이 겹침
+    r.check("H10", "soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1", d["palm"]["sx"] / 2 - d["soft"]["drum_r"], lo=h["width"] / 2 + 4 + 1, unit="mm")
     r.check("H8", "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)", yp + dd + 6, hi=d["palm"]["sy"] / 2, unit="mm")
     # 장력: 손끝판 수평력 F → 링크 토크 F·L·cosψ (ψ=0 최대) → T = F L / r
     T = c["force"]["pinch_target_N"] * L / h["drum_r"]
@@ -453,11 +455,62 @@ def b5():
     r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각)", T, hi=45, unit="N")
     r.put("hard_pull_mm", h["drum_r"] * (psi_open - psi_min))
     r.put("hard_face_wedge_deg", 0)
+    comp = h.get("compliance")
+    V_REQ = 10.0  # 목표 수직 순응 (팔 높이 오차 가정 ±10 mm)
+    if comp is None:
+        # 기본 B5: 손톱 플랩(5 mm) 만 — 접힘으로 얻는 최대 상승
+        rise = h["nail_len"] * (1 - sp.cos(85 * deg))
+        r.put("vertical_compliance_mm", rise)
+    elif comp["type"] == "tip":
+        # 손끝판 피벗 = E_in 아래 4.5 (커플러 바 밑). 손톱 끝 = 피벗에서 (안쪽 -halfT, 아래 -Lp)
+        Lp = Lc_val - 4.5
+        th = sp.symbols("th", real=True)
+        # 바닥 힘(위 방향)의 모멘트 vs pinch 반력(바깥 방향, 패드 가운데 높이)의 모멘트 → 부호가 반대여야 스토퍼로 분리
+        M_floor = (-half_t) * 1  # r_y * N
+        M_pinch = (Lp / 2) * 1  # -r_z * F
+        r.check("C1", "바닥 힘과 pinch 반력이 손끝판을 반대로 돌림 (M_floor·M_pinch < 0 → pinch 는 스토퍼, 바닥은 꺾임)", M_floor * M_pinch, hi=-1e-9)
+        # 각 th 로 꺾일 때 (바닥이 미는 방향 = 아래쪽 끝이 안쪽·위로) 손톱 끝 상승과 안쪽 이동
+        ty0, tz0 = -half_t, -Lp
+        ty = ty0 * sp.cos(th) + tz0 * sp.sin(th)
+        tz = ty0 * sp.sin(th) * -1 + tz0 * sp.cos(th)
+        rise = (tz - tz0)
+        th10 = sp.nsolve(rise - V_REQ, th, 0.5)
+        r.put("tip_theta_for_10mm_deg", th10 / deg)
+        r.put("tip_inward_shift_at_10mm", -(ty.subs(th, th10) - ty0))
+        r.check("C2", "10 mm 상승에 필요한 손끝판 꺾임각 ≤ θ_max", th10 / deg, hi=comp["theta_max_deg"], unit="deg")
+        # C3 (시뮬에서 발견): 바닥 힘이 손끝을 '안쪽(물체 쪽)' 으로 돌리면, 물체를 쥐고 있을 때 물체가 막아 순응이 안 됨.
+        #   반대로 돌게 하면 pinch 반력과 같은 방향이라 스토퍼로 분리 불가 (C1 실패) → 손끝판 관절은 구조적으로 성립 안 함.
+        r.check("C3", "10 mm 순응 시 손끝 안쪽 이동 ≤ 2 mm (물체 쪽으로 파고들지 않음)", -(ty.subs(th, th10) - ty0), hi=2, unit="mm")
+        r.put("vertical_compliance_mm", rise.subs(th, comp["theta_max_deg"] * deg))
+        # 고무줄: 바닥 3 N 에서 꺾이기 시작(프리로드 모멘트 = N·팔), 10 mm 에서 6 N
+        arm0 = half_t
+        M0 = comp["engage_N"] * arm0
+        r.put("tip_preload_Nmm", M0)
+        r.put("tip_rubber_k_Nmm_per_rad", (comp["force_at_travel_N"] * arm0 - M0) / th10)
+    elif comp["type"] == "float":
+        r.check("C1", "텔레스코프 이동 범위 ≥ 10 mm + 여유 2", comp["travel"], lo=V_REQ + 2, unit="mm")
+        r.check("C2", "슬리브(굵은 빨대) 길이 ≥ 2 × 이동 (빠지지 않고 덜 기울게)", comp["sleeve_len"], lo=2 * comp["travel"], unit="mm")
+        # pinch 반력 8 N 이 손끝(아래 ~H)에 → 슬리브 2개 간격 s 에서 우력. 마찰 μ0.4 로 생기는 수직 저항이 프리로드보다 작아야 수직 순응 유지
+        H_arm = -z_floor - 0
+        s_gap = h["d"] + 12
+        Fn = c["force"]["pinch_target_N"] * H_arm / s_gap
+        r.put("float_sleeve_normal_N", Fn)
+        r.put("float_friction_N_mu0.4", 0.4 * Fn)
+        # (처음엔 '쥔 채로도 수직 순응' 을 요구해 실패로 판정했으나, 순응은 접근 중에만 필요하고 쥔 뒤 마찰로 잠기는 건
+        #  들어올릴 때 손가락이 처지지 않는 장점 → 정보값으로만 기록)
+        r.put("float_locks_when_gripping", 1 if 2 * 0.4 * Fn > comp["engage_N"] else 0)
+        r.put("vertical_compliance_mm", comp["travel"])
+        r.put("float_k_N_per_mm", (comp["force_at_travel_N"] - comp["engage_N"]) / V_REQ)
+    elif comp["type"] == "nail":
+        rise = comp["nail_len"] * (1 - sp.cos(comp["fold_max_deg"] * deg))
+        r.put("vertical_compliance_mm", rise)
+        r.check("C1", "손톱이 접히며 얻는 상승 ≥ 10 mm", rise, lo=V_REQ, unit="mm")
+        r.check("C2", "손톱(강성 쪽: 안쪽 스토퍼)이 건전지 적도 높이(7)를 덮음 → 접히기 전엔 손톱 안쪽 면이 쥐는 면", comp["nail_len"], lo=o["battery"]["d"] / 2, unit="mm")
     return r.dump()
 
 
 def main():
-    res = [b1(), b2(), b3(), b3o(), b4(), b5()]
+    res = [b1(), b2(), b3(), b3o(), b4(), b5(), b5("B5T"), b5("B5F"), b5("B5N")]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",

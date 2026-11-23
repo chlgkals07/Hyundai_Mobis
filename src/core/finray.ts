@@ -197,9 +197,12 @@ export function finrayGenForce(
   q: number,
   dq: number,
   sdf: (p: Vector3) => number,
+  /** 단계당 최대 q 증가량 (회전 rad / 직선 mm). 고정 8단계는 큰 각도에서 손끝이 물체 안으로 점프(터널링)함 */
+  maxStep = Infinity,
 ) {
-  const r1 = solveFinray(s, frameAt, q0, q, sdf);
+  const steps = Math.max(8, Math.ceil(Math.abs(q - q0) / maxStep));
+  const r1 = solveFinray(s, frameAt, q0, q, sdf, steps);
   if (r1.nContact === 0) return { res: r1, Q: 0 };
-  const r2 = solveFinray(s, frameAt, q0, q + dq, sdf);
+  const r2 = solveFinray(s, frameAt, q0, q + dq, sdf, steps);
   return { res: r1, Q: Math.max(0, (r2.energy - r1.energy) / dq) };
 }

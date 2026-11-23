@@ -205,9 +205,9 @@
 
 | ID | 조건 | 값 | 범위 | 결과 |
 |---|---|---|---|---|
-| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-6.824, ] | ✅ |
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
 | S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 90.0] | ✅ |
-| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 33.667 N | [, 40.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 38.846 N | [, 40.0] | ✅ |
 | R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
 | H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
 | H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
@@ -217,6 +217,7 @@
 | H6 | 드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2) | 20.0 mm | [18.0, ] | ✅ |
 | H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2 | 8.991 mm | [8.0, ] | ✅ |
 | H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| H10 | soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1 | 17.0 mm | [17.0, ] | ✅ |
 | H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
 | H1 | pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각) | 27.5 N | [, 45.0] | ✅ |
 
@@ -226,14 +227,14 @@
 |---|---|
 | `soft_hinge_x` | 30.0 |
 | `soft_reach` | 101.0 |
-| `soft_phi_min_deg` | -6.8235 |
-| `soft_x_min` | 18.0 |
+| `soft_phi_min_deg` | -7.9676 |
+| `soft_x_min` | 16.0 |
 | `soft_phi_battery_deg` | -2.8376 |
 | `soft_phi_chip_deg` | -2.8376 |
 | `soft_phi_sponge_deg` | 2.8376 |
 | `soft_open_half_width` | 131.0 |
-| `soft_pull_mm` | 25.3483 |
-| `soft_string_T_at_limit_N` | 33.6667 |
+| `soft_pull_mm` | 22.2282 |
+| `soft_string_T_at_limit_N` | 38.8462 |
 | `hard_pivot_y` | 13.5 |
 | `hard_coupler_below_E` | 26.3762 |
 | `rigid_palm_height` | 101.3762 |
@@ -248,5 +249,177 @@
 | `hard_string_T_N` | 27.5 |
 | `hard_pull_mm` | 21.0311 |
 | `hard_face_wedge_deg` | 0.0 |
+| `vertical_compliance_mm` | 4.5642 |
+
+</details>
+
+## B5T 손끝판 관절 — 평행 링크 + 바닥 쪽으로만 꺾이는 손끝판  —  FAIL
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 90.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 38.846 N | [, 40.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
+| H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
+| H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
+| R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 27.897 mm | [10.0, ] | ✅ |
+| H5 | 바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4) | 16.0 mm | [, 20.0] | ✅ |
+| H5b | 앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3) | 43.0 mm | [3.0, ] | ✅ |
+| H6 | 드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2) | 20.0 mm | [18.0, ] | ✅ |
+| H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2 | 8.991 mm | [8.0, ] | ✅ |
+| H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| H10 | soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1 | 17.0 mm | [17.0, ] | ✅ |
+| H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
+| H1 | pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각) | 27.5 N | [, 45.0] | ✅ |
+| C1 | 바닥 힘과 pinch 반력이 손끝판을 반대로 돌림 (M_floor·M_pinch < 0 → pinch 는 스토퍼, 바닥은 꺾임) | -49.221  | [, -0.0] | ✅ |
+| C2 | 10 mm 상승에 필요한 손끝판 꺾임각 ≤ θ_max | 46.253 deg | [, 50.0] | ✅ |
+| C3 | 10 mm 순응 시 손끝 안쪽 이동 ≤ 2 mm (물체 쪽으로 파고들지 않음) | 14.415 mm | [, 2.0] | ❌ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 101.0 |
+| `soft_phi_min_deg` | -7.9676 |
+| `soft_x_min` | 16.0 |
+| `soft_phi_battery_deg` | -2.8376 |
+| `soft_phi_chip_deg` | -2.8376 |
+| `soft_phi_sponge_deg` | 2.8376 |
+| `soft_open_half_width` | 131.0 |
+| `soft_pull_mm` | 22.2282 |
+| `soft_string_T_at_limit_N` | 38.8462 |
+| `hard_pivot_y` | 13.5 |
+| `hard_coupler_below_E` | 26.3762 |
+| `rigid_palm_height` | 101.3762 |
+| `rigid_finray_tip_above_floor` | 6.5 |
+| `hard_psi_cable_deg` | -4.6931 |
+| `hard_tip_rise_cable_mm` | 0.1844 |
+| `hard_psi_cap_deg` | 8.3636 |
+| `hard_tip_rise_cap_mm` | 0.5849 |
+| `hard_psi_min_deg` | -7.312 |
+| `soft_mode_hard_above_finray` | 27.8966 |
+| `hard_opening_mm` | 115.9902 |
+| `hard_string_T_N` | 27.5 |
+| `hard_pull_mm` | 21.0311 |
+| `hard_face_wedge_deg` | 0.0 |
+| `tip_theta_for_10mm_deg` | 46.2526 |
+| `tip_inward_shift_at_10mm` | 14.4149 |
+| `vertical_compliance_mm` | 11.2616 |
+| `tip_preload_Nmm` | 13.5 |
+| `tip_rubber_k_Nmm_per_rad` | 16.7232 |
+
+</details>
+
+## B5F 플로팅 — 평행 링크 브래킷을 빨대 텔레스코프에 띄움  —  PASS
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 90.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 38.846 N | [, 40.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
+| H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
+| H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
+| R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 27.897 mm | [10.0, ] | ✅ |
+| H5 | 바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4) | 16.0 mm | [, 20.0] | ✅ |
+| H5b | 앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3) | 43.0 mm | [3.0, ] | ✅ |
+| H6 | 드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2) | 20.0 mm | [18.0, ] | ✅ |
+| H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2 | 8.991 mm | [8.0, ] | ✅ |
+| H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| H10 | soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1 | 17.0 mm | [17.0, ] | ✅ |
+| H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
+| H1 | pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각) | 27.5 N | [, 45.0] | ✅ |
+| C1 | 텔레스코프 이동 범위 ≥ 10 mm + 여유 2 | 13.0 mm | [12.0, ] | ✅ |
+| C2 | 슬리브(굵은 빨대) 길이 ≥ 2 × 이동 (빠지지 않고 덜 기울게) | 30.0 mm | [26.0, ] | ✅ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 101.0 |
+| `soft_phi_min_deg` | -7.9676 |
+| `soft_x_min` | 16.0 |
+| `soft_phi_battery_deg` | -2.8376 |
+| `soft_phi_chip_deg` | -2.8376 |
+| `soft_phi_sponge_deg` | 2.8376 |
+| `soft_open_half_width` | 131.0 |
+| `soft_pull_mm` | 22.2282 |
+| `soft_string_T_at_limit_N` | 38.8462 |
+| `hard_pivot_y` | 13.5 |
+| `hard_coupler_below_E` | 26.3762 |
+| `rigid_palm_height` | 101.3762 |
+| `rigid_finray_tip_above_floor` | 6.5 |
+| `hard_psi_cable_deg` | -4.6931 |
+| `hard_tip_rise_cable_mm` | 0.1844 |
+| `hard_psi_cap_deg` | 8.3636 |
+| `hard_tip_rise_cap_mm` | 0.5849 |
+| `hard_psi_min_deg` | -7.312 |
+| `soft_mode_hard_above_finray` | 27.8966 |
+| `hard_opening_mm` | 115.9902 |
+| `hard_string_T_N` | 27.5 |
+| `hard_pull_mm` | 21.0311 |
+| `hard_face_wedge_deg` | 0.0 |
+| `float_sleeve_normal_N` | 22.528 |
+| `float_friction_N_mu0.4` | 9.0112 |
+| `float_locks_when_gripping` | 1.0 |
+| `vertical_compliance_mm` | 13.0 |
+| `float_k_N_per_mm` | 0.3 |
+
+</details>
+
+## B5N 긴 손톱 — 평행 링크 + 14 mm 접히는 손톱  —  PASS
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 90.0] | ✅ |
+| S3 | 칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N) | 38.846 N | [, 40.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
+| H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
+| H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
+| R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 27.897 mm | [10.0, ] | ✅ |
+| H5 | 바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4) | 16.0 mm | [, 20.0] | ✅ |
+| H5b | 앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3) | 43.0 mm | [3.0, ] | ✅ |
+| H6 | 드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2) | 20.0 mm | [18.0, ] | ✅ |
+| H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 링크두께 + 2 | 8.991 mm | [8.0, ] | ✅ |
+| H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| H10 | soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1 | 17.0 mm | [17.0, ] | ✅ |
+| H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
+| H1 | pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각) | 27.5 N | [, 45.0] | ✅ |
+| C1 | 손톱이 접히며 얻는 상승 ≥ 10 mm | 11.569 mm | [10.0, ] | ✅ |
+| C2 | 손톱(강성 쪽: 안쪽 스토퍼)이 건전지 적도 높이(7)를 덮음 → 접히기 전엔 손톱 안쪽 면이 쥐는 면 | 14.0 mm | [7.0, ] | ✅ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 101.0 |
+| `soft_phi_min_deg` | -7.9676 |
+| `soft_x_min` | 16.0 |
+| `soft_phi_battery_deg` | -2.8376 |
+| `soft_phi_chip_deg` | -2.8376 |
+| `soft_phi_sponge_deg` | 2.8376 |
+| `soft_open_half_width` | 131.0 |
+| `soft_pull_mm` | 22.2282 |
+| `soft_string_T_at_limit_N` | 38.8462 |
+| `hard_pivot_y` | 13.5 |
+| `hard_coupler_below_E` | 26.3762 |
+| `rigid_palm_height` | 101.3762 |
+| `rigid_finray_tip_above_floor` | 6.5 |
+| `hard_psi_cable_deg` | -4.6931 |
+| `hard_tip_rise_cable_mm` | 0.1844 |
+| `hard_psi_cap_deg` | 8.3636 |
+| `hard_tip_rise_cap_mm` | 0.5849 |
+| `hard_psi_min_deg` | -7.312 |
+| `soft_mode_hard_above_finray` | 27.8966 |
+| `hard_opening_mm` | 115.9902 |
+| `hard_string_T_N` | 27.5 |
+| `hard_pull_mm` | 21.0311 |
+| `hard_face_wedge_deg` | 0.0 |
+| `vertical_compliance_mm` | 11.5689 |
 
 </details>
