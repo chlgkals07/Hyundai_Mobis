@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>R4 × B5N 전체 실 배선</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      color: #322d27;
+      background: #f5f2eb;
+      font: 15px system-ui;
+    }
+    header,
+    footer {
+      padding: 11px 3vw;
+      background: #fffdf8;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 6px;
+    }
+    main {
+      height: clamp(300px, 68vh, 900px);
+    }
+    canvas {
+      display: block;
+    }
+    footer,
+    section {
+      display: flex;
+      gap: 10px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input[type="range"] {
+      width: 80px;
+      vertical-align: middle;
+    }
+    select,
+    button {
+      padding: 5px;
+    }
+    small {
+      color: #675b4d;
+    }
+    output {
+      display: block;
+      padding: 5px 3vw;
+      background: #eae5db;
+    }
+  </style>
+  <header>
+    <h1>R4 × B5N　전체 실 배선</h1>
+    <section>
+      <b style="color: #744495">● 받침 좌우</b
+      ><b style="color: #956000">● 팔 올림</b
+      ><b style="color: #007b72">● 손목 좌우</b
+      ><b style="color: #ac3b28">● Fin Ray · A</b
+      ><b style="color: #166eb2">● 평행 집게 · B</b>
+    </section>
+  </header>
+  <main></main>
+  <output></output>
+  <footer>
+    <button>자동 시연</button
+    ><select id="filter" aria-label="실 경로 선택">
+      <option value="-1">모든 실 보기</option>
+      <option value="0">받침 좌우</option>
+      <option value="1">팔 올림</option>
+      <option value="2">손목 좌우</option>
+      <option value="3">Fin Ray · A</option>
+      <option value="4">평행 집게 · B</option></select
+    ><label><input type="checkbox" id="xray" />골판지 투시</label>
+  </footer>
+  <footer>
+    <label>받침 좌우 <input type="range" id="y" max="45" value="15" /></label
+    ><label>팔 올림 <input type="range" id="p" max="19" value="7" /></label
+    ><label>손목 좌우 <input type="range" id="r" max="90" value="20" /></label
+    ><label>Fin Ray · A <input type="range" id="a" max="100" value="0" /></label
+    ><label
+      >평행 집게 · B <input type="range" id="b" max="100" value="0"
+    /></label>
+  </footer>
+  <footer>
+    <small
+      >드래그 회전 · 휠 확대　|　작은 베이지색 점은 실 가이드, 실 색의 끝점은
+      매듭입니다. 경로는 피복 중심선을 나타냅니다.</small
+    >
+  </footer>
+  <!-- VIEWER -->
+</html>
