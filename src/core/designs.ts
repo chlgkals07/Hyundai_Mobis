@@ -916,10 +916,12 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" | "B5E" = "B5"): Design 
 }
 
 /** 현재 후보 (B5 계열: 평행 링크 hard + 수직 순응 옵션) */
-export const CURRENT: Design[] = [makeB5("B5E"), makeB5("B5N"), makeB5("B5F"), makeB5("B5")];
+export const CURRENT: Design[] = [makeB5("B5E"), makeB5("B5N")];
 /** 보관 (old): 하민 피드백으로 내려간 안. 비교용으로만 유지 */
-export const OLD: Design[] = [makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
+export const OLD: Design[] = [makeB5("B5F"), makeB5("B5"), makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
 export const OLD_REASON: Record<string, string> = {
+  B5F: "플로팅 브래킷 — 순응은 B5N 과 같은 14 mm 인데 텔레스코프 2쌍·손바닥 슬롯이 추가. 하민: 최종(B5N) + 쉬운 버전(B5E) 두 개만 남김 (2026-11-25)",
+  B5: "B5N 의 바탕 (손톱 5 mm, 수직 순응 4 mm) — 긴 손톱(B5N)으로 대체",
   B5T: "손끝판 관절 — 바닥 힘이 손끝을 물체 쪽으로 돌려, 쥐고 있을 때 물체가 막아 순응 안 됨. 반대로 돌리면 pinch 반력과 분리 불가 (SymPy C1·C3)",
   B1: "단일 피벗 hard — 손끝이 비스듬(쐐기 패드 필요), 수직 순응은 손톱 5 mm",
   B2: "직선 슬롯 — 개구 90×71 mm·높이 59 mm 제한 (주방 스펀지 불가)",

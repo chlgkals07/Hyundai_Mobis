@@ -33,7 +33,7 @@ for (const [entry, tpl, out] of [
   ["src/viewer/arm.ts", "src/viewer/arm.html", "arm"],
 ]) {
   const js = await bundle(entry, out);
-  const page = readFileSync(tpl, "utf8").replace("<!--APP-->", `${tags}\n<script>\n${js}\n</script>`);
+  const page = readFileSync(tpl, "utf8").replace("<!--APP-->", () => `${tags}\n<script>\n${js}\n</script>`); // 함수형: 번들 안 $& 등이 치환 패턴으로 해석되지 않게
   writeFileSync(`out/${out}.html`, page);
   writeFileSync(`out/${out === "gripper-bench" ? "local" : out + "-local"}.html`, doc(page));
   console.log(out, (page.length / 1024).toFixed(0), "KB");

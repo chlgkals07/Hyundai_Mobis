@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 348.4" role="img" aria-label="레버 만들기"><style>
+.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.pad{fill:#333}
+.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.floor{stroke:#2f6b5b;stroke-width:3}
+.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.lead{fill:none;stroke:#555;stroke-width:.8}
+.dot{fill:#555}
+.glue{fill:url(#hatch);stroke:none}
+text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.lbl{font-size:12.5px;fill:#1d2422}
+.note{font-size:11px;fill:#5b6763}
+.hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+</style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><text class="hd" x="26" y="20.8" text-anchor="start">① V자 판 자르기 (전개도 그대로)</text><polygon class="drum" points="104,119.6 145.6,119.6 145.6,140.4 104,140.4"/><polygon class="drum" points="95.8,136.4 54.19,83.13 70.58,70.33 112.2,123.6"/><circle class="pivot" cx="145.6" cy="130" r="3.12"/><circle class="pivot" cx="104" cy="130" r="7.8"/><text class="note" x="78" y="187.2" text-anchor="start">hard 레버 ×3장: 팔 16 · 발 26 · 128°</text><polygon class="drum" points="390,119.6 457.6,119.6 457.6,140.4 390,140.4"/><polygon class="drum" points="383.74,138.31 350.52,113.27 363.04,96.66 396.26,121.69"/><circle class="pivot" cx="457.6" cy="130" r="3.12"/><text class="note" x="351" y="187.2" text-anchor="start">soft 레버 ×2장: 팔 26 · 발 16 · 143°</text><text class="hd" x="26" y="223.6" text-anchor="start">② 같은 판끼리 겹쳐 풀칠 (hard 3겹 = 두께 9, soft 2겹) — 원판과 달리 중심 맞출 필요 없음</text><text class="hd" x="26" y="270.4" text-anchor="start">③ 팔 끝 구멍(Ø1.5)에 실을 꿰어 매듭 → 감기 없음. 매듭에 풀 한 방울</text><text class="lbl" x="26" y="306.8" text-anchor="start">④ hard 레버: 꼭짓점 구멍 = 바깥 축, 발을 바깥 링크 막대 사이에 면 접착(D4)</text><text class="lbl" x="26" y="338" text-anchor="start">④ soft 레버: 꼭짓점 = 힌지선, 발을 플랩 바깥면에 세워 풀칠 + 삼각 보강</text></svg>

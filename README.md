@@ -12,10 +12,10 @@
 |---|---|
 | [`docs/site/index.html`](docs/site/index.html) | 목록 |
 | `docs/site/bench.html` | 설계안 시뮬레이터 · 비교표 · 전개도 (현재 후보 / 보관) |
-| `docs/site/assembly.html` | B5N 조립 과정: 전체 애니메이션 · 블록별 조립 · 메커니즘 단면도 · 전개도 |
+| `docs/site/assembly.html` | B5E / B5N 조립 과정 (버튼 전환): 전체 애니메이션 · 블록별 조립 · 메커니즘 단면도 · 전개도 |
 | `docs/site/arm.html` | 팔(R4, 가정 치수) + 그리퍼 결합 · 간섭 확인 |
-| `docs/B5N-조립과정.mp4` | 94 초 조립 영상 |
-| `patterns/B5N/B5N-전개도-A4.pdf` | **인쇄용 1:1 전개도** (A4, 실제 크기 100%) |
+| `docs/B5E-조립과정.mp4` · `docs/B5N-조립과정.mp4` | 94 초 조립 영상 (쉬운 버전 · 최종) |
+| `patterns/B5E/B5E-전개도-A4.pdf` · `patterns/B5N/…` | **인쇄용 1:1 전개도** (A4, 실제 크기 100%) |
 
 three.js 는 CDN(cdnjs, jsdelivr)에서 불러오므로 인터넷이 필요하다.
 
@@ -32,7 +32,7 @@ npx tsx scripts/score.ts           # 채점 → docs/COMPARISON.md
 npx tsx scripts/patterns.ts        # 전개도 → patterns/<ID>/ (SVG, A4 PDF, 부품표)
 npx tsx scripts/diagrams.ts        # 메커니즘 단면도 → docs/diagrams/*.svg
 npm run build                      # HTML → out/ + docs/site/
-node scripts/record-assembly.mjs   # 조립 영상 → docs/B5N-조립과정.mp4 (Playwright + ffmpeg)
+node scripts/record-assembly.mjs 20 - B5E   # 조립 영상 → docs/B5E-조립과정.mp4 (B5N 도 가능, Playwright + ffmpeg)
 ```
 **params 를 바꾸면** `calc → score/patterns/diagrams → build` 순서로 다시 돌린다. 스크린샷·PDF·영상은 Playwright Chromium 이 필요하다.
 
