@@ -15,7 +15,7 @@ function opening(id: string): [number, number] {
   const halfT = (p.hard.plies * C.board_t) / 2;
   const face = halfT + C.pad_t;
   const yp = p.palm.sy / 2 + halfT;
-  const x = p.soft.type === "slot" ? 2 * p.soft.x_open : 2 * (p.palm.sx / 2 + p.soft.root_len + C.finray.L);
+  const x = p.soft.type === "slot" ? 2 * p.soft.x_open : 2 * (p.palm.sx / 2 + (p.soft.root_len + C.finray.L) * Math.sin((p.soft.phi_open_deg ?? 90) * (Math.PI / 180)));
   const h = p.hard;
   const r = Math.PI / 180;
   const y =
@@ -27,7 +27,7 @@ function opening(id: string): [number, number] {
 }
 
 const calc: Record<string, { pass: boolean; derived: Record<string, number | string> }> = {};
-for (const id of ["B1", "B2", "B3", "B3o", "B4", "B5", "B5T", "B5F", "B5N"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
+for (const id of ["B1", "B2", "B3", "B3o", "B4", "B5", "B5T", "B5F", "B5N", "B5E"]) calc[id] = JSON.parse(readFileSync(`calc/out/${id}.json`, "utf8"));
 const baseOf = (id: string) => (id === "V5" ? "B1" : id === "V5b" ? "B3" : id);
 
 const O = common.objects;
@@ -50,6 +50,7 @@ const RISK: Record<string, [number, string]> = {
   B5T: [2.5, "손끝판 핀 + 고무줄 + 스토퍼. 순응 방향이 물체 쪽이라 쥘 때 무력화(SymPy C3)."],
   B5F: [3.0, "빨대-in-빨대 텔레스코프 2쌍 + 손바닥 슬롯. 텔레스코프가 기울면 걸릴 수 있음(슬리브 30 mm 로 완화)."],
   B5N: [4.0, "B5 에서 손톱 플랩만 14 mm 로 — 추가 부품 없음. 손톱 테이프 힌지 내구성이 관건."],
+  B5E: [4.5, "B5N 에서 드럼 6개(3장 적층·중심 맞춤·실 감기)를 레버 판 4개 + 매듭 1개로. 가장 어려운 원형 부품이 사라짐. hard 레버 끝 ↔ 안쪽 축 여유 1 mm(SymPy E5)는 실물에서 확인."],
   B4: [2.5, "B2 의 슬롯 마찰 미지수 + B3 의 텐던 순서·고무줄 튜닝을 둘 다 가짐. 대신 가운데 경사 벽이 없어 B2 보다 부품이 단순."],
   V5: [3.0, "B1 과 같고, 실 1개라 칩을 쥘 때 S 를 45% 넘기면 hard 가 닫혀 칩을 누름 → 조작 주의."],
   V5b: [2.0, "B3 리스크 + 실 1개라 Fin Ray 가 끝까지 닫혀 Rigid 에서 텐던 손가락과 부딪힘(시뮬 간섭)."],
@@ -63,6 +64,7 @@ const HAND: Record<string, [number, string]> = {
   B5T: [3, "B5 와 같음."],
   B5F: [3, "B5 와 같음."],
   B5N: [3, "B5 와 같음."],
+  B5E: [3, "B5 와 같음."],
   B4: [5, "B3 와 같은 2관절 텐던 손가락."],
   V5: [3, "B1 과 동일."],
   V5b: [5, "B3 과 동일."],
@@ -96,7 +98,8 @@ for (const d of ALL) {
   }
   const cd = calc[baseOf(d.id)];
   const pc = partCount(d.id);
-  const softT = Number(cd.derived.soft_string_T_at_limit_N);
+  const video = cd.derived.soft_string_T_video_N !== undefined; // B5E: 영상용 힘 목표(pinch 1.5 N, Fin Ray 0.5 N)로 계산된 장력
+  const softT = Number(video ? cd.derived.soft_string_T_video_N : cd.derived.soft_string_T_at_limit_N);
   const hardT = Number(cd.derived.hard_string_T_N);
   const Tmax = d.oneString ? softT + hardT : Math.max(softT, hardT);
   const [ox, oy] = opening(d.id);
@@ -124,7 +127,7 @@ for (const d of ALL) {
       "개구 x×y": `${ox.toFixed(0)}×${oy.toFixed(0)} mm`,
       "SymPy": cd.pass ? "전부 통과" : "실패 있음",
       "부품 수 (자르는 판)": `${pc}`,
-      "최대 실 장력": `${Tmax.toFixed(0)} N${d.oneString ? " (실 1개 합)" : ""}`,
+      "최대 실 장력": `${Tmax.toFixed(0)} N${d.oneString ? " (실 1개 합)" : ""}${video ? " (영상용 힘)" : ""}`,
       "리스크": RISK[d.id][1],
       "핸드형": HAND[d.id][1],
     },
@@ -150,7 +153,8 @@ const sc = Object.fromEntries(rows.map((r) => [r.id, r.total.toFixed(1)]));
 const cur = rows.filter((r) => r.group === "current");
 const recommendation = [
   `<b>현재 후보 (hard = 평행 링크 + 텐던 1가닥, 수직 순응 옵션):</b> ${cur.map((r) => `${r.id} ${r.total.toFixed(1)}`).join(" · ")}. 닫힘 방향 순응·힘 제한은 soft Fin Ray 가 맡으므로 hard 는 바닥 쪽(수직) 순응만 평가했습니다 — 목표 ±10 mm (팔 높이 오차 가정).`,
-  `<b>B5N (긴 손톱, ${sc.B5N})</b>: 추가 부품 없이 손톱 플랩 5 → 14 mm 로 12 mm 까지 순응. 접히기 전엔 손톱 안쪽 면이 건전지를 쥐는 면. 가장 싸고 단순 → 목요일 1차 제작 추천.`,
+  `<b>B5E (쉬운 버전, ${sc.B5E})</b>: B5N 형상 그대로 드럼 6개 → 레버 판 4개. 실은 레버 끝 구멍에 매듭 하나라 원형 부품·실 감기가 없음. soft 열림 30°(팔 결합 기준)와 영상용 힘(pinch 1.5 N, Fin Ray 0.5 N)을 반영한 영상 과제용 → 제작 추천. 장력은 영상용 힘 기준이라 다른 안(8 N 기준)과 '손 구동' 점수를 직접 비교하지 말 것.`,
+  `<b>B5N (긴 손톱, ${sc.B5N})</b>: 추가 부품 없이 손톱 플랩 5 → 14 mm 로 12 mm 까지 순응. 접히기 전엔 손톱 안쪽 면이 건전지를 쥐는 면. B5E 의 바탕. 드럼을 직접 만들 수 있으면 이대로도 됨.`,
   `<b>B5F (플로팅, ${sc.B5F})</b>: 손가락 전체를 손바닥 위 빨대 텔레스코프에 띄워 14 mm 까지 순응, 손끝이 기울지 않음. 쥐는 순간 슬리브 마찰로 잠겨 들어올릴 때 안 처짐. 텔레스코프가 기울어 걸리는지가 실물 리스크 → B5N 손톱이 약하면 이걸로.`,
   "탈락: B5T(손끝판 관절)는 바닥 힘이 손끝을 물체 쪽으로 돌려, 물체를 쥐고 있으면 물체가 막아 순응이 사라집니다(SymPy C3: 10 mm 에 안쪽 14 mm). 손바닥 힌지 방식은 10 mm 상승에 손끝이 22 mm 안쪽으로 휘어 calc 단계에서 제외. 나머지 이전 안들은 '보관(old)' 표에 이유와 함께 모았습니다.",
 ];

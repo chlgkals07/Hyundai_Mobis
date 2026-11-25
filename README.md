@@ -3,7 +3,7 @@
 직교 2축 역할 분담 그리퍼: **soft Fin Ray 4개(x 축)** + **hard 평행 링크 손가락 2개(y 축)**.
 골판지·빨대·실·고무줄·풀로 만드는 영상 과제용 버전을 **치수 파라미터 → SymPy 검증 → 3D 시뮬 → 비교 채점 → 1:1 전개도 → 조립 애니메이션** 으로 반복 설계한다.
 
-현재 기준안: **B5N** (평행 링크 hard + 14 mm 접히는 손톱). 팔 결합은 [`docs/ARM-HANDOFF.md`](docs/ARM-HANDOFF.md).
+현재 기준안: **B5E** — B5N(평행 링크 hard + 14 mm 접히는 손톱)에서 드럼 6개를 레버 판 4개로 바꾼 영상 과제용 쉬운 버전. 전개도 `patterns/B5E/B5E-전개도-A4.pdf`. 팔 결합은 [`docs/ARM-HANDOFF.md`](docs/ARM-HANDOFF.md).
 
 실로 구동하는 전체 팔의 [R4 × B5N 시연·제작 자료](arm/R4-B5N/README.md)도 볼 수 있다.
 
@@ -40,7 +40,7 @@ node scripts/record-assembly.mjs   # 조립 영상 → docs/B5N-조립과정.mp4
 ```
 params/            치수 단일 소스 (JSON). Python calc 와 TS 코어가 같이 읽음
   common.json        재료(골판지 3 mm, 빨대 Ø6/Ø12), Fin Ray, 물체 5종, 힘 한계
-  B5N.json …         설계안별 (B1–B5, B5F/B5N/B5T, V5 계열은 코드에서 파생)
+  B5E.json, B5N.json … 설계안별 (B1–B5, B5E/B5F/B5N/B5T, V5 계열은 코드에서 파생)
   arm/R4.json        팔 치수 (⚠ 가정값 — 실측으로 교체)
 calc/              SymPy 검증
   designs.py         설계안별 조건 (S·R·H·C·J 번호) → calc/out/<ID>.json, REPORT.md

@@ -92,14 +92,15 @@ def soft_flap(r: Report, w_hard: float):
     base = c["finray"]["base"]
     open_half = xh + Rs * sp.sin(phi_open) + base * sp.cos(phi_open)
     r.put("soft_open_half_width", open_half)
-    drum = d["soft"]["drum_r"]
-    pull = drum * (phi_open - phi_min)
-    r.put("soft_pull_mm", pull)
-    # 한쪽 플랩 = Fin Ray 2개, 손가락당 한계 F/2. 접촉점을 끝(최악, 레버 Rs)으로 둔 보수적 줄 장력
-    #   T = 2 * (F/2) * Rs / r  (시뮬에서 칩 접촉이 손끝 근처로 나와 70% 가정은 낙관적이었음)
-    T = c["force"]["chip_limit_N"] * Rs / drum
-    r.put("soft_string_T_at_limit_N", T)
-    r.check("S3", "칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N)", T, hi=40, unit="N")
+    if "drum_r" in d["soft"]:  # 레버(B5E)면 b5() 의 lever_checks 에서 계산
+        drum = d["soft"]["drum_r"]
+        pull = drum * (phi_open - phi_min)
+        r.put("soft_pull_mm", pull)
+        # 한쪽 플랩 = Fin Ray 2개, 손가락당 한계 F/2. 접촉점을 끝(최악, 레버 Rs)으로 둔 보수적 줄 장력
+        #   T = 2 * (F/2) * Rs / r  (시뮬에서 칩 접촉이 손끝 근처로 나와 70% 가정은 낙관적이었음)
+        T = c["force"]["chip_limit_N"] * Rs / drum
+        r.put("soft_string_T_at_limit_N", T)
+        r.check("S3", "칩 한계력에서 실 A 장력 (손으로 당길 만한가, ≤ 40 N)", T, hi=40, unit="N")
     return dict(z_top=z_top, Rs=Rs, tip_x=tip_x, tip_z=tip_z, phi=phi, phi_b=phi_b, phi_c=phi_c,
                 phi_min=phi_min)
 
@@ -390,6 +391,79 @@ def b4():
     return r.dump()
 
 
+def lever_arm(piv, r_, ang, guide, n=121):
+    """레버 모멘트 팔 (2D, 실 방향 고려). 레버 끝 T = piv + r(-cos a, sin a), 실은 T → guide.
+    닫힘 토크(시계 방향)가 + 가 되도록 부호를 맞춤. ang = (a0, a1) 열림→닫힘. SymPy 식을 n 점에서 평가."""
+    a = sp.symbols("a", real=True)
+    T = sp.Matrix([piv[0] - r_ * sp.cos(a), piv[1] + r_ * sp.sin(a)])
+    u = sp.Matrix(guide) - T
+    rr = T - sp.Matrix(piv)
+    m = -(rr[0] * u[1] - rr[1] * u[0]) / sp.sqrt(u.dot(u))
+    a0, a1 = ang
+    vals = [f(m.subs(a, a0 + (a1 - a0) * k / (n - 1))) for k in range(n)]
+    pull = sp.Integral(m, (a, a0, a1))
+    return dict(m=m, a=a, T=T, min=min(vals), max=max(vals), pull=f(pull.evalf(8)), vals=vals)
+
+
+def lever_checks(r: Report, s: dict, yp: float, psi_min, z_top: float):
+    """B5E: 드럼 → 레버. soft 레버는 플랩에 세운 판(힌지선 → 안쪽·위), hard 레버는 바깥 링크 사이(바깥 피벗 → 안쪽 피벗 쪽).
+    영상용 힘 목표(FINAL-CHANGES §1)로 장력 계산."""
+    c, d = r.c, r.d
+    h, so = d["hard"], d["soft"]
+    fv = d["force_video"]
+    # --- soft
+    L = so["lever"]
+    xh = d["palm"]["sx"] / 2
+    b0 = L["beta_open_deg"] * deg
+    trav = so["phi_open_deg"] * deg - s["phi_min"]
+    sl = lever_arm((xh, z_top), L["r"], (b0, b0 + trav), (L["guide_x"], z_top + L["guide_dz"]))
+    r.put("soft_lever_travel_deg", trav / deg)
+    r.put("soft_lever_arm_min", sl["min"])
+    r.put("soft_lever_arm_max", sl["max"])
+    r.put("soft_pull_mm", sl["pull"])
+    # 손바닥 슬롯(깊이 slot_depth, H10 브래킷 때문에 더 못 팜) 밖에서 레버 아랫변이 손바닥 윗면 위
+    s_ = L["slot_depth"] / sp.cos(b0)
+    clr = s_ * sp.sin(b0) - L["w"] / 2 * sp.cos(b0)
+    r.check("E1", "soft 레버 아랫변이 손바닥 슬롯 밖에서 윗면 위 (열림 자세, ≥ 0.5)", clr, lo=0.5, unit="mm")
+    # 레버 팔이 손바닥 윗면(슬롯 끝 모서리)에 닿는 β → 그때의 φ = 자연 열림 스토퍼 (별도 스토퍼 블록 불필요)
+    bt = sp.asin((L["w"] / 2) / L["slot_depth"])
+    phi_stop = so["phi_open_deg"] * deg + (b0 - bt)
+    r.put("soft_lever_stop_phi_deg", phi_stop / deg)
+    r.check("E11", "레버가 손바닥에 닿는 자연 열림 스토퍼 φ < 45° (R4 끝판 간섭 시작, FINAL-CHANGES §3)", phi_stop / deg, hi=44, unit="deg")
+    tipx = xh - L["r"] * sp.cos(b0) - L["w"] / 2
+    r.check("E2", "좌·우 soft 레버 끝이 가운데에서 안 만남 (레버 끝 안쪽 변 x ≥ 1)", tipx, lo=1, unit="mm")
+    r.check("E3", "soft 레버 최소 모멘트 팔 ≥ B5N 드럼 반지름 13", sl["min"], lo=13, unit="mm")
+    Rs = so["root_len"] + c["finray"]["L"]
+    Ts = 2 * fv["soft_per_finger_N"] * Rs / sl["min"]
+    r.put("soft_string_T_video_N", Ts)
+    r.check("E4", "영상용 soft 0.5 N/손가락에서 실 A 장력 ≤ 손 한계", Ts, hi=fv["hand_T_max_N"], unit="N")
+    # --- hard
+    H = h["lever"]
+    g0 = H["gamma_open_deg"] * deg
+    travh = h["psi_open_deg"] * deg - psi_min
+    P2 = (yp + h["d"], -h["bracket_drop"])
+    P1 = (yp, -h["bracket_drop"])
+    hl = lever_arm(P2, H["r"], (g0, g0 + travh), (H["hole_y"], 0))
+    r.put("hard_lever_travel_deg", travh / deg)
+    r.put("hard_lever_arm_min", hl["min"])
+    r.put("hard_lever_arm_max", hl["max"])
+    r.put("hard_pull_mm", hl["pull"])
+    # 레버 끝 ↔ 안쪽 피벗 축 (빨대) 최소 거리
+    dist = sp.sqrt((hl["T"][0] - P1[0]) ** 2 + (hl["T"][1] - P1[1]) ** 2)
+    dmin = min(f(dist.subs(hl["a"], g0 + travh * k / 120)) for k in range(121))
+    r.put("hard_lever_to_inner_axle_min", dmin)
+    r.check("E5", "hard 레버 끝 ↔ 안쪽 피벗 축 ≥ 빨대 반지름 + 레버 반폭 + 1", dmin, lo=c["straw_d"] / 2 + H["w"] / 2 + 1, unit="mm")
+    ztop_tip = max(f(hl["T"][1].subs(hl["a"], g0 + travh * k / 120)) for k in range(121))
+    r.check("E6", "hard 레버 끝 윗변이 손바닥 아랫면 아래 (≤ −2)", ztop_tip + H["w"] / 2, hi=-2, unit="mm")
+    r.check("E7", "hard 레버 최소 모멘트 팔 ≥ 0.8 r (실 기울기·회전 61° 포함)", hl["min"], lo=0.8 * H["r"], unit="mm")
+    r.check("E8", "hard 실 구멍이 앞·뒤 따로 (2·hole_y ≥ 10) 이고 손바닥 안", H["hole_y"], lo=5, hi=d["palm"]["sy"] / 2 - 4, unit="mm")
+    Th = fv["pinch_N"] * h["L"] / hl["min"]
+    r.put("hard_string_T_video_N", Th)
+    r.check("E9", "영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계", Th, hi=fv["hand_T_max_N"], unit="N")
+    r.check("E10", "영상용 pinch ≥ 건전지 최소 0.85 N (SF3)", fv["pinch_N"], lo=fv["battery_min_N"], unit="N")
+    r.put("hard_string_T_N", Th)
+
+
 def b5(name="B5"):
     """평행사변형 hard. 손끝판(coupler)은 항상 수직 → 쐐기 0°, 평행 pinch.
     피벗 y 를 '건전지 pinch 에서 링크 수직' 으로 두면 pinch = 손끝 궤적 최저점 → 닫히는 도중 바닥 파고듦 없음."""
@@ -439,9 +513,10 @@ def b5(name="B5"):
     Y = 2 * (yp + L * sp.sin(psi_open) - face)
     r.put("hard_opening_mm", Y)
     # 링크 끼리 / 바닥 / 드럼
-    r.check("H5", "바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4)", h["drum_r"], hi=dd - 4, unit="mm")
-    r.check("H5b", "앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3)", 2 * (yp + dd - h["drum_r"]), lo=3, unit="mm")
-    r.check("H6", "드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2)", h["bracket_drop"], lo=h["drum_r"] + 2, unit="mm")
+    if "lever" not in h:
+        r.check("H5", "바깥 피벗 드럼이 안쪽 피벗 축을 안 건드림 (r ≤ d - 4)", h["drum_r"], hi=dd - 4, unit="mm")
+        r.check("H5b", "앞·뒤 드럼 안 겹침 (2·(yp + d - r) ≥ 3)", 2 * (yp + dd - h["drum_r"]), lo=3, unit="mm")
+        r.check("H6", "드럼 윗면이 손바닥 아랫면보다 아래 (bracket_drop ≥ r + 2)", h["bracket_drop"], lo=h["drum_r"] + 2, unit="mm")
     # 두 링크는 평행, 수직 거리 = d·cosψ. 완전 개방에서 가장 가까움 (1차 시도: 피벗을 위·아래로 쌓아 수직일 때 겹침 → 수평 배치로 변경)
     # H7 (조립 검토에서 수정): 링크 막대는 y–z 평면 판 → 운동 평면 안의 높이 = 막대 높이(12). 앞·뒤 링크가 같은 x 평면이라
     #   평행 링크 수직 거리 d·cosψ 가 막대 높이 + 2 이상이어야 함 (이전엔 판 두께 6 으로 잘못 잡아 68° 까지 허용했음)
@@ -449,7 +524,8 @@ def b5(name="B5"):
     r.check("H9", "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
             12, lo=9 + 3, unit="mm")
     # H10 (시뮬에서 발견): 브래킷(x = w/2+1 ~ w/2+4)과 soft 드럼 아래 절반(x ≥ 손바닥 반폭 - r_s) 이 겹침
-    r.check("H10", "soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1", d["palm"]["sx"] / 2 - d["soft"]["drum_r"], lo=h["width"] / 2 + 4 + 1, unit="mm")
+    if "lever" not in h:
+        r.check("H10", "soft 드럼 안쪽 끝 x ≥ hard 브래킷 바깥 x + 1", d["palm"]["sx"] / 2 - d["soft"]["drum_r"], lo=h["width"] / 2 + 4 + 1, unit="mm")
     # --- 조립 메커니즘 (2026-11-23 조립 검토에서 추가)
     so = d["soft"]
     phm = abs(s["phi_min"])
@@ -477,10 +553,13 @@ def b5(name="B5"):
     r.check("H12", "링크 막대 바깥 면(4.5+막대두께) + 1 ≤ 브래킷 안쪽 면 (w/2+1)", 4.5 + bar_t + 1, hi=h["width"] / 2 + 1, unit="mm")
     r.check("H8", "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)", yp + dd + 6, hi=d["palm"]["sy"] / 2, unit="mm")
     # 장력: 손끝판 수평력 F → 링크 토크 F·L·cosψ (ψ=0 최대) → T = F L / r
-    T = c["force"]["pinch_target_N"] * L / h["drum_r"]
-    r.put("hard_string_T_N", T)
-    r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각)", T, hi=45, unit="N")
-    r.put("hard_pull_mm", h["drum_r"] * (psi_open - psi_min))
+    if "lever" in h:
+        lever_checks(r, s, yp, psi_min, z_top)
+    else:
+        T = c["force"]["pinch_target_N"] * L / h["drum_r"]
+        r.put("hard_string_T_N", T)
+        r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 45 N (연속 루프 1가닥, 두 손가락 몫 각각)", T, hi=45, unit="N")
+        r.put("hard_pull_mm", h["drum_r"] * (psi_open - psi_min))
     r.put("hard_face_wedge_deg", 0)
     comp = h.get("compliance")
     V_REQ = 10.0  # 목표 수직 순응 (팔 높이 오차 가정 ±10 mm)
@@ -537,7 +616,7 @@ def b5(name="B5"):
 
 
 def main():
-    res = [b1(), b2(), b3(), b3o(), b4(), b5(), b5("B5T"), b5("B5F"), b5("B5N")]
+    res = [b1(), b2(), b3(), b3o(), b4(), b5(), b5("B5T"), b5("B5F"), b5("B5N"), b5("B5E")]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",
