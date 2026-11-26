@@ -22,6 +22,7 @@ npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개�
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
 node scripts/record-assembly.mjs 20 - B5E # 조립 애니메이션 → docs/<B5E|B5N>-조립과정.mp4 (프레임 캡처 + ffmpeg)
+node scripts/manual-shots.mjs    # 설명서 그림 → docs/manual-img/*.png (build 후, 조립 페이지 캡처)
 npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg (B5N), docs/diagrams/B5E/*.svg
 python3 calc/envelope.py         # 팔 결합용 그리퍼 점유 공간·장착 영역·실 마찰
 npx tsx scripts/arm-check.ts     # 팔↔그리퍼 간섭표 → docs/arm-check.md (params/arm/R4.json 은 가정값)

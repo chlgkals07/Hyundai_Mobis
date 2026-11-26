@@ -902,7 +902,9 @@ const MEDIA: Record<DId, { video: string; pdf: string }> = (window as unknown as
 // 제작 설명서 (B5E 기준, docs/B5E-제작설명서.md). 그림은 B5E 단면도·지도를 인라인으로
 {
   const figs = Object.fromEntries(DIAGRAMS("B5E").map((d) => [d.id, d]));
-  document.getElementById("manual")!.innerHTML = mdToHtml(manualMd, figs);
+  // 설명서 사진: Artifact 는 media/manual/ (publish 의 files), docs/site 는 빌드가 window.__IMG_BASE 로 레포 경로
+  const imgBase = (window as unknown as { __IMG_BASE?: string }).__IMG_BASE ?? "media/manual/";
+  document.getElementById("manual")!.innerHTML = mdToHtml(manualMd, figs, imgBase);
 }
 function fillPages() {
   document.getElementById("sections")!.innerHTML = DIAGRAMS(DESIGN_ID)

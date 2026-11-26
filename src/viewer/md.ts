@@ -8,12 +8,13 @@ const inline = (s: string) =>
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
 
-export function mdToHtml(md: string, figs: Record<string, { title: string; svg: string }>): string {
+export function mdToHtml(md: string, figs: Record<string, { title: string; svg: string }>, imgBase = ""): string {
   const lines = md.replace(/\r/g, "").split("\n");
   const out: string[] = [];
   let i = 0;
   const listBlock = (ordered: boolean) => {
     const items: string[] = [];
+    const start = ordered ? Number(/^(\d+)\./.exec(lines[i])?.[1] ?? 1) : 1;
     const re = ordered ? /^(\d+)\. (.*)$/ : /^- (.*)$/;
     while (i < lines.length && re.test(lines[i])) {
       const m = lines[i].match(re)!;
@@ -25,7 +26,7 @@ export function mdToHtml(md: string, figs: Record<string, { title: string; svg: 
       if (box) text = text.slice(4);
       items.push(`<li${box ? ' class="chk"' : ""}>${box ? `<span class="box">${box[1] === "x" ? "☑" : "☐"}</span> ` : ""}${inline(text)}${sub.length ? `<ul>${sub.map((x) => `<li>${inline(x)}</li>`).join("")}</ul>` : ""}</li>`);
     }
-    out.push(ordered ? `<ol>${items.join("")}</ol>` : `<ul>${items.join("")}</ul>`);
+    out.push(ordered ? `<ol${start > 1 ? ` start="${start}"` : ""}>${items.join("")}</ol>` : `<ul>${items.join("")}</ul>`);
   };
   while (i < lines.length) {
     const l = lines[i];
@@ -40,7 +41,22 @@ export function mdToHtml(md: string, figs: Record<string, { title: string; svg: 
       i++;
       continue;
     }
+    if (l.startsWith("```")) {
+      const code: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) code.push(lines[i++]);
+      i++;
+      out.push(`<pre class="ascii">${esc(code.join("\n"))}</pre>`);
+      continue;
+    }
     const img = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(l);
+    if (img && /\.(png|jpg)$/.test(img[2])) {
+      // 사진(캡처): 경로의 파일 이름만 쓰고 imgBase 앞에 붙임
+      const file = img[2].split("/").pop()!;
+      out.push(`<figure class="shot"><img src="${imgBase}${file}" alt="${esc(img[1])}" loading="lazy"><figcaption>${esc(img[1])}</figcaption></figure>`);
+      i++;
+      continue;
+    }
     if (img) {
       const id = img[2].split("/").pop()!.replace(/\.svg$/, "");
       const f = figs[id];
@@ -68,7 +84,7 @@ export function mdToHtml(md: string, figs: Record<string, { title: string; svg: 
       continue;
     }
     const para: string[] = [];
-    while (i < lines.length && lines[i].trim() && !/^(#|\||- |\d+\. |!\[)/.test(lines[i])) para.push(lines[i++]);
+    while (i < lines.length && lines[i].trim() && !/^(#|\||- |\d+\. |!\[|```)/.test(lines[i])) para.push(lines[i++]);
     out.push(`<p>${inline(para.join(" "))}</p>`);
   }
   return out.join("\n");
