@@ -908,7 +908,7 @@ function fillPages() {
   if (vid.getAttribute("src") !== MEDIA[DESIGN_ID].video) vid.src = MEDIA[DESIGN_ID].video;
   (document.getElementById("vidLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].video;
   (document.getElementById("pdfLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].pdf;
-  document.getElementById("pdfLink")!.textContent = `${DESIGN_ID} 전개도 PDF 받기 (A4 3장)`;
+  document.getElementById("pdfLink")!.textContent = LEV ? "B5E 전개도 PDF 받기 (A4 5장: 본 3 + 여분·B5N 전환 2)" : "B5N 전개도 PDF 받기 (A4 3장)";
   for (const b of document.querySelectorAll<HTMLButtonElement>("#dsel button")) b.setAttribute("aria-pressed", String(b.dataset.d === DESIGN_ID));
 }
 /** 설계 전환: 모든 설계 의존 상태를 다시 만듦 */

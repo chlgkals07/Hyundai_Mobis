@@ -47,6 +47,8 @@ export interface DesignPattern {
   /** 자르지 않는 부자재 */
   cutList: string[];
   steps: string[];
+  /** 같은 PDF 뒤에 붙이는 여분·전환 부품 (B5E: 실패 잦은 부품 여분 + B5N 드럼 전환용) */
+  spare?: { title: string; shapes: Shape[]; notes: string[] };
 }
 
 const C = common;
@@ -541,8 +543,16 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   const shapes: Shape[] = [...keep];
   const top = shapes.find((s) => s.label.startsWith("손바닥 윗장"))!;
   for (const t of [1, -1]) top.holes.push({ c: [p.soft.root_len + p.palm.sx / 2, p.palm.sy / 2 + t * ty], d: 3 });
+  if (hLev) {
+    // B5N 으로 바꿀 때 쓰는 텐던 구멍 (드럼 안쪽 접선 y = yp + d − 16). 처음부터 같이 뚫어 두면 손바닥을 그대로 씀
+    const tyN = yp + h.d - 16;
+    for (const t of [1, -1]) {
+      top.holes.push({ c: [p.soft.root_len + p.palm.sx / 2, p.palm.sy / 2 + t * tyN], d: 3 });
+      top.text.push({ p: [p.soft.root_len + p.palm.sx / 2 + 3, p.palm.sy / 2 + t * tyN + 1], s: "B5N", size: 2.4 });
+    }
+  }
   if (sLev) top.note = `좌우 플랩은 점선에서 아래로 접힘. 열림은 레버가 손바닥에 닿는 약 ${fx(Number(d.soft_lever_stop_phi_deg))}° 까지 (영상·팔 결합 기준). 힌지선 안쪽 슬롯 ${sLev.slot_depth}×10 = soft 레버 통로.`;
-  top.note = (top.note ?? "") + ` 가운데 텐던 구멍 2개 (y=±${fx(ty)}).`;
+  top.note = (top.note ?? "") + ` 가운데 텐던 구멍 2개 (y=±${fx(ty)})${hLev ? `, + 'B5N' 표시 구멍 2개 (y=±${fx(yp + h.d - 16)}, 드럼으로 바꿀 때용 — 같이 뚫어 둠)` : ""}.`;
   // 아랫장: 좌우 relief 만큼 좁게 (플랩이 −8° 까지 닫히도록, SymPy S5) + soft 드럼 슬롯 + 텐던 구멍
   const rel = so.palm_edge_relief ?? 0;
   const bw0 = p.palm.sx - 2 * rel;
@@ -550,6 +560,7 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   const sr = sLev ? sLev.slot_depth : p.soft.drum_r;
   for (const s of [-1, 1]) rectCut(bot, s > 0 ? bw0 - (sr - rel) : 0, p.palm.sy / 2 + p.soft.drum_y - 5, sr - rel, 10);
   for (const t of [1, -1]) bot.holes.push({ c: [bw0 / 2, p.palm.sy / 2 + t * ty], d: 3 });
+  if (hLev) for (const t of [1, -1]) bot.holes.push({ c: [bw0 / 2, p.palm.sy / 2 + t * (yp + h.d - 16)], d: 3 });
   shapes.unshift(bot);
   // soft 닫힘 스토퍼 블록
   const hb = so.stop_block_h ?? 8;
@@ -682,8 +693,43 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   };
 }
 
+/** B5E + 여분 시트: 실패가 잦은 부품 여분 + B5N(드럼)으로 바꿀 때 필요한 부품 */
+function b5eWithSpare(): DesignPattern {
+  const e = b5(B5Ep as unknown as typeof B5p, B5Ec.derived);
+  const nPat = b5(B5Np as unknown as typeof B5p, B5Nc.derived);
+  const pick = (src: DesignPattern, label: string, qty: number, tag: string, note: string): Shape => {
+    const sh = src.shapes.find((x) => x.label === label);
+    if (!sh) throw new Error(`여분 시트: ${label} 없음`);
+    return { ...sh, label: `[${tag}] ${label}`, qty, note, holes: [...sh.holes], text: [...sh.text], cut: [...sh.cut] };
+  };
+  const shapes: Shape[] = [
+    pick(e, "구멍 맞춤 시험편", 1, "여분", "처음 고른 구멍이 헐거우면 다시 시험."),
+    pick(e, "바깥 링크 막대", 4, "여분", "구멍 간격 55 가 틀어지면 교체 (2장 적층 = 막대 1개)."),
+    pick(e, "안쪽 링크 막대", 4, "여분", "구멍 간격 55 가 틀어지면 교체."),
+    pick(e, "Hard 레버", 3, "여분", "레버 끝이 안쪽 축에 닿으면 팔을 1–2 mm 깎거나 교체 (3장 = 1개)."),
+    pick(e, "Soft 레버", 2, "여분", "2장 = 1개."),
+    pick(e, "손톱 플랩", 3, "여분", "테이프 힌지가 약해지면 교체 (3장 = 1개)."),
+    pick(e, "Fin Ray 띠 1/4", 1, "여분", "겉종이 벗기다 찢어지면 사용."),
+    pick(nPat, "Hard 드럼 큰판", 4, "B5N 전환", "드럼으로 바꿀 때: 큰-작은-큰 3장 → 바깥 링크 막대(새 것) 사이에 면 접착."),
+    pick(nPat, "Hard 드럼 작은판", 2, "B5N 전환", ""),
+    pick(nPat, "Soft 드럼 큰판", 4, "B5N 전환", "플랩 바깥면 힌지선에 세워 붙이고 삼각 보강 (soft 레버 대신)."),
+    pick(nPat, "Soft 드럼 작은판", 2, "B5N 전환", ""),
+    pick(nPat, "바깥 링크 막대", 8, "B5N 전환", "레버가 이미 붙은 막대는 못 씀 → 드럼용 새 막대."),
+  ];
+  e.spare = {
+    title: `${e.name} · 여분 / B5N 전환`,
+    shapes,
+    notes: [
+      "[여분] = 실패가 잦은 부품. 필요할 때만 자름.",
+      "[B5N 전환] = 레버 대신 드럼(B5N)으로 바꿀 때. 손바닥은 'B5N' 표시 구멍(y=±21.5)을 처음부터 같이 뚫어 두면 그대로 씀. soft 는 드럼이면 90° 까지 열림.",
+      "B5N 실 경로: soft 드럼 홈에 매듭 → 1/2바퀴 → 안쪽 접선에서 위로 / hard 드럼 1바퀴 → 손바닥 'B5N' 구멍 → 손잡이.",
+    ],
+  };
+  return e;
+}
+
 export const PATTERNS: DesignPattern[] = [
-  b5(B5Ep as unknown as typeof B5p, B5Ec.derived),
+  b5eWithSpare(),
   b5(B5Np as unknown as typeof B5p, B5Nc.derived),
   b5(B5Fp as unknown as typeof B5p, B5Fc.derived),
   b5(),

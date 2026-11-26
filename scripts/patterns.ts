@@ -143,10 +143,13 @@ for (const dp of PATTERNS) {
   const dir = isCurrent(dp.id) ? `patterns/${dp.id}` : `patterns/old/${dp.id}`;
   mkdirSync(dir, { recursive: true });
   const pages = pack(dp.shapes);
+  const sparePages = dp.spare ? pack(dp.spare.shapes) : [];
+  const total = pages.length + sparePages.length;
   const svgs: string[] = [];
   let idx = 1;
-  pages.forEach((pg, i) => {
-    const svg = pageSvg(dp.name, i + 1, pages.length, pg, idx);
+  [...pages, ...sparePages].forEach((pg, i) => {
+    const isSpare = i >= pages.length;
+    const svg = pageSvg(isSpare ? dp.spare!.title : dp.name, i + 1, total, pg, idx);
     idx += pg.length;
     writeFileSync(`${dir}/page-${i + 1}.svg`, svg);
     svgs.push(svg);
@@ -154,7 +157,7 @@ for (const dp of PATTERNS) {
   const md = [
     `# ${dp.name} — 제작 시트`,
     "",
-    "인쇄: A4, **실제 크기(100%)**, 여백 없음. 각 장의 100 mm 눈금자를 자로 확인.",
+    `인쇄: A4 ${total}장, **실제 크기(100%)**, 여백 없음. 각 장의 100 mm 눈금자를 자로 확인.`,
     "",
     "## 자를 부품",
     "",
@@ -162,6 +165,18 @@ for (const dp of PATTERNS) {
     "|---|---|---|---|---|---|",
     ...pages.flat().map((p, i) => `| ${i + 1} | ${p.s.label} | ${p.s.qty} | ${n(p.s.w)}×${n(p.s.h)} | ${p.s.material} | ${p.s.note ?? ""} |`),
     "",
+    ...(dp.spare
+      ? [
+          `## 여분 / B5N 전환 (${pages.length + 1}–${total} 쪽)`,
+          "",
+          ...dp.spare.notes.map((x) => `- ${x}`),
+          "",
+          "| # | 부품 | 수량 | 크기 (mm) | 재료 | 메모 |",
+          "|---|---|---|---|---|---|",
+          ...sparePages.flat().map((p, i) => `| ${pages.flat().length + i + 1} | ${p.s.label} | ${p.s.qty} | ${n(p.s.w)}×${n(p.s.h)} | ${p.s.material} | ${p.s.note ?? ""} |`),
+          "",
+        ]
+      : []),
     "## 부자재 (자르지 않음)",
     "",
     ...dp.cutList.map((c) => `- ${c}`),

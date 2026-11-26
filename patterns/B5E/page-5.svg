@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<defs><pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2" stroke="#e08a00" stroke-width=".35"/></pattern></defs>
+<style>
+.cut{fill:none;stroke:#000;stroke-width:.3}
+.score{fill:none;stroke:#1565c0;stroke-width:.35;stroke-dasharray:2 1.2}
+.mark{fill:none;stroke:#777;stroke-width:.25;stroke-dasharray:3 1 .6 1}
+.glue{fill:url(#hatch);stroke:none}
+.hole{fill:none;stroke:#c62828;stroke-width:.3}
+.cross{stroke:#c62828;stroke-width:.2}
+.flute{fill:none;stroke:#2e7d32;stroke-width:.35}
+text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#222}
+.lbl{font-size:3.1px;font-weight:bold}.dim{font-size:2.6px;fill:#666}
+.hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
+</style>
+<rect width="210" height="297" fill="#fff"/>
+<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) · 여분 / B5N 전환 — 전개도 5/5</text>
+<text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
+<polygon class="cut" points="71,24 72.55,24.2 74,24.8 75.24,25.76 76.2,27 76.8,28.45 77,30 76.8,31.55 76.2,33 75.24,34.24 74,35.2 72.55,35.8 71,36 16,36 14.45,35.8 13,35.2 11.76,34.24 10.8,33 10.2,31.55 10,30 10.2,28.45 10.8,27 11.76,25.76 13,24.8 14.45,24.2 16,24"/>
+<circle class="hole" cx="16" cy="30" r="3.25"/>
+<path class="cross" d="M15 30h2M16 29v2"/>
+<circle class="hole" cx="71" cy="30" r="3.25"/>
+<path class="cross" d="M70 30h2M71 29v2"/>
+<path class="flute" d="M63 33H73M71 31L73 33L71 35M65 31L63 33L65 35"/>
+<text class="lbl" x="10" y="40">32. [여분] 바깥 링크 막대 ×4</text>
+<text class="dim" x="10" y="43.6">67×12 · B골 3 mm</text>
+<polygon class="cut" points="144,24 145.55,24.2 147,24.8 148.24,25.76 149.2,27 149.8,28.45 150,30 149.8,31.55 149.2,33 148.24,34.24 147,35.2 145.55,35.8 144,36 89,36 87.45,35.8 86,35.2 84.76,34.24 83.8,33 83.2,31.55 83,30 83.2,28.45 83.8,27 84.76,25.76 86,24.8 87.45,24.2 89,24"/>
+<circle class="hole" cx="89" cy="30" r="3.25"/>
+<path class="cross" d="M88 30h2M89 29v2"/>
+<circle class="hole" cx="144" cy="30" r="3.25"/>
+<path class="cross" d="M143 30h2M144 29v2"/>
+<path class="flute" d="M136 33H146M144 31L146 33L144 35M138 31L136 33L138 35"/>
+<text class="lbl" x="83" y="40">33. [여분] 안쪽 링크 막대 ×4</text>
+<text class="dim" x="83" y="43.6">67×12 · B골 3 mm</text>
+<polygon class="cut" points="71,51 72.55,51.2 74,51.8 75.24,52.76 76.2,54 76.8,55.45 77,57 76.8,58.55 76.2,60 75.24,61.24 74,62.2 72.55,62.8 71,63 16,63 14.45,62.8 13,62.2 11.76,61.24 10.8,60 10.2,58.55 10,57 10.2,55.45 10.8,54 11.76,52.76 13,51.8 14.45,51.2 16,51"/>
+<circle class="hole" cx="16" cy="57" r="3.25"/>
+<path class="cross" d="M15 57h2M16 56v2"/>
+<circle class="hole" cx="71" cy="57" r="3.25"/>
+<path class="cross" d="M70 57h2M71 56v2"/>
+<path class="flute" d="M63 60H73M71 58L73 60L71 62M65 58L63 60L65 62"/>
+<text class="lbl" x="10" y="67">34. [B5N 전환] 바깥 링크 막대 ×8</text>
+<text class="dim" x="10" y="70.6">67×12 · B골 3 mm</text>
+<path class="cut" d="M10 281h100"/>
+<path class="cut" d="M10 281v-4"/>
+<path class="cut" d="M20 281v-2.5"/>
+<path class="cut" d="M30 281v-2.5"/>
+<path class="cut" d="M40 281v-2.5"/>
+<path class="cut" d="M50 281v-2.5"/>
+<path class="cut" d="M60 281v-4"/>
+<path class="cut" d="M70 281v-2.5"/>
+<path class="cut" d="M80 281v-2.5"/>
+<path class="cut" d="M90 281v-2.5"/>
+<path class="cut" d="M100 281v-2.5"/>
+<path class="cut" d="M110 281v-4"/>
+<text class="small" x="10" y="285">100 mm — 인쇄 후 자로 재서 100 mm 가 아니면 배율(실제 크기 100%) 확인</text>
+</svg>

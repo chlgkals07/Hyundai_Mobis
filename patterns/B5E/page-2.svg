@@ -13,7 +13,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 .hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
 </style>
 <rect width="210" height="297" fill="#fff"/>
-<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) — 전개도 2/3</text>
+<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) — 전개도 2/5</text>
 <text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
 <polygon class="glue" points="10,36 10,24 32,24 32,36"/>
 <polygon class="cut" points="10,238.49 10,24 32,24 32,238.49"/>

@@ -13,7 +13,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 .hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
 </style>
 <rect width="210" height="297" fill="#fff"/>
-<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) — 전개도 1/3</text>
+<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) — 전개도 1/5</text>
 <text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
 <polygon class="cut" points="10,42 26,42 26,24 86,24 86,42 102,42 102,106 86,106 86,112 26,112 26,106 10,106"/>
 <polygon class="cut" points="26,96 39,96 39,106 26,106"/>
@@ -28,7 +28,13 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <path class="cross" d="M55 96.5h2M56 95.5v2"/>
 <circle class="hole" cx="56" cy="39.5" r="1.5"/>
 <path class="cross" d="M55 39.5h2M56 38.5v2"/>
+<circle class="hole" cx="56" cy="89.5" r="1.5"/>
+<path class="cross" d="M55 89.5h2M56 88.5v2"/>
+<circle class="hole" cx="56" cy="46.5" r="1.5"/>
+<path class="cross" d="M55 46.5h2M56 45.5v2"/>
 <text x="30" y="68" font-size="4" >윗장 (골 ↔)</text>
+<text x="59" y="90.5" font-size="2.4" >B5N</text>
+<text x="59" y="47.5" font-size="2.4" >B5N</text>
 <path class="flute" d="M88 33H98M96 31L98 33L96 35M90 31L88 33L90 35"/>
 <text class="lbl" x="10" y="116">1. 손바닥 윗장 + Soft 플랩 ×1</text>
 <text class="dim" x="10" y="119.6">92×88 · B골 3 mm</text>
@@ -39,6 +45,10 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <path class="cross" d="M135.5 96.5h2M136.5 95.5v2"/>
 <circle class="hole" cx="136.5" cy="39.5" r="1.5"/>
 <path class="cross" d="M135.5 39.5h2M136.5 38.5v2"/>
+<circle class="hole" cx="136.5" cy="89.5" r="1.5"/>
+<path class="cross" d="M135.5 89.5h2M136.5 88.5v2"/>
+<circle class="hole" cx="136.5" cy="46.5" r="1.5"/>
+<path class="cross" d="M135.5 46.5h2M136.5 45.5v2"/>
 <path class="flute" d="M156 28V38M154 36L156 38L158 36M154 30L156 28L158 30"/>
 <text class="lbl" x="108" y="116">2. 손바닥 아랫장 ×1</text>
 <text class="dim" x="108" y="119.6">57×88 · B골 3 mm</text>
