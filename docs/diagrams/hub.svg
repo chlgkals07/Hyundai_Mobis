@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 644 350" role="img" aria-label="바깥 축 단면"><style>
-.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
-.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
-.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
-.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
-.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
-.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
-.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
-.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
-.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
-.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
-.rubber{fill:none;stroke:#e4572e;stroke-width:2}
-.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
-.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
-.pad{fill:#333}
-.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
-.floor{stroke:#2f6b5b;stroke-width:3}
-.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
-.lead{fill:none;stroke:#555;stroke-width:.8}
-.dot{fill:#555}
-.glue{fill:url(#hatch);stroke:none}
-text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.lbl{font-size:12.5px;fill:#1d2422}
-.note{font-size:11px;fill:#5b6763}
-.hd{font-size:15px;font-weight:700;fill:#1d2422}
-.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 644 350" role="img" aria-label="바깥 축 단면"><style>
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
 </style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><polygon class="ghost" points="371,266 392,266 392,70 371,70"/><polygon class="board" points="311.5,224 353.5,224 353.5,112 311.5,112"/><polygon class="glue" points="307.3,224 315.7,224 315.7,112 307.3,112"/><polygon class="ghost" points="189,266 168,266 168,70 189,70"/><polygon class="board" points="248.5,224 206.5,224 206.5,112 248.5,112"/><polygon class="glue" points="252.7,224 244.3,224 244.3,112 252.7,112"/><polygon class="drum" points="248.5,224 269.5,224 269.5,112 248.5,112"/><polygon class="drum" points="269.5,203 290.5,203 290.5,133 269.5,133"/><polygon class="drum" points="290.5,224 311.5,224 311.5,112 290.5,112"/><polygon class="straw" points="154,189 406,189 406,147 154,147"/><polyline class="lead" points="7,35 178.5,98"/><circle class="dot" cx="178.5" cy="98" r="2"/><text class="lbl" x="7" y="32" text-anchor="start">브래킷 (손바닥에 고정)</text><text class="lbl" x="7" y="46" text-anchor="start">구멍 = 시험편 지름</text><polyline class="lead" points="406,28 332.5,119"/><circle class="dot" cx="332.5" cy="119" r="2"/><text class="lbl" x="406" y="32" text-anchor="start">바깥 링크 막대 (2장 적층)</text><polyline class="lead" points="7,294 248.5,182"/><circle class="dot" cx="248.5" cy="182" r="2"/><text class="lbl" x="7" y="291" text-anchor="start">드럼(큰-작은-큰)을 막대 사이에</text><text class="lbl" x="7" y="305" text-anchor="start">면 풀칠(빗금) → 토크는 골판지로</text><polyline class="lead" points="420,280 385,168"/><circle class="dot" cx="385" cy="168" r="2"/><text class="lbl" x="420" y="277" text-anchor="start">빨대 = 핀만 (회전, 토크 X)</text><text class="lbl" x="420" y="291" text-anchor="start">속에 종이 말아 넣어 보강</text><text class="note" x="7" y="343" text-anchor="start">위에서 본 바깥 피벗 (x 방향 단면, 확대)</text></svg>

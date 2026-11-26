@@ -83,36 +83,36 @@ class Fig {
     this.out.push(`<text class="${cls}" x="${n(this.X(at[0]))}" y="${n(this.Z(at[1]))}" text-anchor="${anchor}">${t}</text>`);
   }
   svg() {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n(this.w)} ${n(this.h)}" role="img" aria-label="${this.title}">${STYLE}${this.out.join("")}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 ${n(this.w)} ${n(this.h)}" role="img" aria-label="${this.title}">${STYLE}${this.out.join("")}</svg>`;
   }
 }
 
 const STYLE = `<style>
-.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
-.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
-.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
-.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
-.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
-.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
-.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
-.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
-.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
-.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
-.rubber{fill:none;stroke:#e4572e;stroke-width:2}
-.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
-.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
-.pad{fill:#333}
-.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
-.floor{stroke:#2f6b5b;stroke-width:3}
-.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
-.lead{fill:none;stroke:#555;stroke-width:.8}
-.dot{fill:#555}
-.glue{fill:url(#hatch);stroke:none}
-text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.lbl{font-size:12.5px;fill:#1d2422}
-.note{font-size:11px;fill:#5b6763}
-.hd{font-size:15px;font-weight:700;fill:#1d2422}
-.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
 </style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs>`;
 
 // ------------------------------------------------------------------ D1 soft 정면 단면
@@ -438,6 +438,85 @@ export function routingTop() {
   return f.svg();
 }
 
+// ------------------------------------------------------------------ D6 손바닥 구멍·부착 위치 지도 (B5E, 위에서 본 실제 좌표)
+/** which = "top": 윗장 윗면(구멍·슬롯·레버·고무줄·Fin Ray 자리) / "bottom": 아랫면 부착물(브래킷·축·스토퍼 블록) */
+export function palmMap(which: "top" | "bottom") {
+  const sx = P.palm.sx / 2;
+  const sy = P.palm.sy / 2;
+  const h = P.hard;
+  const yp = D.hard_pivot_y;
+  const rl = P.soft.root_len;
+  const sl = P.soft.lever!;
+  const rel = (P.soft as { palm_edge_relief?: number }).palm_edge_relief ?? 0;
+  const f = new Fig(-175, 175, -60, 60, 3.0, which === "top" ? "손바닥 윗면 지도" : "손바닥 아랫면 지도");
+  const dimT = (x: number, y: number, t: string, a: "start" | "middle" | "end" = "middle") => f.text([x, y], t, "dim", a);
+  const yLo = -C.finray.pair_y - C.finray.width / 2 - 2;
+  const yHi = P.soft.drum_y + 5;
+  const slotY0 = P.soft.drum_y - 5;
+  if (which === "top") {
+    // 윗장 + 펼친 플랩 (전개도 모양 그대로)
+    f.rect(-sx, -sy, sx, sy, "board");
+    for (const s of [1, -1]) f.rect(s * sx, yLo, s * (sx + rl), yHi, "board2");
+    for (const s of [1, -1]) f.line([s * sx, yLo], [s * sx, yHi], "groove");
+    // 레버 슬롯 (힌지선에서 안쪽 slot_depth, 폭 10)
+    for (const s of [1, -1]) f.rect(s * (sx - sl.slot_depth), slotY0, s * sx, slotY0 + 10, "stop");
+    // 레버 (위에서 본 투영, 점선) + 실 A 올라가는 점
+    const bo = sl.beta_open_deg * deg;
+    for (const s of [1, -1]) {
+      f.rect(s * (sx - sl.r * Math.cos(bo)), P.soft.drum_y - 3, s * (sx + 16), P.soft.drum_y + 3, "ghost");
+      f.circle([s * (sx - sl.r * Math.cos(bo)), P.soft.drum_y], 1.4, "pivot");
+    }
+    // Fin Ray 밑판 자리 (플랩 끝)
+    for (const s of [1, -1]) for (const t of [1, -1]) f.rect(s * (sx + rl - 3), t * C.finray.pair_y - C.finray.width / 2, s * (sx + rl), t * C.finray.pair_y + C.finray.width / 2, "flank");
+    // 구멍: 고무줄 2, 텐던 2 (+ B5N 2)
+    const yf = C.finray.pair_y;
+    for (const s of [1, -1]) f.circle([s * (sx - 14), -yf], 1.5, "pivot");
+    for (const t of [1, -1]) {
+      f.circle([0, t * h.lever!.hole_y], 1.5, "pivot");
+      f.circle([0, t * (yp + h.d - 16)], 1.5, "ghost");
+    }
+    // 팔 장착 영역 24×30
+    f.rect(-12, -15, 12, 15, "ghost");
+    f.label([-172, 52], `텐던 구멍 Ø3 (x=0, y=±${n(h.lever!.hole_y)})`, [0, h.lever!.hole_y], "start");
+    f.label([-172, 40], `점선 원 = B5N 구멍 (y=±${n(yp + h.d - 16)}, 같이 뚫어 둠)`, [0, yp + h.d - 16], "start");
+    f.label([172, 52], `레버 슬롯 ${sl.slot_depth}×10 (윗장·아랫장 둘 다)`, [sx - 4, slotY0 + 8], "end");
+    f.label([172, 40], "점선 = soft 레버 (발은 플랩 위, 팔은 안쪽)", [sx - 16, P.soft.drum_y], "end");
+    f.label([-172, -32], `고무줄 구멍 Ø3 (x=±${n(sx - 14)}, y=${n(-yf)})`, [-(sx - 14), -yf], "start");
+    f.label([172, -32], "Fin Ray 밑판 자리 (플랩 끝, 2개씩)", [sx + rl - 1.5, -yf], "end");
+    f.label([-172, -50], "팔 장착 24×30 (가운데, 여기만 접착)", [-12, -15], "start");
+    f.label([172, -50], `파란 점선 = 접는 선 (x=±${sx}), 바깥 ${rl} mm = 플랩`, [sx, yLo + 3], "end");
+    f.text([0, 57], "위에서 본 손바닥 윗장 (펼친 상태) · 앞 = +y · 단위 mm", "note", "middle");
+  } else {
+    const bw = sx - rel;
+    f.rect(-bw, -sy, bw, sy, "board2");
+    for (const s of [1, -1]) f.rect(s * (sx - sl.slot_depth), slotY0, s * bw, slotY0 + 10, "stop");
+    // 브래킷 (앞·뒤 손가락, 좌우 2장씩): 안쪽 면 x = ±(w/2+1), 두께 3, y = yp−8 … yp+d+8
+    const bi = h.width / 2 + 1;
+    for (const t of [1, -1]) {
+      for (const s of [1, -1]) {
+        f.rect(s * bi, t * (yp - 8), s * (bi + 3), t * (yp + h.d + 8), "drum");
+        f.rect(s * (bi + 3), t * (yp - 2), s * (bi + 6), t * (yp + 4), "board");
+      }
+      // 축 (빨대) 2개
+      f.rect(-(bi + 4), t * yp - 3, bi + 4, t * yp + 3, "straw");
+      f.rect(-(bi + 4), t * (yp + h.d) - 3, bi + 4, t * (yp + h.d) + 3, "straw");
+      f.circle([0, t * h.lever!.hole_y], 1.5, "pivot");
+      f.circle([0, t * (yp + h.d - 16)], 1.5, "ghost");
+    }
+    // soft 닫힘 스토퍼 블록
+    const fx0 = D.soft_stop_face_x;
+    for (const s of [1, -1]) f.rect(s * (fx0 - 6), -20, s * fx0, 0, "stop");
+    f.label([-172, 52], `브래킷 안쪽 면 x=±${n(bi)} (간격 ${n(2 * bi)}), y=${n(yp - 8)}…${n(yp + h.d + 8)}`, [-bi - 1.5, yp + 20], "start");
+    f.label([-172, 40], `안쪽 축 y=±${n(yp)} · 바깥 축 y=±${n(yp + h.d)} (손바닥 아래 ${h.bracket_drop})`, [-(bi + 4), yp], "start");
+    f.label([172, 52], "브래킷 끝이 손바닥보다 1.5 mm 나옴 (괜찮음)", [bi + 1.5, yp + h.d + 8], "end");
+    f.label([172, -14], `soft 닫힘 스토퍼 블록 (6×20, 높이 8): 바깥 면 x=±${n(fx0)}, y=−20…0`, [fx0 - 3, -10], "end");
+    f.label([-172, -40], "작은 사각 = 브래킷 삼각 보강 (바깥 면, 안쪽 축 옆)", [-(bi + 4.5), -yp], "start");
+    f.label([172, -40], `아랫장은 윗장보다 좌우 ${rel} mm 좁음 (폭 ${n(2 * bw)})`, [bw, -30], "end");
+    f.text([0, 57], "아랫면에 붙는 것 (위에서 투시) · 앞 = +y · 단위 mm", "note", "middle");
+  }
+  return f.svg();
+}
+
 /** id 별 단면도. B5E 는 드럼 대신 레버 */
 export const DIAGRAMS = (id: "B5N" | "B5E" = "B5N") => {
   P = (id === "B5E" ? B5Ep : B5Np) as PP;
@@ -450,5 +529,11 @@ export const DIAGRAMS = (id: "B5N" | "B5E" = "B5N") => {
     lev ? { id: "lever", title: "V자 레버 만드는 법", svg: leverHowTo() } : { id: "drum", title: "원형 드럼 만드는 법", svg: drumHowTo() },
     { id: "hub", title: `바깥 축: ${lev ? "레버를" : "드럼을"} 링크 막대 사이에 끼우기 (확대)`, svg: hubSection() },
     { id: "route", title: "위에서 본 실 경로", svg: routingTop() },
+    ...(lev
+      ? [
+          { id: "palm-top", title: "손바닥 윗장: 구멍·슬롯·레버·Fin Ray 자리 (실제 좌표)", svg: palmMap("top") },
+          { id: "palm-bottom", title: "손바닥 아랫면: 브래킷·축·스토퍼 블록 자리 (실제 좌표)", svg: palmMap("bottom") },
+        ]
+      : []),
   ];
 };

@@ -82,7 +82,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="114.81" y="147.51" font-size="2.6" >스토퍼 탭</text>
 <path class="flute" d="M117 131V141M115 139L117 141L119 139M115 133L117 131L119 133"/>
 <text class="lbl" x="86" y="169">4. 링크 브래킷 ×4</text>
-<text class="dim" x="86" y="172.6">40×38 · B골 3 mm 2겹</text>
+<text class="dim" x="86" y="172.6">40×38 · B골 3 mm (1겹)</text>
 <polygon class="cut" points="171.16,127 171.16,135 153.11,135 138.3,153.95 132,149.03 148.01,128.54 148.31,128.2 148.64,127.89 149.01,127.63 149.41,127.4 149.82,127.23 150.26,127.1 150.71,127.03 151.16,127"/>
 <circle class="hole" cx="151.16" cy="131" r="3.25"/>
 <path class="cross" d="M150.16 131h2M151.16 130v2"/>
@@ -137,7 +137,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <path class="cross" d="M96.67 222h2M97.67 221v2"/>
 <path class="flute" d="M94.67 220V230M92.67 228L94.67 230L96.67 228M92.67 222L94.67 220L96.67 222"/>
 <text class="lbl" x="67.67" y="238.38">11. 커플러 측판 (L자) ×4</text>
-<text class="dim" x="67.67" y="241.98">36×18.38 · B골 3 mm 2겹</text>
+<text class="dim" x="67.67" y="241.98">36×18.38 · B골 3 mm (1겹)</text>
 <polygon class="cut" points="132,232.95 154,232.95 154,252.95 132,252.95"/>
 <polyline class="score" points="132,238.95 154,238.95"/>
 <path class="flute" d="M140 241.95H150M148 239.95L150 241.95L148 243.95M142 239.95L140 241.95L142 243.95"/>

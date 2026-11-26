@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 989 409.4" role="img" aria-label="hard 측면 단면"><style>
-.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
-.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
-.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
-.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
-.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
-.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
-.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
-.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
-.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
-.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
-.rubber{fill:none;stroke:#e4572e;stroke-width:2}
-.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
-.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
-.pad{fill:#333}
-.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
-.floor{stroke:#2f6b5b;stroke-width:3}
-.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
-.lead{fill:none;stroke:#555;stroke-width:.8}
-.dot{fill:#555}
-.glue{fill:url(#hatch);stroke:none}
-text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.lbl{font-size:12.5px;fill:#1d2422}
-.note{font-size:11px;fill:#5b6763}
-.hd{font-size:15px;font-weight:700;fill:#1d2422}
-.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 989 409.4" role="img" aria-label="hard 측면 단면"><style>
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
 </style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><polygon class="board" points="393.3,151.8 595.7,151.8 595.7,138 393.3,138"/><polyline class="floor" points="230,384.97 759,384.97"/><circle class="obj" cx="494.5" cy="368.87" r="16.1"/><polygon class="ghost" points="507.15,213.9 599.15,213.9 599.15,151.8 507.15,151.8"/><polygon class="ghost" points="588.86,186.64 691.2,260.99 674.98,283.32 572.64,208.96"/><polygon class="ghost" points="533.66,186.64 636,260.99 619.78,283.32 517.44,208.96"/><polygon class="ghost" points="627.89,261.8 692.29,261.8 692.29,282.5 627.89,282.5"/><polygon class="ghost" points="617.54,300.62 638.24,300.62 638.24,282.5 617.54,282.5"/><polygon class="ghost" points="616.39,332.82 620.99,332.82 620.99,300.62 616.39,300.62"/><polygon class="board" points="594.55,197.8 594.55,324.3 566.95,324.3 566.95,197.8"/><polygon class="board" points="539.35,197.8 539.35,324.3 511.75,324.3 511.75,197.8"/><polygon class="board2" points="525.55,313.95 589.95,313.95 589.95,334.65 525.55,334.65"/><polygon class="board2" points="515.2,352.77 535.9,352.77 535.9,334.65 515.2,334.65"/><polygon class="nail" points="514.05,384.97 518.65,384.97 518.65,352.77 514.05,352.77"/><circle class="pivot" cx="525.55" cy="324.3" r="6.9"/><circle class="pivot" cx="580.75" cy="324.3" r="6.9"/><circle class="drum" cx="580.75" cy="197.8" r="36.8"/><circle class="groove" cx="580.75" cy="197.8" r="29.9"/><circle class="pivot" cx="525.55" cy="197.8" r="6.9"/><circle class="pivot" cx="580.75" cy="197.8" r="6.9"/><polygon class="stop" points="587.21,198.98 601.01,198.98 601.01,185.18 587.21,185.18"/><polyline class="rubber" points="587.65,266.8 585.2,254.68 593.06,243.43 587.17,231.03 595.03,219.77 589.14,207.37 597,196.12 594.55,184"/><polygon class="ghost" points="481.85,213.9 389.85,213.9 389.85,151.8 481.85,151.8"/><polygon class="ghost" points="416.36,208.96 314.02,283.32 297.8,260.99 400.14,186.64"/><polygon class="ghost" points="471.56,208.96 369.22,283.32 353,260.99 455.34,186.64"/><polygon class="ghost" points="361.11,261.8 296.71,261.8 296.71,282.5 361.11,282.5"/><polygon class="ghost" points="350.76,300.62 371.46,300.62 371.46,282.5 350.76,282.5"/><polygon class="ghost" points="370.31,332.82 368.01,332.82 368.01,300.62 370.31,300.62"/><polygon class="board" points="422.05,197.8 422.05,324.3 394.45,324.3 394.45,197.8"/><polygon class="board" points="477.25,197.8 477.25,324.3 449.65,324.3 449.65,197.8"/><polygon class="board2" points="463.45,313.95 399.05,313.95 399.05,334.65 463.45,334.65"/><polygon class="board2" points="453.1,352.77 473.8,352.77 473.8,334.65 453.1,334.65"/><polygon class="nail" points="472.65,384.97 470.35,384.97 470.35,352.77 472.65,352.77"/><circle class="pivot" cx="463.45" cy="324.3" r="6.9"/><circle class="pivot" cx="408.25" cy="324.3" r="6.9"/><circle class="drum" cx="408.25" cy="197.8" r="36.8"/><circle class="groove" cx="408.25" cy="197.8" r="29.9"/><circle class="pivot" cx="463.45" cy="197.8" r="6.9"/><circle class="pivot" cx="408.25" cy="197.8" r="6.9"/><polygon class="stop" points="387.99,198.98 401.79,198.98 401.79,185.18 387.99,185.18"/><polyline class="rubber" points="401.35,266.8 396.93,255.26 402.82,242.86 394.95,231.6 400.85,219.2 392.98,207.94 398.87,195.54 394.45,184"/><polyline class="tendon" points="543.95,197.8 543.95,50.6 494.5,32.2 445.05,50.6 445.05,197.8"/><circle class="drum" cx="494.5" cy="36.8" r="11.5"/><text class="lbl" x="494.5" y="16.1" text-anchor="middle">손잡이 / 모터 풀리 (텐던 1가닥 루프)</text><polyline class="lead" points="305.9,59.8 445.05,82.8"/><circle class="dot" cx="445.05" cy="82.8" r="2"/><text class="lbl" x="305.9" y="63.8" text-anchor="end">텐던 1가닥: 앞 드럼 → 풀리 → 뒤 드럼</text><polyline class="lead" points="305.9,92 445.05,105.8"/><circle class="dot" cx="445.05" cy="105.8" r="2"/><text class="lbl" x="305.9" y="96" text-anchor="end">양쪽 같은 장력 → 앞·뒤 동시에 닫힘</text><polyline class="lead" points="683.1,92 603.75,179.4"/><circle class="dot" cx="603.75" cy="179.4" r="2"/><text class="lbl" x="683.1" y="96" text-anchor="start">드럼 r16: 바깥 링크 막대 사이에 면 접착</text><polyline class="lead" points="683.1,124.2 543.95,151.8"/><circle class="dot" cx="543.95" cy="151.8" r="2"/><text class="lbl" x="683.1" y="128.2" text-anchor="start">실은 드럼 안쪽 접선(y=±21.5)에서 위로</text><polyline class="lead" points="683.1,243.8 560.05,262.2"/><circle class="dot" cx="560.05" cy="262.2" r="2"/><text class="lbl" x="683.1" y="247.8" text-anchor="start">평행사변형: 피벗 간격 24 = 핀 간격 24, 링크 55</text><polyline class="lead" points="683.1,276 525.55,315.97"/><circle class="dot" cx="525.55" cy="315.97" r="2"/><text class="lbl" x="683.1" y="280" text-anchor="start">→ 손끝판 항상 수직 (평행 pinch)</text><polyline class="lead" points="683.1,170.2 594.11,192.08"/><circle class="dot" cx="594.11" cy="192.08" r="2"/><text class="lbl" x="683.1" y="174.2" text-anchor="start">열림 54° 스토퍼 탭 (점선 = 열림 자세)</text><polyline class="lead" points="683.1,349.6 515.2,368.87"/><circle class="dot" cx="515.2" cy="368.87" r="2"/><text class="lbl" x="683.1" y="353.6" text-anchor="start">건전지 pinch: 링크 수직 = 손끝 최저점</text><polyline class="lead" points="305.9,331.2 473.8,371.17"/><circle class="dot" cx="473.8" cy="371.17" r="2"/><text class="lbl" x="305.9" y="335.2" text-anchor="end">긴 손톱 14 mm (3겹): 바닥에 눌리면 접힘</text><polyline class="lead" points="305.9,184 397.9,230"/><circle class="dot" cx="397.9" cy="230" r="2"/><text class="lbl" x="305.9" y="188" text-anchor="end">복원 고무줄: 실을 놓으면 바깥으로 열림</text><text class="note" x="6.9" y="400.2" text-anchor="start">측면 단면 (y–z), 손바닥 아래 높이 101.38 mm 에서 건전지 · 단위 mm</text></svg>

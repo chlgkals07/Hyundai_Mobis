@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1070 424" role="img" aria-label="soft 정면 단면"><style>
-.board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
-.board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
-.ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
-.flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
-.flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
-.drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
-.groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
-.straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
-.string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
-.tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
-.rubber{fill:none;stroke:#e4572e;stroke-width:2}
-.stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
-.nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
-.pad{fill:#333}
-.obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
-.floor{stroke:#2f6b5b;stroke-width:3}
-.pivot{fill:#fff;stroke:#222;stroke-width:1.5}
-.lead{fill:none;stroke:#555;stroke-width:.8}
-.dot{fill:#555}
-.glue{fill:url(#hatch);stroke:none}
-text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.lbl{font-size:12.5px;fill:#1d2422}
-.note{font-size:11px;fill:#5b6763}
-.hd{font-size:15px;font-weight:700;fill:#1d2422}
-.dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 1070 424" role="img" aria-label="soft 정면 단면"><style>
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
 </style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><polygon class="board" points="410,194 530,194 530,188 410,188"/><polygon class="board2" points="413,200 527,200 527,194 413,194"/><polygon class="flankg" points="530,188 562,188 732,188 562,132"/><polygon class="board" points="530,188 525.56,219.69 531.51,220.52 535.94,188.83"/><polygon class="flank" points="525.56,219.69 502,388.05 581.02,227.45"/><polyline class="straw" points="520.85,253.36 565.22,259.57"/><polyline class="straw" points="516.14,287.03 549.41,291.69"/><polyline class="straw" points="511.43,320.71 533.61,323.81"/><polyline class="straw" points="506.71,354.38 517.8,355.93"/><circle class="drum" cx="530" cy="188" r="26"/><circle class="groove" cx="530" cy="188" r="20"/><polyline class="string" points="504,188 504,76"/><polyline class="rubber" points="533.23,211.07 526.56,208.96 524.29,201.15 516.15,200.94 513.88,193.12 505.74,192.91 502,187"/><polygon class="stop" points="514.08,216 526.08,216 526.08,200 514.08,200"/><polygon class="flankg" points="410,188 378,188 208,188 378,132"/><polygon class="board" points="410,188 414.44,219.69 408.49,220.52 404.06,188.83"/><polygon class="flank" points="414.44,219.69 438,388.05 358.98,227.45"/><polyline class="straw" points="419.15,253.36 374.78,259.57"/><polyline class="straw" points="423.86,287.03 390.59,291.69"/><polyline class="straw" points="428.57,320.71 406.39,323.81"/><polyline class="straw" points="433.29,354.38 422.2,355.93"/><circle class="drum" cx="410" cy="188" r="26"/><circle class="groove" cx="410" cy="188" r="20"/><polyline class="string" points="436,188 436,76"/><polyline class="rubber" points="406.77,211.07 410.51,205.16 418.64,204.95 420.92,197.13 429.05,196.92 431.33,189.11 438,187"/><polygon class="stop" points="425.92,216 413.92,216 413.92,200 425.92,200"/><polygon class="board" points="428,78 512,78 512,72 428,72"/><polyline class="rubber" points="470,72 466,68 474,64 466,60 474,56 466,52 474,48 466,44 470,40"/><polyline class="string" points="470,40 470,16"/><text class="lbl" x="470" y="12" text-anchor="middle">손잡이 (실 A)</text><polyline class="lead" points="234,24 470,24"/><circle class="dot" cx="470" cy="24" r="2"/><text class="lbl" x="234" y="28" text-anchor="end">실 A 를 위로 당기면 플랩이 닫힘</text><polyline class="lead" points="234,56 470,56"/><circle class="dot" cx="470" cy="56" r="2"/><text class="lbl" x="234" y="60" text-anchor="end">직렬 고무줄 = 힘 제한 (Fin Ray 당 2.5 N)</text><polyline class="lead" points="706,76 512,75"/><circle class="dot" cx="512" cy="75" r="2"/><text class="lbl" x="706" y="80" text-anchor="start">균형막대: 먼저 닿은 쪽은 멈추고 반대쪽이 계속</text><polyline class="lead" points="706,120 546,168"/><circle class="dot" cx="546" cy="168" r="2"/><text class="lbl" x="706" y="124" text-anchor="start">드럼 r13 (원판 3장, 가운데 홈)</text><polyline class="lead" points="706,148 504,140"/><circle class="dot" cx="504" cy="140" r="2"/><text class="lbl" x="706" y="152" text-anchor="start">드럼 중심 = 접는 선 = 힌지, 실은 안쪽 접선에서 위로</text><polyline class="lead" points="706,180 542,212"/><circle class="dot" cx="542" cy="212" r="2"/><text class="lbl" x="706" y="184" text-anchor="start">플랩 = 윗장이 이어져 접힘 · 점선 = 펼침(90°)</text><polyline class="lead" points="234,180 414,197"/><circle class="dot" cx="414" cy="197" r="2"/><text class="lbl" x="234" y="184" text-anchor="end">아랫장 좌우 1.5 mm 좁게 (−8° 접힐 공간)</text><polyline class="lead" points="234,224 419.92,208"/><circle class="dot" cx="419.92" cy="208" r="2"/><text class="lbl" x="234" y="228" text-anchor="end">닫힘 스토퍼 블록 (-7.97° 에서 멈춤)</text><polyline class="lead" points="706,280 546,300"/><circle class="dot" cx="546" cy="300" r="2"/><text class="lbl" x="706" y="284" text-anchor="start">Fin Ray: 단면 골판지 띠 + 빨대 리브</text><polyline class="lead" points="706,316 534,360"/><circle class="dot" cx="534" cy="360" r="2"/><text class="lbl" x="706" y="320" text-anchor="start">물체에 닿으면 끝이 물체 쪽으로 감쌈</text><polyline class="lead" points="234,280 422,194"/><circle class="dot" cx="422" cy="194" r="2"/><text class="lbl" x="234" y="284" text-anchor="end">복원 고무줄: 실을 놓으면 펼쳐짐</text><text class="note" x="6" y="416" text-anchor="start">정면 단면 (x–z) · 실선 = 닫힘(−8°), 점선 = 열림(90°) · 단위 mm</text></svg>

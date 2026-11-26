@@ -568,7 +568,7 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   // 브래킷
   const bh = h.bracket_drop + 8 + 10;
   const bw = h.d + 16;
-  const br = blank("링크 브래킷", 4, "B골 3 mm 2겹", bw, bh, comp?.type === "float"
+  const br = blank("링크 브래킷", 4, "B골 3 mm (1겹)", bw, bh, comp?.type === "float"
     ? `손가락당 2장(링크 양옆). 손바닥에 붙이지 않음: 위 탭을 꺾어 두 브래킷을 잇는 '다리' → 슬라이더 빨대 2개. 손바닥 슬롯 안에서 ${comp.travel} mm 오르내림.`
     : `손가락당 2장(링크 양옆, 안쪽 면 간격 ${fx(h.width + 2)} mm). 위 8 mm 탭을 꺾어 손바닥 아랫면 y=±${fx(yp - 8)}~${fx(yp + h.d + 8)} 에 풀칠 + 삼각 보강.`);
   rectCut(br, 0, 0, bw, bh);
@@ -595,7 +595,7 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   // 커플러 측판
   const arm = h.d + 12;
   const leg = Lc - h.nail_len + 6;
-  const cs = blank("커플러 측판 (L자)", 4, "B골 3 mm 2겹", arm, leg, `손가락당 2장. 구멍 간격 ${h.d} = 피벗 간격 → 평행사변형. 수직 다리 사이에 손끝판.`);
+  const cs = blank("커플러 측판 (L자)", 4, "B골 3 mm (1겹)", arm, leg, `손가락당 2장. 구멍 간격 ${h.d} = 피벗 간격 → 평행사변형. 수직 다리 사이에 손끝판.`);
   cs.cut.push({ pts: [[0, 0], [arm, 0], [arm, 12], [12, 12], [12, leg], [0, leg]], closed: true });
   cs.holes.push({ c: [6, 6], d: pinHole }, { c: [6 + h.d, 6], d: pinHole });
   cs.flute = "y";

@@ -8,6 +8,8 @@ import { PATTERNS } from "../core/pattern";
 import type { Assembly, Part } from "../core/types";
 import viewerData from "../../data/viewer-data.json";
 import { DIAGRAMS } from "../core/diagrams";
+import manualMd from "../../docs/B5E-제작설명서.md?raw";
+import { mdToHtml } from "./md";
 
 type DId = "B5E" | "B5N";
 const DESIGNS: DId[] = ["B5E", "B5N"];
@@ -858,7 +860,7 @@ function buildChapters() {
   }
 }
 // 탭 (hash): full / blocks / sections / patterns
-const TABS = ["full", "blocks", "sections", "video", "patterns"];
+const TABS = ["full", "blocks", "sections", "video", "patterns", "manual"];
 const playerBox = document.getElementById("player")!;
 function route() {
   const hsh = location.hash.slice(1);
@@ -871,6 +873,7 @@ function route() {
   document.getElementById("page-sections")!.hidden = tab !== "sections";
   document.getElementById("page-patterns")!.hidden = tab !== "patterns";
   document.getElementById("page-video")!.hidden = tab !== "video";
+  document.getElementById("page-manual")!.hidden = tab !== "manual";
   if (tab !== "video") (document.getElementById("vid") as HTMLVideoElement).pause();
   if (tab === "full" || tab === "blocks") {
     const newMode = tab as "full" | "blocks";
@@ -896,6 +899,11 @@ const MEDIA: Record<DId, { video: string; pdf: string }> = (window as unknown as
   B5E: { video: "media/B5E-assembly.mp4", pdf: "media/B5E-pattern-A4.pdf" },
   B5N: { video: "media/B5N-assembly.mp4", pdf: "media/B5N-pattern-A4.pdf" },
 };
+// 제작 설명서 (B5E 기준, docs/B5E-제작설명서.md). 그림은 B5E 단면도·지도를 인라인으로
+{
+  const figs = Object.fromEntries(DIAGRAMS("B5E").map((d) => [d.id, d]));
+  document.getElementById("manual")!.innerHTML = mdToHtml(manualMd, figs);
+}
 function fillPages() {
   document.getElementById("sections")!.innerHTML = DIAGRAMS(DESIGN_ID)
     .map((d) => `<figure class="fig"><figcaption>${d.title}</figcaption>${d.svg}</figure>`)
