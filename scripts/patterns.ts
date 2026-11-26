@@ -22,7 +22,8 @@ function textW(t: string, size = 3.1) {
   for (const ch of t) w += /[ㄱ-힝]/.test(ch) ? size : size * 0.6;
   return w;
 }
-const labelLine = (s: Shape, idx: number) => `${idx}. ${s.label} ×${s.qty}`;
+// 전량판(full) 부품은 라벨에 원래 번호·순번이 이미 들어 있음: "#6 바깥 링크 막대 (3/8)"
+const labelLine = (s: Shape, idx: number) => ((s as Shape & { full?: boolean }).full ? s.label : `${idx}. ${s.label} ×${s.qty}`);
 
 /** bottom-left 배치: 후보점(왼쪽 위, 기존 부품의 오른쪽·아래)에서 겹치지 않는 가장 위·왼쪽 자리 */
 function pack(shapes: Shape[]): Placed[][] {
@@ -190,6 +191,34 @@ for (const dp of PATTERNS) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${svgs.join("\n")}</body></html>`;
   writeFileSync(`${dir}/print.html`, html);
   pdfJobs.push({ html: `${dir}/print.html`, pdf: `${dir}/${dp.id}-전개도-A4.pdf` });
+  if (dp.spare) {
+    // 전량판: 수량만큼 모두 그려서 '인쇄 → 붙이기 → 자르기' 만 하면 되게. 번호는 위 전개도의 # 와 같음
+    const nMain = pages.flat().length;
+    const expand = (list: Placed[], base: number) => {
+      const out: Shape[] = [];
+      list.forEach((pl, k) => {
+        const sh = pl.s;
+        const no = base + k + 1;
+        for (let j = 1; j <= sh.qty; j++) out.push({ ...sh, qty: 1, label: sh.qty > 1 ? `#${no} ${sh.label} (${j}/${sh.qty})` : `#${no} ${sh.label}`, full: true } as Shape & { full: boolean });
+      });
+      return out;
+    };
+    const eMain = expand(pages.flat(), 0);
+    const eSpare = expand(sparePages.flat(), nMain);
+    const fMain = pack(eMain);
+    const fSpare = pack(eSpare);
+    const fAll = [...fMain, ...fSpare];
+    mkdirSync(`${dir}/full`, { recursive: true });
+    const fsvgs = fAll.map((pg, i) => {
+      const title = i < fMain.length ? `${dp.id} 전량판 — 본 부품 (수량만큼 모두 그림, # = 부품 번호)` : `${dp.id} 전량판 — 여분 / B5N 전환 (필요할 때만)`;
+      const svg = pageSvg(title, i + 1, fAll.length, pg, 1);
+      writeFileSync(`${dir}/full/page-${i + 1}.svg`, svg);
+      return svg;
+    });
+    console.log(dp.id, `전량판 본 ${eMain.length} 조각 ${fMain.length} 장 + 여분 ${eSpare.length} 조각 ${fSpare.length} 장`);
+    writeFileSync(`${dir}/full/print.html`, `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${fsvgs.join("\n")}</body></html>`);
+    pdfJobs.push({ html: `${dir}/full/print.html`, pdf: `${dir}/${dp.id}-전개도-전량-A4.pdf` });
+  }
   viewerPatterns.push({ id: dp.id, name: dp.name, group: isCurrent(dp.id) ? "current" : "old", sheets: svgs.map((s) => s.replace(/width="210mm" height="297mm"/, "")), bom: dp.cutList, steps: dp.steps });
   console.log(dp.id, `${dp.shapes.length} 부품, ${pages.length} 장`);
 }

@@ -15,7 +15,8 @@
 | `docs/site/assembly.html` | B5E / B5N 조립 과정 (버튼 전환): 전체 애니메이션 · 블록별 조립 · 메커니즘 단면도 · 전개도 |
 | `docs/site/arm.html` | 팔(R4, 가정 치수) + 그리퍼 결합 · 간섭 확인 |
 | `docs/B5E-조립과정.mp4` · `docs/B5N-조립과정.mp4` | 94 초 조립 영상 (쉬운 버전 · 최종) |
-| `patterns/B5E/B5E-전개도-A4.pdf` · `patterns/B5N/…` | **인쇄용 1:1 전개도** (A4, 실제 크기 100%) |
+| `patterns/B5E/B5E-전개도-전량-A4.pdf` | **인쇄용 1:1 전개도, 수량만큼 모두 그린 판** (A4 9장, 실제 크기 100%) — 번호판은 `B5E-전개도-A4.pdf` |
+| `docs/B5E-제작설명서.md` | 도면 번호 기준 제작 설명서 (구멍 위치·조립 순서·실 경로) |
 
 three.js 는 CDN(cdnjs, jsdelivr)에서 불러오므로 인터넷이 필요하다.
 
