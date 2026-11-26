@@ -455,3 +455,79 @@
 | `vertical_compliance_mm` | 11.5689 |
 
 </details>
+
+## B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용)  —  PASS
+
+| ID | 조건 | 값 | 범위 | 결과 |
+|---|---|---|---|---|
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 30.0] | ✅ |
+| R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
+| H2 | 케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽 | -4.693 deg | [-7.312, ] | ✅ |
+| H4 | 케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm) | 0.184 mm | [, 2.5] | ✅ |
+| R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 16.172 mm | [10.0, ] | ✅ |
+| H7 | 완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 막대 높이 + 2 | 14.107 mm | [14.0, ] | ✅ |
+| H9 | 안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭 | 12.0 mm | [12.0, ] | ✅ |
+| S5 | 아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| (플랩이 −8° 까지 닫힐 공간) | 1.5 mm | [0.84, ] | ✅ |
+| H11 | 열림 스토퍼 접촉점이 브래킷 안 (y ≤ 바깥 피벗 + 6) | 43.308 mm | [, 45.0] | ✅ |
+| H12 | 링크 막대 바깥 면(4.5+막대두께) + 1 ≤ 브래킷 안쪽 면 (w/2+1) | 11.5 mm | [, 13.0] | ✅ |
+| H8 | 바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2) | 43.5 mm | [, 44.0] | ✅ |
+| E1 | soft 레버 아랫변이 손바닥 슬롯 밖에서 윗면 위 (열림 자세, ≥ 0.5) | 1.836 mm | [0.5, ] | ✅ |
+| E11 | 레버가 손바닥에 닿는 자연 열림 스토퍼 φ < 45° (R4 끝판 간섭 시작, FINAL-CHANGES §3) | 35.08 deg | [, 44.0] | ✅ |
+| E2 | 좌·우 soft 레버 끝이 가운데에서 안 만남 (레버 끝 안쪽 변 x ≥ 1) | 2.067 mm | [1.0, ] | ✅ |
+| E3 | soft 레버 최소 모멘트 팔 ≥ B5N 드럼 반지름 13 | 19.573 mm | [13.0, ] | ✅ |
+| E4 | 영상용 soft 0.5 N/손가락에서 실 A 장력 ≤ 손 한계 | 5.16 N | [, 10.0] | ✅ |
+| E5 | hard 레버 끝 ↔ 안쪽 피벗 축 ≥ 빨대 반지름 + 레버 반폭 + 1 | 8.0 mm | [8.0, ] | ✅ |
+| E6 | hard 레버 끝 윗변이 손바닥 아랫면 아래 (≤ −2) | -4.625 mm | [, -2.0] | ✅ |
+| E7 | hard 레버 최소 모멘트 팔 ≥ 0.8 r (실 기울기·회전 61° 포함) | 13.761 mm | [12.8, ] | ✅ |
+| E8 | hard 실 구멍이 앞·뒤 따로 (2·hole_y ≥ 10) 이고 손바닥 안 | 28.5 mm | [5.0, 40.0] | ✅ |
+| E9 | 영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계 | 5.995 N | [, 10.0] | ✅ |
+| E10 | 영상용 pinch ≥ 건전지 최소 0.85 N (SF3) | 1.5 N | [0.85, ] | ✅ |
+| C1 | 손톱이 접히며 얻는 상승 ≥ 10 mm | 11.569 mm | [10.0, ] | ✅ |
+| C2 | 손톱(강성 쪽: 안쪽 스토퍼)이 건전지 적도 높이(7)를 덮음 → 접히기 전엔 손톱 안쪽 면이 쥐는 면 | 14.0 mm | [7.0, ] | ✅ |
+
+<details><summary>도출 치수</summary>
+
+| 항목 | 값 |
+|---|---|
+| `soft_hinge_x` | 30.0 |
+| `soft_reach` | 101.0 |
+| `soft_phi_min_deg` | -7.9676 |
+| `soft_x_min` | 16.0 |
+| `soft_phi_battery_deg` | -2.8376 |
+| `soft_phi_chip_deg` | -2.8376 |
+| `soft_phi_sponge_deg` | 2.8376 |
+| `soft_open_half_width` | 104.7487 |
+| `hard_pivot_y` | 13.5 |
+| `hard_coupler_below_E` | 26.3762 |
+| `rigid_palm_height` | 101.3762 |
+| `rigid_finray_tip_above_floor` | 6.5 |
+| `hard_psi_cable_deg` | -4.6931 |
+| `hard_tip_rise_cable_mm` | 0.1844 |
+| `hard_psi_cap_deg` | 8.3636 |
+| `hard_tip_rise_cap_mm` | 0.5849 |
+| `hard_psi_min_deg` | -7.312 |
+| `soft_mode_hard_above_finray` | 16.1718 |
+| `hard_opening_mm` | 102.9919 |
+| `soft_edge_interference_mm` | 0.8398 |
+| `soft_stop_face_x` | 28.0405 |
+| `hard_stop_tab_y` | 43.3084 |
+| `hard_stop_tab_z` | -20.5119 |
+| `hard_outer_bar_inner_gap` | 10.0 |
+| `soft_lever_travel_deg` | 37.9676 |
+| `soft_lever_arm_min` | 19.5729 |
+| `soft_lever_arm_max` | 26.0 |
+| `soft_pull_mm` | 16.0703 |
+| `soft_lever_stop_phi_deg` | 35.0798 |
+| `soft_string_T_video_N` | 5.1602 |
+| `hard_lever_travel_deg` | 61.312 |
+| `hard_lever_arm_min` | 13.7606 |
+| `hard_lever_arm_max` | 15.9999 |
+| `hard_pull_mm` | 16.3162 |
+| `hard_lever_to_inner_axle_min` | 8.0002 |
+| `hard_string_T_video_N` | 5.9954 |
+| `hard_string_T_N` | 5.9954 |
+| `hard_face_wedge_deg` | 0.0 |
+| `vertical_compliance_mm` | 11.5689 |
+
+</details>

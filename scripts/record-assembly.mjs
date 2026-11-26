@@ -1,12 +1,13 @@
 // 조립 애니메이션 → mp4. out/assembly-local.html 의 window.__render(t) 를 프레임마다 호출해 캡처 → ffmpeg.
-// 사용: node scripts/record-assembly.mjs [fps=20] [out=docs/B5N-조립과정.mp4]
+// 사용: node scripts/record-assembly.mjs [fps=20] [out=docs/<설계>-조립과정.mp4] [설계=B5E|B5N]
 import { createRequire } from "node:module";
 import { readFileSync, mkdirSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 const { chromium } = createRequire(import.meta.url)("playwright");
 const fps = Number(process.argv[2] ?? 20);
-const outFile = process.argv[3] ?? "docs/B5N-조립과정.mp4";
+const did = process.argv[4] ?? "B5E";
+const outFile = process.argv[3] && process.argv[3] !== "-" ? process.argv[3] : `docs/${did}-조립과정.mp4`;
 const frames = "out/frames";
 rmSync(frames, { recursive: true, force: true });
 mkdirSync(frames, { recursive: true });
@@ -24,7 +25,7 @@ await page.route("**/*", (r) => {
 });
 const errs = [];
 page.on("pageerror", (e) => errs.push(String(e)));
-await page.goto(`file://${resolve("out/assembly-local.html")}?capture=1`);
+await page.goto(`file://${resolve("out/assembly-local.html")}?capture=1&d=${did}`);
 await page.waitForFunction(() => document.body.dataset.ready === "1", null, { timeout: 30000 });
 const T = await page.evaluate(() => window.__T);
 const stage = await page.$("#stage");

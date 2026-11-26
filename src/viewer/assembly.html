@@ -55,11 +55,19 @@ nav.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--line); 
 .pg svg { width: 100%; height: auto; display: block; }
 .bom { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; max-width: 90ch; }
 .bom ul, .bom ol { padding-left: 20px; display: grid; gap: 3px; }
+.vid { width: 100%; max-width: 1280px; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; display: block; }
+.dl { margin: 8px 0 14px; font-size: 13px; }
+.dl a { color: var(--mat); }
+.dl a.btn { display: inline-block; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--mat); text-decoration: none; font-weight: 500; }
+.dsel { display: flex; gap: 4px; }
+.dsel button { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.dsel button[aria-pressed="true"] { background: var(--mat); color: var(--panel); border-color: var(--mat); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--mat); outline-offset: 2px; }
 </style>
 <div class="wrap">
-  <header class="hdr"><div><h1>골판지 그리퍼 조립 과정 — B5N</h1><div class="sub">전개도에서 자르고, 접고, 붙이고, 조립해서 동작하기까지 · 시간·난이도는 추정</div></div>
-  <nav class="tabs" aria-label="보기"><a href="#full" data-tab="full">전체 과정</a><a href="#blocks" data-tab="blocks">블록별 조립</a><a href="#sections" data-tab="sections">메커니즘 단면도</a><a href="#patterns" data-tab="patterns">전개도</a></nav></header>
+  <header class="hdr"><div><h1 id="hdrTitle">골판지 그리퍼 조립 과정</h1><div class="sub">전개도에서 자르고, 접고, 붙이고, 조립해서 동작하기까지 · 시간·난이도는 추정</div></div>
+  <div id="dsel" class="dsel" role="group" aria-label="설계안"><button type="button" data-d="B5E">B5E 쉬운 버전</button><button type="button" data-d="B5N">B5N 최종</button></div>
+  <nav class="tabs" aria-label="보기"><a href="#full" data-tab="full">전체 과정</a><a href="#blocks" data-tab="blocks">블록별 조립</a><a href="#sections" data-tab="sections">메커니즘 단면도</a><a href="#video" data-tab="video">조립 영상</a><a href="#patterns" data-tab="patterns">전개도</a></nav></header>
   <section id="player">
   <div class="stage" id="stage">
     <div class="sheet" id="sheet" hidden></div>
@@ -83,6 +91,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--mat); outli
   <div class="chapters" id="chapters" aria-label="단계로 이동"></div>
   </section>
   <section id="page-sections" hidden><div class="intro">단면도는 params·SymPy 결과에서 그려집니다 (치수가 바뀌면 그림도 바뀜). 실선 = 닫힘/쥔 자세, 점선 = 열림 자세.</div><div id="sections" class="figs"></div></section>
-  <section id="page-patterns" hidden><div class="intro">A4 실제 크기(100%) 인쇄용 PDF: 레포 <code>patterns/B5N/</code>. 가장 먼저 <b>구멍 맞춤 시험편</b>을 잘라 빨대 구멍 지름을 고르세요.</div><div id="patternBom" class="bom"></div><div id="patternSheets" class="pgs"></div></section>
+  <section id="page-video" hidden><div class="intro">위 '전체 과정' 애니메이션을 녹화한 94초 영상 (전개도 자르기 → 12단계 조립 → 동작 → 실현성). 설계 버튼으로 B5E / B5N 영상이 바뀝니다.</div><video id="vid" class="vid" controls preload="metadata" playsinline></video><p class="dl"><a id="vidLink" download>영상 파일 받기 (mp4)</a></p></section>
+  <section id="page-patterns" hidden><div class="intro">A4 실제 크기(100%)로 인쇄 — 여백 없음, 각 장의 100 mm 눈금자를 자로 확인. 가장 먼저 <b>구멍 맞춤 시험편</b>을 잘라 빨대 구멍 지름을 고르세요. 레포 경로 <code id="patPath">patterns/B5N/</code></div><p class="dl"><a id="pdfLink" class="btn" download>전개도 PDF 받기 (A4 3장)</a></p><div id="patternBom" class="bom"></div><div id="patternSheets" class="pgs"></div></section>
 </div>
 <!--APP-->

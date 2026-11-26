@@ -11,11 +11,12 @@ import B5c from "../../calc/out/B5.json";
 import B5Tc from "../../calc/out/B5T.json";
 import B5Fc from "../../calc/out/B5F.json";
 import B5Nc from "../../calc/out/B5N.json";
+import B5Ec from "../../calc/out/B5E.json";
 import viewerData from "../../data/viewer-data.json";
 import { renderCompare, renderPatterns } from "./pages";
 
 interface CalcOut { checks: { id: string; desc: string; value: number; unit: string; pass: boolean }[] }
-const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, B3o: B3oc, B4: B4c, B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
+const CALC: Record<string, CalcOut> = { B1: B1c, B2: B2c, B3: B3c, B3o: B3oc, B4: B4c, B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc, B5E: B5Ec, V5: B1c, V5b: B3c } as unknown as Record<string, CalcOut>;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 

@@ -1,0 +1,273 @@
+{
+  "id": "B5E",
+  "name": "B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용)",
+  "derived": {
+    "soft_hinge_x": 30.0,
+    "soft_reach": 101.0,
+    "soft_phi_min_deg": -7.9676,
+    "soft_x_min": 16.0,
+    "soft_phi_battery_deg": -2.8376,
+    "soft_phi_chip_deg": -2.8376,
+    "soft_phi_sponge_deg": 2.8376,
+    "soft_open_half_width": 104.7487,
+    "hard_pivot_y": 13.5,
+    "hard_coupler_below_E": 26.3762,
+    "rigid_palm_height": 101.3762,
+    "rigid_finray_tip_above_floor": 6.5,
+    "hard_psi_cable_deg": -4.6931,
+    "hard_tip_rise_cable_mm": 0.1844,
+    "hard_psi_cap_deg": 8.3636,
+    "hard_tip_rise_cap_mm": 0.5849,
+    "hard_psi_min_deg": -7.312,
+    "soft_mode_hard_above_finray": 16.1718,
+    "hard_opening_mm": 102.9919,
+    "soft_edge_interference_mm": 0.8398,
+    "soft_stop_face_x": 28.0405,
+    "hard_stop_tab_y": 43.3084,
+    "hard_stop_tab_z": -20.5119,
+    "hard_outer_bar_inner_gap": 10.0,
+    "soft_lever_travel_deg": 37.9676,
+    "soft_lever_arm_min": 19.5729,
+    "soft_lever_arm_max": 26.0,
+    "soft_pull_mm": 16.0703,
+    "soft_lever_stop_phi_deg": 35.0798,
+    "soft_string_T_video_N": 5.1602,
+    "hard_lever_travel_deg": 61.312,
+    "hard_lever_arm_min": 13.7606,
+    "hard_lever_arm_max": 15.9999,
+    "hard_pull_mm": 16.3162,
+    "hard_lever_to_inner_axle_min": 8.0002,
+    "hard_string_T_video_N": 5.9954,
+    "hard_string_T_N": 5.9954,
+    "hard_face_wedge_deg": 0.0,
+    "vertical_compliance_mm": 11.5689
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음)",
+      "value": -2.838,
+      "unit": "deg",
+      "lo": -7.968,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 폭이 개방 범위 안",
+      "value": 2.838,
+      "unit": "deg",
+      "lo": null,
+      "hi": 30.0,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 6.5,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "desc": "케이블 Ø5 각이 손끝 맞닿음 각보다 열린 쪽",
+      "value": -4.693,
+      "unit": "deg",
+      "lo": -7.312,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H4",
+      "desc": "케이블 파지 시 손톱 끝이 케이블 반지름보다 아래 (pinch 각에서 손끝 상승 ≤ 2.5 mm)",
+      "value": 0.184,
+      "unit": "mm",
+      "lo": null,
+      "hi": 2.5,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위",
+      "value": 16.172,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H7",
+      "desc": "완전 개방에서 두 링크 수직 거리 d·cos(ψ_open) ≥ 막대 높이 + 2",
+      "value": 14.107,
+      "unit": "mm",
+      "lo": 14.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H9",
+      "desc": "안쪽 링크 갈래 사이 간격(12)이 드럼 두께(9)+여유 3 이상 — d·cosψ_open < r 라 일체형 링크는 드럼과 간섭",
+      "value": 12.0,
+      "unit": "mm",
+      "lo": 12.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S5",
+      "desc": "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| (플랩이 −8° 까지 닫힐 공간)",
+      "value": 1.5,
+      "unit": "mm",
+      "lo": 0.84,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H11",
+      "desc": "열림 스토퍼 접촉점이 브래킷 안 (y ≤ 바깥 피벗 + 6)",
+      "value": 43.308,
+      "unit": "mm",
+      "lo": null,
+      "hi": 45.0,
+      "pass": true
+    },
+    {
+      "id": "H12",
+      "desc": "링크 막대 바깥 면(4.5+막대두께) + 1 ≤ 브래킷 안쪽 면 (w/2+1)",
+      "value": 11.5,
+      "unit": "mm",
+      "lo": null,
+      "hi": 13.0,
+      "pass": true
+    },
+    {
+      "id": "H8",
+      "desc": "바깥 피벗이 손바닥 안 (yp + d + 6 ≤ sy/2)",
+      "value": 43.5,
+      "unit": "mm",
+      "lo": null,
+      "hi": 44.0,
+      "pass": true
+    },
+    {
+      "id": "E1",
+      "desc": "soft 레버 아랫변이 손바닥 슬롯 밖에서 윗면 위 (열림 자세, ≥ 0.5)",
+      "value": 1.836,
+      "unit": "mm",
+      "lo": 0.5,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "E11",
+      "desc": "레버가 손바닥에 닿는 자연 열림 스토퍼 φ < 45° (R4 끝판 간섭 시작, FINAL-CHANGES §3)",
+      "value": 35.08,
+      "unit": "deg",
+      "lo": null,
+      "hi": 44.0,
+      "pass": true
+    },
+    {
+      "id": "E2",
+      "desc": "좌·우 soft 레버 끝이 가운데에서 안 만남 (레버 끝 안쪽 변 x ≥ 1)",
+      "value": 2.067,
+      "unit": "mm",
+      "lo": 1.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "E3",
+      "desc": "soft 레버 최소 모멘트 팔 ≥ B5N 드럼 반지름 13",
+      "value": 19.573,
+      "unit": "mm",
+      "lo": 13.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "E4",
+      "desc": "영상용 soft 0.5 N/손가락에서 실 A 장력 ≤ 손 한계",
+      "value": 5.16,
+      "unit": "N",
+      "lo": null,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "E5",
+      "desc": "hard 레버 끝 ↔ 안쪽 피벗 축 ≥ 빨대 반지름 + 레버 반폭 + 1",
+      "value": 8.0,
+      "unit": "mm",
+      "lo": 8.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "E6",
+      "desc": "hard 레버 끝 윗변이 손바닥 아랫면 아래 (≤ −2)",
+      "value": -4.625,
+      "unit": "mm",
+      "lo": null,
+      "hi": -2.0,
+      "pass": true
+    },
+    {
+      "id": "E7",
+      "desc": "hard 레버 최소 모멘트 팔 ≥ 0.8 r (실 기울기·회전 61° 포함)",
+      "value": 13.761,
+      "unit": "mm",
+      "lo": 12.8,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "E8",
+      "desc": "hard 실 구멍이 앞·뒤 따로 (2·hole_y ≥ 10) 이고 손바닥 안",
+      "value": 28.5,
+      "unit": "mm",
+      "lo": 5.0,
+      "hi": 40.0,
+      "pass": true
+    },
+    {
+      "id": "E9",
+      "desc": "영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계",
+      "value": 5.995,
+      "unit": "N",
+      "lo": null,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "E10",
+      "desc": "영상용 pinch ≥ 건전지 최소 0.85 N (SF3)",
+      "value": 1.5,
+      "unit": "N",
+      "lo": 0.85,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "C1",
+      "desc": "손톱이 접히며 얻는 상승 ≥ 10 mm",
+      "value": 11.569,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "C2",
+      "desc": "손톱(강성 쪽: 안쪽 스토퍼)이 건전지 적도 높이(7)를 덮음 → 접히기 전엔 손톱 안쪽 면이 쥐는 면",
+      "value": 14.0,
+      "unit": "mm",
+      "lo": 7.0,
+      "hi": null,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

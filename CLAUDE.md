@@ -21,8 +21,8 @@ npx tsx scripts/score.ts         # 채점 → docs/COMPARISON.md + out/viewer-da
 npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개도-A4.pdf, README.md
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
-node scripts/record-assembly.mjs # B5N 조립 애니메이션 → docs/B5N-조립과정.mp4 (프레임 캡처 + ffmpeg)
-npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg
+node scripts/record-assembly.mjs 20 - B5E # 조립 애니메이션 → docs/<B5E|B5N>-조립과정.mp4 (프레임 캡처 + ffmpeg)
+npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg (B5N), docs/diagrams/B5E/*.svg
 python3 calc/envelope.py         # 팔 결합용 그리퍼 점유 공간·장착 영역·실 마찰
 npx tsx scripts/arm-check.ts     # 팔↔그리퍼 간섭표 → docs/arm-check.md (params/arm/R4.json 은 가정값)
 ```
@@ -31,7 +31,7 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 ## 구조
 - `src/core/finray.ts` Fin Ray PBD: 플랭크 굽힘(EI) + 핀 리브, 접촉 SDF, 굽힘에너지 미분으로 힘 추정
 - `src/core/modules.ts` soft 플랩/슬롯, 손톱 플랩, 쐐기 패드, whiffletree
-- `src/core/designs.ts` 조립 + 프리셋. `CURRENT`(B5N, B5F, B5) / `OLD`(+`OLD_REASON`) 로 나눔 — 뷰어·비교·전개도가 이 구분을 따름
+- `src/core/designs.ts` 조립 + 프리셋. `CURRENT`(B5E, B5N — 하민: 최종 + 쉬운 버전 두 개만, 2026-11-25) / `OLD`(+`OLD_REASON`) 로 나눔 — 뷰어·비교·전개도가 이 구분을 따름
 - `scripts/approach.ts` 접근 높이 오차(손바닥을 e mm 더 내림) 테스트 → '수직 순응' 채점
 - `calc/optimize_b3.py` B3 치수 최적화 (랜덤 탐색 + SymPy 재검증) → `params/B3o.json`
 - `calc/capacity.py` 개구 범위 (B1/B2/B3)
@@ -39,7 +39,7 @@ params 를 바꾸면 위 순서대로 전부 다시 돌린다 (calc → score/pa
 - `src/core/collide.ts` OBB SAT 부품 간섭 + 바닥/물체 관통 + 실 걸림
 - `src/core/pattern.ts` 전개도 부품 (params/calc 에서 생성)
 - `src/viewer/` three.js r128(cdnjs UMD) + IIFE 번들. R3F 는 Artifact CDN 규칙 때문에 쓰지 않음
-- `src/viewer/assembly.ts` 조립 과정 애니메이션 (전개도 자르기 → 부품 → 12단계 조립 → 동작 → 실현성), Artifact: https://claude.ai/artifact/VBuZDZwSdEKW868aH6jNfw
+- `src/viewer/assembly.ts` 조립 과정 애니메이션 (전개도 자르기 → 부품 → 12단계 조립 → 동작 → 실현성). B5E/B5N 버튼 전환(`?d=`), `setDesign()` 이 설계 의존 상태를 다시 만듦. Artifact: https://claude.ai/artifact/VBuZDZwSdEKW868aH6jNfw
 
 ## 시뮬에서 발견해 반영한 것
 - 건전지 pinch 는 '면 y = r' 가 아니라 '쥐는 면이 원통에 접하면서 손톱 끝이 바닥' (접선 조건)
@@ -83,10 +83,25 @@ Fin Ray 솔버 터널링(고정 8단계 → 2°/단계; V5b '간섭 탈락' 은 
 - 추가 부품: soft 닫힘 스토퍼 블록, hard 열림 스토퍼 탭(H11 접촉점), 브래킷 삼각 보강, 구멍 맞춤 시험편, 손톱 3겹
 - 단면도 `src/core/diagrams.ts` (→ docs/diagrams/*.svg), 블록별 조립 애니메이션은 조립 Artifact '블록별 조립' 탭
 
+## B5E 쉬운 버전 (2026-11-25, 하민: E1 선택)
+B5N 형상 그대로, 드럼 6개(3장 적층·중심 맞춤·실 감기) → V자 레버 판 4개 + 레버 끝 매듭. 영상용 설계 (`params/B5E.json` force_video).
+- soft 레버 r26·폭 8·2겹, 열림 자세에서 손바닥 윗면 위 23°. 실 A 는 레버 끝 → x=±29 위로. 모멘트 팔 19.6–26 (B5N 드럼 13) (SymPy E1–E4)
+- soft 열림 30°. 레버가 손바닥 슬롯 끝에 닿는 φ≈35° 가 자연 열림 스토퍼 → 별도 스토퍼 블록 불필요 (E11, R4 끝판 간섭 45° 미만)
+- hard 레버 r16·3겹, 바깥 링크 막대 사이(드럼 자리)에 발 26 mm 면 접착, 열림에서 안쪽 수평 아래 16°. 텐던 구멍 y=±28.5. 모멘트 팔 13.8–16 (E5–E8)
+- ⚠ hard 레버 끝 ↔ 안쪽 축 빨대 여유가 계산상 딱 1 mm (E5 경계) → 실물에서 끝까지 돌려 확인
+- 영상용 장력: 텐던 6.0 N (pinch 1.5 N), 실 A 5.2 N (Fin Ray 0.5 N) (E4, E9, E10)
+- 판 수는 비슷(드럼 12장 → 레버 10장). 쉬워진 건 '원판 중심 맞춤·홈·감기'가 없어진 것
+- 젓가락 축은 허용 (하민 확인, 2026-11-25)
+- 조립 애니메이션·단면도·블록별 조립(블록 A = V자 레버 만들기) B5E 버전 추가, 영상 `docs/B5E-조립과정.mp4`
+- B5F·B5 는 보관(old)으로 이동
+- 빌드 버그: 번들에 `$&` 가 생기자 `String.replace` 치환 패턴으로 해석돼 HTML 이 깨짐 → `build-viewer.mjs` 를 함수형 replace 로 (48a6659 의 docs/site 는 깨져 있었음)
+
 ## 다음 할 일
-- [ ] 목요일 실물 (B5N): Fin Ray 1개 → EI 보정, 평행 링크 손가락 1개 → 손끝판 수직 유지·손톱 접힘 확인
+- [ ] 목요일 실물 (B5E 권장, B5N 도 가능): Fin Ray 1개 → EI 보정, 평행 링크 손가락 1개 → 손끝판 수직 유지·손톱 접힘 확인
 - [ ] 팔 높이 오차 실측 → 수직 순응 목표(현재 ±10 가정) 갱신
 - [ ] 실측값 반영: 골판지 두께, 빨대 외경, 고무줄 강성
 - [x] 하이브리드 B4 (B2 soft + B3 텐던 hard): 물체 5/5, 간섭 0, 42.4점
 - [x] 팀원 R4 팔 PR #1 머지 (`arm/R4-B5N/`)
-- [ ] 최종본 수정 사항: `docs/FINAL-CHANGES.md` (영상용 힘 목표, soft 섹터 드럼, 30° 스토퍼, 꺾임, 내림 하한, 종이 축, 레포 통합)
+- [ ] 최종본 수정 사항: `docs/FINAL-CHANGES.md` (영상용 힘 목표·soft 드럼·30° 스토퍼는 B5E 로 반영, 남은 것: 꺾임, 내림 하한, 레포 통합)
+- [x] B5E 조립 애니메이션·단면도
+- [ ] 팀원 R5-F1 팔 PR #2: 소스·높이 표 요청 리뷰 남김, 머지 대기

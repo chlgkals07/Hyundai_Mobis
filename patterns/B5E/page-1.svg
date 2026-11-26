@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<defs><pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2" stroke="#e08a00" stroke-width=".35"/></pattern></defs>
+<style>
+.cut{fill:none;stroke:#000;stroke-width:.3}
+.score{fill:none;stroke:#1565c0;stroke-width:.35;stroke-dasharray:2 1.2}
+.mark{fill:none;stroke:#777;stroke-width:.25;stroke-dasharray:3 1 .6 1}
+.glue{fill:url(#hatch);stroke:none}
+.hole{fill:none;stroke:#c62828;stroke-width:.3}
+.cross{stroke:#c62828;stroke-width:.2}
+.flute{fill:none;stroke:#2e7d32;stroke-width:.35}
+text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#222}
+.lbl{font-size:3.1px;font-weight:bold}.dim{font-size:2.6px;fill:#666}
+.hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
+</style>
+<rect width="210" height="297" fill="#fff"/>
+<text class="hdr" x="10" y="14">B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용) — 전개도 1/3</text>
+<text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
+<polygon class="cut" points="10,42 26,42 26,24 86,24 86,42 102,42 102,106 86,106 86,112 26,112 26,106 10,106"/>
+<polygon class="cut" points="26,96 39,96 39,106 26,106"/>
+<polygon class="cut" points="73,96 86,96 86,106 73,106"/>
+<polyline class="score" points="26,42 26,106"/>
+<polyline class="score" points="86,42 86,106"/>
+<circle class="hole" cx="40" cy="55" r="1.5"/>
+<path class="cross" d="M39 55h2M40 54v2"/>
+<circle class="hole" cx="72" cy="55" r="1.5"/>
+<path class="cross" d="M71 55h2M72 54v2"/>
+<circle class="hole" cx="56" cy="96.5" r="1.5"/>
+<path class="cross" d="M55 96.5h2M56 95.5v2"/>
+<circle class="hole" cx="56" cy="39.5" r="1.5"/>
+<path class="cross" d="M55 39.5h2M56 38.5v2"/>
+<text x="30" y="68" font-size="4" >윗장 (골 ↔)</text>
+<path class="flute" d="M88 33H98M96 31L98 33L96 35M90 31L88 33L90 35"/>
+<text class="lbl" x="10" y="116">1. 손바닥 윗장 + Soft 플랩 ×1</text>
+<text class="dim" x="10" y="119.6">92×88 · B골 3 mm</text>
+<polygon class="cut" points="108,24 165,24 165,112 108,112"/>
+<polygon class="cut" points="108,96 119.5,96 119.5,106 108,106"/>
+<polygon class="cut" points="153.5,96 165,96 165,106 153.5,106"/>
+<circle class="hole" cx="136.5" cy="96.5" r="1.5"/>
+<path class="cross" d="M135.5 96.5h2M136.5 95.5v2"/>
+<circle class="hole" cx="136.5" cy="39.5" r="1.5"/>
+<path class="cross" d="M135.5 39.5h2M136.5 38.5v2"/>
+<path class="flute" d="M156 28V38M154 36L156 38L158 36M154 30L156 28L158 30"/>
+<text class="lbl" x="108" y="116">2. 손바닥 아랫장 ×1</text>
+<text class="dim" x="108" y="119.6">57×88 · B골 3 mm</text>
+<polygon class="cut" points="10,127 80,127 80,149 10,149"/>
+<circle class="hole" cx="20" cy="136" r="3"/>
+<path class="cross" d="M19 136h2M20 135v2"/>
+<circle class="hole" cx="36" cy="136" r="3.15"/>
+<path class="cross" d="M35 136h2M36 135v2"/>
+<circle class="hole" cx="52" cy="136" r="3.3"/>
+<path class="cross" d="M51 136h2M52 135v2"/>
+<circle class="hole" cx="68" cy="136" r="3.5"/>
+<path class="cross" d="M67 136h2M68 135v2"/>
+<text x="14" y="146" font-size="2.6" >Ø6</text>
+<text x="30" y="146" font-size="2.6" >Ø6.3</text>
+<text x="46" y="146" font-size="2.6" >Ø6.6</text>
+<text x="62" y="146" font-size="2.6" >Ø7</text>
+<text class="lbl" x="10" y="153">3. 구멍 맞춤 시험편 ×2</text>
+<text class="dim" x="10" y="156.6">70×22 · B골 3 mm (1장=2겹용, 1장=3겹용)</text>
+<polygon class="glue" points="86,127 126,127 126,135 86,135"/>
+<polygon class="cut" points="86,127 126,127 126,165 86,165"/>
+<polyline class="score" points="86,135 126,135"/>
+<polyline class="mark" points="120.81,149.51 126.81,149.51"/>
+<polyline class="mark" points="120.81,149.51 120.81,155.51"/>
+<polyline class="mark" points="126.81,149.51 126.81,155.51"/>
+<circle class="hole" cx="94" cy="155" r="3.25"/>
+<path class="cross" d="M93 155h2M94 154v2"/>
+<circle class="hole" cx="118" cy="155" r="3.25"/>
+<path class="cross" d="M117 155h2M118 154v2"/>
+<text x="89" y="164" font-size="3" >안쪽 축</text>
+<text x="111" y="164" font-size="3" >바깥 축</text>
+<text x="114.81" y="147.51" font-size="2.6" >스토퍼 탭</text>
+<path class="flute" d="M117 131V141M115 139L117 141L119 139M115 133L117 131L119 133"/>
+<text class="lbl" x="86" y="169">4. 링크 브래킷 ×4</text>
+<text class="dim" x="86" y="172.6">40×38 · B골 3 mm 2겹</text>
+<polygon class="cut" points="171.16,127 171.16,135 153.11,135 138.3,153.95 132,149.03 148.01,128.54 148.31,128.2 148.64,127.89 149.01,127.63 149.41,127.4 149.82,127.23 150.26,127.1 150.71,127.03 151.16,127"/>
+<circle class="hole" cx="151.16" cy="131" r="3.25"/>
+<path class="cross" d="M150.16 131h2M151.16 130v2"/>
+<circle class="hole" cx="167.16" cy="131" r="0.75"/>
+<path class="cross" d="M166.16 131h2M167.16 130v2"/>
+<text x="161.16" y="138.5" font-size="2.4" >매듭</text>
+<path class="flute" d="M157.16 136H167.16M165.16 134L167.16 136L165.16 138M159.16 134L157.16 136L159.16 138"/>
+<text class="lbl" x="132" y="157.95">5. Hard 레버 ×6</text>
+<text class="dim" x="132" y="161.55">39.16×26.95 · B골 3 mm, 3장 적층</text>
+<polygon class="cut" points="71,164 72.55,164.2 74,164.8 75.24,165.76 76.2,167 76.8,168.45 77,170 76.8,171.55 76.2,173 75.24,174.24 74,175.2 72.55,175.8 71,176 16,176 14.45,175.8 13,175.2 11.76,174.24 10.8,173 10.2,171.55 10,170 10.2,168.45 10.8,167 11.76,165.76 13,164.8 14.45,164.2 16,164"/>
+<circle class="hole" cx="16" cy="170" r="3.25"/>
+<path class="cross" d="M15 170h2M16 169v2"/>
+<circle class="hole" cx="71" cy="170" r="3.25"/>
+<path class="cross" d="M70 170h2M71 169v2"/>
+<path class="flute" d="M63 173H73M71 171L73 173L71 175M65 171L63 173L65 175"/>
+<text class="lbl" x="10" y="180">6. 바깥 링크 막대 ×8</text>
+<text class="dim" x="10" y="183.6">67×12 · B골 3 mm</text>
+<polygon class="cut" points="193,168.95 194.55,169.16 196,169.75 197.24,170.71 198.2,171.95 198.8,173.4 199,174.95 198.8,176.5 198.2,177.95 197.24,179.19 196,180.15 194.55,180.75 193,180.95 138,180.95 136.45,180.75 135,180.15 133.76,179.19 132.8,177.95 132.2,176.5 132,174.95 132.2,173.4 132.8,171.95 133.76,170.71 135,169.75 136.45,169.16 138,168.95"/>
+<circle class="hole" cx="138" cy="174.95" r="3.25"/>
+<path class="cross" d="M137 174.95h2M138 173.95v2"/>
+<circle class="hole" cx="193" cy="174.95" r="3.25"/>
+<path class="cross" d="M192 174.95h2M193 173.95v2"/>
+<path class="flute" d="M185 177.95H195M193 175.95L195 177.95L193 179.95M187 175.95L185 177.95L187 179.95"/>
+<text class="lbl" x="132" y="184.95">7. 안쪽 링크 막대 ×8</text>
+<text class="dim" x="132" y="188.55">67×12 · B골 3 mm</text>
+<polygon class="cut" points="10,191 90,191 90,201 10,201"/>
+<circle class="hole" cx="15" cy="196" r="1.5"/>
+<path class="cross" d="M14 196h2M15 195v2"/>
+<circle class="hole" cx="50" cy="196" r="1.5"/>
+<path class="cross" d="M49 196h2M50 195v2"/>
+<circle class="hole" cx="85" cy="196" r="1.5"/>
+<path class="cross" d="M84 196h2M85 195v2"/>
+<text class="lbl" x="10" y="205">8. 균형막대 (whiffletree) ×2</text>
+<text class="dim" x="10" y="208.6">80×10 · B골 3 mm 2겹</text>
+<polygon class="glue" points="132,195.95 140,195.95 140,217.95 132,217.95"/>
+<polygon class="cut" points="132,195.95 168,195.95 168,217.95 132,217.95"/>
+<polyline class="score" points="140,195.95 140,217.95"/>
+<path class="flute" d="M154 204.95H164M162 202.95L164 204.95L162 206.95M156 202.95L154 204.95L156 206.95"/>
+<text class="lbl" x="132" y="221.95">9. Fin Ray 밑판 ×4</text>
+<text class="dim" x="132" y="225.55">36×22 · B골 3 mm</text>
+<polygon class="cut" points="55.19,216 55.19,224 26.52,224 14.81,232.82 10,226.43 22.78,216.81 23.04,216.62 23.32,216.46 23.61,216.32 23.92,216.21 24.23,216.12 24.54,216.05 24.86,216.01 25.19,216"/>
+<circle class="hole" cx="51.19" cy="220" r="0.75"/>
+<path class="cross" d="M50.19 220h2M51.19 219v2"/>
+<text x="45.19" y="227.5" font-size="2.4" >매듭</text>
+<path class="flute" d="M41.19 225H51.19M49.19 223L51.19 225L49.19 227M43.19 223L41.19 225L43.19 227"/>
+<text class="lbl" x="10" y="236.82">10. Soft 레버 ×4</text>
+<text class="dim" x="10" y="240.42">45.19×16.82 · B골 3 mm, 2장 적층</text>
+<polygon class="cut" points="67.67,216 103.67,216 103.67,228 79.67,228 79.67,234.38 67.67,234.38"/>
+<circle class="hole" cx="73.67" cy="222" r="3.25"/>
+<path class="cross" d="M72.67 222h2M73.67 221v2"/>
+<circle class="hole" cx="97.67" cy="222" r="3.25"/>
+<path class="cross" d="M96.67 222h2M97.67 221v2"/>
+<path class="flute" d="M94.67 220V230M92.67 228L94.67 230L96.67 228M92.67 222L94.67 220L96.67 222"/>
+<text class="lbl" x="67.67" y="238.38">11. 커플러 측판 (L자) ×4</text>
+<text class="dim" x="67.67" y="241.98">36×18.38 · B골 3 mm 2겹</text>
+<polygon class="cut" points="132,232.95 154,232.95 154,252.95 132,252.95"/>
+<polyline class="score" points="132,238.95 154,238.95"/>
+<path class="flute" d="M140 241.95H150M148 239.95L150 241.95L148 243.95M142 239.95L140 241.95L142 243.95"/>
+<text class="lbl" x="132" y="256.95">12. 손톱 플랩 ×6</text>
+<text class="dim" x="132" y="260.55">22×20 · B골 3 mm, 3장 적층</text>
+<polygon class="cut" points="10,247.82 32,247.82 32,255.82 10,255.82"/>
+<path class="flute" d="M18 256.82H28M26 254.82L28 256.82L26 258.82M20 254.82L18 256.82L20 258.82"/>
+<text class="lbl" x="10" y="259.82">13. 손톱 스토퍼 ×2</text>
+<text class="dim" x="10" y="263.42">22×8 · B골 3 mm</text>
+<polygon class="cut" points="67.67,249.38 87.67,249.38 87.67,257.38 67.67,257.38"/>
+<path class="flute" d="M73.67 258.38H83.67M81.67 256.38L83.67 258.38L81.67 260.38M75.67 256.38L73.67 258.38L75.67 260.38"/>
+<text class="lbl" x="67.67" y="261.38">14. Soft 닫힘 스토퍼 블록 ×4</text>
+<text class="dim" x="67.67" y="264.98">20×8 · B골 3 mm (2장 적층 × 좌우)</text>
+<path class="cut" d="M10 281h100"/>
+<path class="cut" d="M10 281v-4"/>
+<path class="cut" d="M20 281v-2.5"/>
+<path class="cut" d="M30 281v-2.5"/>
+<path class="cut" d="M40 281v-2.5"/>
+<path class="cut" d="M50 281v-2.5"/>
+<path class="cut" d="M60 281v-4"/>
+<path class="cut" d="M70 281v-2.5"/>
+<path class="cut" d="M80 281v-2.5"/>
+<path class="cut" d="M90 281v-2.5"/>
+<path class="cut" d="M100 281v-2.5"/>
+<path class="cut" d="M110 281v-4"/>
+<text class="small" x="10" y="285">100 mm — 인쇄 후 자로 재서 100 mm 가 아니면 배율(실제 크기 100%) 확인</text>
+</svg>

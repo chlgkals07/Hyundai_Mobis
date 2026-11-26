@@ -5,10 +5,16 @@
 import common from "../../params/common.json";
 import B5Np from "../../params/B5N.json";
 import B5Nc from "../../calc/out/B5N.json";
+import B5Ep from "../../params/B5E.json";
+import B5Ec from "../../calc/out/B5E.json";
 
 const C = common;
-const P = B5Np;
-const D = B5Nc.derived as unknown as Record<string, number>;
+type SLev = { r: number; w: number; beta_open_deg: number; guide_x: number; guide_dz: number; slot_depth: number };
+type HLev = { r: number; w: number; gamma_open_deg: number; hole_y: number };
+type PP = typeof B5Np & { soft: typeof B5Np.soft & { lever?: SLev }; hard: typeof B5Np.hard & { lever?: HLev } };
+// 현재 그리는 설계 (DIAGRAMS(id) 가 바꿈). B5E = 드럼 대신 레버
+let P = B5Np as PP;
+let D = B5Nc.derived as unknown as Record<string, number>;
 const deg = Math.PI / 180;
 const zt = C.board_t * C.palm_layers;
 
@@ -64,6 +70,14 @@ class Fig {
     this.out.push(`<circle class="dot" cx="${n(this.X(to[0]))}" cy="${n(this.Z(to[1]))}" r="2"/>`);
     const lines = text.split("\n");
     lines.forEach((t, i) => this.out.push(`<text class="${cls}" x="${n(this.X(at[0]))}" y="${n(this.Z(at[1]) + i * 14 - (lines.length - 1) * 7 + 4)}" text-anchor="${anchor}">${t}</text>`));
+  }
+  /** 폭 w 막대 (a→b) */
+  bar(a: Pt, b: Pt, w: number, cls: string) {
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const l = Math.hypot(dx, dz) || 1;
+    const o: Pt = [(-dz / l) * (w / 2), (dx / l) * (w / 2)];
+    this.poly([[a[0] + o[0], a[1] + o[1]], [b[0] + o[0], b[1] + o[1]], [b[0] - o[0], b[1] - o[1]], [a[0] - o[0], a[1] - o[1]]], cls);
   }
   text(at: Pt, t: string, cls = "note", anchor: "start" | "end" | "middle" = "start") {
     this.out.push(`<text class="${cls}" x="${n(this.X(at[0]))}" y="${n(this.Z(at[1]))}" text-anchor="${anchor}">${t}</text>`);
@@ -121,11 +135,24 @@ export function softSection() {
   // 손바닥 (윗장 + relief 아랫장)
   f.rect(-xh, 3, xh, 6, "board");
   f.rect(-xh + rel, 0, xh - rel, 3, "board2");
+  const sl = P.soft.lever;
+  const phiO = P.soft.phi_open_deg * deg;
   for (const s of [1, -1]) {
-    // 열린 자세 (펼침 = 90°) 점선
-    const o = flapAt(s, 90 * deg);
-    const Ho = o.H;
-    f.poly([Ho, [Ho[0] + s * Rr, Ho[1]], [Ho[0] + s * (Rr + L), Ho[1]], [Ho[0] + s * Rr, Ho[1] + b]], "flankg");
+    // 열린 자세 점선 (B5N 90° 펼침 / B5E 30°)
+    if (!sl) {
+      const o = flapAt(s, 90 * deg);
+      const Ho = o.H;
+      f.poly([Ho, [Ho[0] + s * Rr, Ho[1]], [Ho[0] + s * (Rr + L), Ho[1]], [Ho[0] + s * Rr, Ho[1] + b]], "flankg");
+    } else {
+      const Ao: Pt = [s * Math.sin(phiO), -Math.cos(phiO)];
+      const No: Pt = [s * Math.cos(phiO), Math.sin(phiO)];
+      const Hh: Pt = [s * xh, zt];
+      const po = (u: number, v: number): Pt => [Hh[0] + Ao[0] * u + No[0] * v, Hh[1] + Ao[1] * u + No[1] * v];
+      f.poly([po(Rr, 0), po(Rr + L, 0), po(Rr, b)], "flankg");
+      f.line(po(0, 0), po(Rr, 0), "flankg");
+      const bo = sl.beta_open_deg * deg;
+      f.bar(Hh, [Hh[0] - s * sl.r * Math.cos(bo), Hh[1] + sl.r * Math.sin(bo)], sl.w, "ghost");
+    }
     // 닫힌 자세 (φ_min)
     const phi = phiMin;
     const A: Pt = [s * Math.sin(phi), -Math.cos(phi)];
@@ -135,11 +162,21 @@ export function softSection() {
     f.poly([pt(0, 0), pt(Rr, 0), pt(Rr, 3), pt(0, 3)], "board");
     f.poly([pt(Rr, 0), pt(Rr + L, 0), pt(Rr, b)], "flank");
     for (const i of [2, 4, 6, 8]) f.line(pt(Rr + (L * i) / 10, 0), pt(Rr + (L * i) / 10, b * (1 - i / 10)), "straw");
-    // 드럼 (힌지 중심)
-    f.circle(H, r, "drum");
-    f.circle(H, r - 3, "groove");
-    // 실 A: 안쪽 접선에서 위로 → 균형막대
-    f.poly([[s * (xh - r), zt], [s * (xh - r), 62]], "string", false);
+    if (sl) {
+      // 레버 (V자: 발은 플랩 바깥면, 팔은 손바닥 위 안쪽). 닫힘 자세 β = β0 + (φ_open − φ)
+      const be = sl.beta_open_deg * deg + (phiO - phi);
+      const tip: Pt = [H[0] - s * sl.r * Math.cos(be), H[1] + sl.r * Math.sin(be)];
+      f.bar(pt(0, 3 + sl.w / 2), pt(16, 3 + sl.w / 2), sl.w, "drum");
+      f.bar(H, tip, sl.w, "drum");
+      f.circle(tip, 1.2, "pivot");
+      f.poly([tip, [s * sl.guide_x, zt + sl.guide_dz]], "string", false);
+    } else {
+      // 드럼 (힌지 중심)
+      f.circle(H, r, "drum");
+      f.circle(H, r - 3, "groove");
+      // 실 A: 안쪽 접선에서 위로 → 균형막대
+      f.poly([[s * (xh - r), zt], [s * (xh - r), 62]], "string", false);
+    }
     // 복원 고무줄
     f.zig(pt(Rr * 0.7, 3.2), [s * (xh - 14), zt + 0.5], "rubber", 6, 1.2);
     // 닫힘 스토퍼 블록
@@ -148,7 +185,8 @@ export function softSection() {
     f.rect(s * (fx0 - 6), -hb, s * fx0, 0, "stop");
   }
   // 균형막대 + 직렬 고무줄 + 손잡이
-  f.rect(-(xh - r) - 4, 61, xh - r + 4, 64, "board");
+  const wx = sl ? sl.guide_x : xh - r;
+  f.rect(-wx - 4, 61, wx + 4, 64, "board");
   f.zig([0, 64], [0, 80], "rubber", 8, 2);
   f.poly([[0, 80], [0, 92]], "string", false);
   f.text([0, 94], "손잡이 (실 A)", "lbl", "middle");
@@ -156,17 +194,26 @@ export function softSection() {
   const Lx = -118;
   const Rx = 118;
   f.label([Lx, 88], "실 A 를 위로 당기면 플랩이 닫힘", [0, 88], "end");
-  f.label([Lx, 72], "직렬 고무줄 = 힘 제한 (Fin Ray 당 2.5 N)", [0, 72], "end");
-  f.label([Rx, 62], "균형막대: 먼저 닿은 쪽은 멈추고 반대쪽이 계속", [xh - r + 4, 62.5]);
-  f.label([Rx, 40], `드럼 r${r} (원판 3장, 가운데 홈)`, [xh + 8, zt + 10]);
-  f.label([Rx, 26], "드럼 중심 = 접는 선 = 힌지, 실은 안쪽 접선에서 위로", [xh - r, 30]);
-  f.label([Rx, 10], "플랩 = 윗장이 이어져 접힘 · 점선 = 펼침(90°)", [xh + 6, -6]);
+  const fv = (P as { force_video?: { soft_per_finger_N: number } }).force_video;
+  f.label([Lx, 72], fv ? `직렬 고무줄 = 힘 제한 (${fv.soft_per_finger_N} N/Fin Ray)` : "직렬 고무줄 = 힘 제한 (Fin Ray 당 2.5 N)", [0, 72], "end");
+  f.label([Rx, 62], "균형막대: 먼저 닿은 쪽은 멈추고 반대쪽이 계속", [wx + 4, 62.5]);
+  if (sl) {
+    const be = sl.beta_open_deg * deg + (phiO - phiMin);
+    const tip: Pt = [xh - sl.r * Math.cos(be), zt + sl.r * Math.sin(be)];
+    f.label([Rx, 42], `레버 r${sl.r} (2겹 V자): 팔 끝 구멍에 실 A 매듭`, [tip[0] + 2, tip[1]]);
+    f.label([Rx, 28], `레버 발은 플랩 바깥면에 세워 풀칠 + 삼각 보강`, [xh + 6, zt - 6]);
+    f.label([Rx, 10], `점선 = 열림 ${P.soft.phi_open_deg}° · 레버가 손바닥에 닿는 ${n(D.soft_lever_stop_phi_deg)}° 가 열림 스토퍼`, [xh - 14, zt + 4]);
+  } else {
+    f.label([Rx, 40], `드럼 r${r} (원판 3장, 가운데 홈)`, [xh + 8, zt + 10]);
+    f.label([Rx, 26], "드럼 중심 = 접는 선 = 힌지, 실은 안쪽 접선에서 위로", [xh - r, 30]);
+    f.label([Rx, 10], "플랩 = 윗장이 이어져 접힘 · 점선 = 펼침(90°)", [xh + 6, -6]);
+  }
   f.label([Lx, 10], `아랫장 좌우 ${rel} mm 좁게 (−8° 접힐 공간)`, [-(xh - rel) + 0.5, 1.5], "end");
   f.label([Lx, -12], `닫힘 스토퍼 블록 (${n(D.soft_phi_min_deg)}° 에서 멈춤)`, [-(D.soft_stop_face_x - 3), -4], "end");
   f.label([Rx, -40], "Fin Ray: 단면 골판지 띠 + 빨대 리브", [xh + 8, -50]);
   f.label([Rx, -58], "물체에 닿으면 끝이 물체 쪽으로 감쌈", [xh + 2, -80]);
   f.label([Lx, -40], "복원 고무줄: 실을 놓으면 펼쳐짐", [-(xh - 6), 3], "end");
-  f.text([-232, -108], "정면 단면 (x–z) · 실선 = 닫힘(−8°), 점선 = 완전 개방(90°) · 단위 mm", "note");
+  f.text([-232, -108], `정면 단면 (x–z) · 실선 = 닫힘(−8°), 점선 = 열림(${sl ? P.soft.phi_open_deg : 90}°) · 단위 mm`, "note");
   return f.svg();
 }
 
@@ -213,9 +260,26 @@ export function hardSection() {
     };
     drawFinger(h.psi_open_deg * deg, false);
     drawFinger(0, true);
-    // 드럼 (바깥 피벗)
-    f.circle([t * (yp + h.d), zP], h.drum_r, "drum");
-    f.circle([t * (yp + h.d), zP], h.drum_r - 3, "groove");
+    const hl = h.lever;
+    if (hl) {
+      // 레버 (발 = 바깥 링크 방향, 팔 = 안쪽 피벗 쪽). 쥔 자세(ψ=0) 실선, 열림 점선
+      const P2: Pt = [t * (yp + h.d), zP];
+      for (const [psi, cls] of [[h.psi_open_deg * deg, "ghost"], [0, "drum"]] as [number, string][]) {
+        const ga = hl.gamma_open_deg * deg + (h.psi_open_deg * deg - psi);
+        const tip: Pt = [P2[0] - t * hl.r * Math.cos(ga), P2[1] + hl.r * Math.sin(ga)];
+        const u: Pt = [t * Math.sin(psi), -Math.cos(psi)];
+        f.bar(P2, [P2[0] + u[0] * 26, P2[1] + u[1] * 26], hl.w, cls);
+        f.bar(P2, tip, hl.w, cls);
+        if (cls === "drum") {
+          f.circle(tip, 1.2, "pivot");
+          f.poly([tip, [t * hl.hole_y, 0]], "tendon", false);
+        }
+      }
+    } else {
+      // 드럼 (바깥 피벗)
+      f.circle([t * (yp + h.d), zP], h.drum_r, "drum");
+      f.circle([t * (yp + h.d), zP], h.drum_r - 3, "groove");
+    }
     f.circle([t * yp, zP], 3, "pivot");
     f.circle([t * (yp + h.d), zP], 3, "pivot");
     // 스토퍼 탭
@@ -224,16 +288,22 @@ export function hardSection() {
     f.zig([t * (yp + h.d + 3), zP - 30], [t * (yp + h.d + 6), zP + 6], "rubber", 7, 1.5);
   }
   // 텐던 루프
-  const ty = yp + h.d - h.drum_r;
-  f.poly([[ty, zP], [ty, 44], [0, 52], [-ty, 44], [-ty, zP]], "tendon", false);
+  const ty = h.lever ? h.lever.hole_y : yp + h.d - h.drum_r;
+  f.poly([[ty, h.lever ? 0 : zP], [ty, 44], [0, 52], [-ty, 44], [-ty, h.lever ? 0 : zP]], "tendon", false);
   f.circle([0, 50], 5, "drum");
   f.text([0, 59], "손잡이 / 모터 풀리 (텐던 1가닥 루프)", "lbl", "middle");
   const Lx = -82;
   const Rx = 82;
-  f.label([Lx, 40], "텐던 1가닥: 앞 드럼 → 풀리 → 뒤 드럼", [-ty, 30], "end");
+  const what = h.lever ? "레버" : "드럼";
+  f.label([Lx, 40], `텐던 1가닥: 앞 ${what} → 풀리 → 뒤 ${what}`, [-ty, 30], "end");
   f.label([Lx, 26], "양쪽 같은 장력 → 앞·뒤 동시에 닫힘", [-ty, 20], "end");
-  f.label([Rx, 26], `드럼 r${h.drum_r}: 바깥 링크 막대 사이에 면 접착`, [yp + h.d + 10, zP + 8]);
-  f.label([Rx, 12], `실은 드럼 안쪽 접선(y=±${n(ty)})에서 위로`, [ty, 0]);
+  if (h.lever) {
+    f.label([Rx, 26], `레버 r${h.lever.r} (3겹): 발을 링크 막대 사이에 접착`, [yp + h.d + 4, zP - 12]);
+    f.label([Rx, 12], `레버 끝 매듭 → 손바닥 구멍 y=±${n(ty)} → 위로`, [ty, 0]);
+  } else {
+    f.label([Rx, 26], `드럼 r${h.drum_r}: 바깥 링크 막대 사이에 면 접착`, [yp + h.d + 10, zP + 8]);
+    f.label([Rx, 12], `실은 드럼 안쪽 접선(y=±${n(ty)})에서 위로`, [ty, 0]);
+  }
   f.label([Rx, -40], `평행사변형: 피벗 간격 ${h.d} = 핀 간격 ${h.d}, 링크 ${h.L}`, [yp + h.d / 2 + 3, zP - 28]);
   f.label([Rx, -54], "→ 손끝판 항상 수직 (평행 pinch)", [yp, -H + 30]);
   f.label([Rx, -8], `열림 ${h.psi_open_deg}° 스토퍼 탭 (점선 = 열림 자세)`, [D.hard_stop_tab_y, D.hard_stop_tab_z + 3]);
@@ -278,6 +348,32 @@ export function drumHowTo() {
   return f.svg();
 }
 
+// ------------------------------------------------------------------ D3' 레버 만들기 (B5E)
+export function leverHowTo() {
+  const f = new Fig(0, 300, -14, 120, 2.6, "레버 만들기");
+  const hl = P.hard.lever!;
+  const sl = P.soft.lever!;
+  const vshape = (cx: number, cz: number, arm: number, foot: number, w: number, alphaDeg: number, cls: string) => {
+    const a = alphaDeg * deg;
+    f.bar([cx, cz], [cx + arm, cz], w, cls);
+    f.bar([cx, cz], [cx + foot * Math.cos(a), cz + foot * Math.sin(a)], w, cls);
+    f.circle([cx + arm, cz], 1.2, "pivot");
+  };
+  const aH = 360 - (270 - hl.gamma_open_deg - P.hard.psi_open_deg);
+  const aS = 360 - (270 - sl.beta_open_deg - P.soft.phi_open_deg);
+  f.text([10, 112], "① V자 판 자르기 (전개도 그대로)", "hd");
+  vshape(40, 70, hl.r, 26, hl.w, aH, "drum");
+  f.circle([40, 70], 3, "pivot");
+  f.text([30, 48], `hard 레버 ×3장: 팔 ${hl.r} · 발 26 · ${n(aH)}°`, "note");
+  vshape(150, 70, sl.r, 16, sl.w, aS, "drum");
+  f.text([135, 48], `soft 레버 ×2장: 팔 ${sl.r} · 발 16 · ${n(aS)}°`, "note");
+  f.text([10, 34], "② 같은 판끼리 겹쳐 풀칠 (hard 3겹 = 두께 9, soft 2겹) — 원판과 달리 중심 맞출 필요 없음", "hd");
+  f.text([10, 16], "③ 팔 끝 구멍(Ø1.5)에 실을 꿰어 매듭 → 감기 없음. 매듭에 풀 한 방울", "hd");
+  f.text([10, 2], "④ hard 레버: 꼭짓점 구멍 = 바깥 축, 발을 바깥 링크 막대 사이에 면 접착(D4)", "lbl");
+  f.text([10, -10], "④ soft 레버: 꼭짓점 = 힌지선, 발을 플랩 바깥면에 세워 풀칠 + 삼각 보강", "lbl");
+  return f.svg();
+}
+
 // ------------------------------------------------------------------ D4 바깥 축 단면 (드럼 샌드위치)
 export function hubSection() {
   const h = P.hard;
@@ -290,13 +386,16 @@ export function hubSection() {
     f.rect(s * 4.5, -r, s * (4.5 + barT), r, "board");
     f.rect(s * 4.5 - s * 0.6, -r, s * 4.5 + s * 0.6, r, "glue");
   }
-  f.rect(-4.5, -h.drum_r / 2, -1.5, h.drum_r / 2, "drum");
-  f.rect(-1.5, -h.drum_r / 2 + 3, 1.5, h.drum_r / 2 - 3, "drum");
-  f.rect(1.5, -h.drum_r / 2, 4.5, h.drum_r / 2, "drum");
+  if (h.lever) f.rect(-4.5, -r, 4.5, r, "drum");
+  else {
+    f.rect(-4.5, -h.drum_r / 2, -1.5, h.drum_r / 2, "drum");
+    f.rect(-1.5, -h.drum_r / 2 + 3, 1.5, h.drum_r / 2 - 3, "drum");
+    f.rect(1.5, -h.drum_r / 2, 4.5, h.drum_r / 2, "drum");
+  }
   f.rect(-bIn - 5, -C.straw_d / 2, bIn + 5, C.straw_d / 2, "straw");
   f.label([-39, 19], "브래킷 (손바닥에 고정)\n구멍 = 시험편 지름", [-bIn - 1.5, 10]);
   f.label([18, 20], "바깥 링크 막대 (2장 적층)", [4.5 + barT / 2, r - 1]);
-  f.label([-39, -18], "드럼(큰-작은-큰)을 막대 사이에\n면 풀칠(빗금) → 토크는 골판지로", [-4.5, -2]);
+  f.label([-39, -18], h.lever ? "레버 발(3겹)을 막대 사이에\n면 풀칠(빗금) → 토크는 골판지로" : "드럼(큰-작은-큰)을 막대 사이에\n면 풀칠(빗금) → 토크는 골판지로", [-4.5, -2]);
   f.label([20, -16], "빨대 = 핀만 (회전, 토크 X)\n속에 종이 말아 넣어 보강", [15, 0]);
   f.text([-39, -25], "위에서 본 바깥 피벗 (x 방향 단면, 확대)", "note");
   return f.svg();
@@ -309,24 +408,28 @@ export function routingTop() {
   const sy = P.palm.sy / 2;
   const yp = D.hard_pivot_y;
   const h = P.hard;
-  const ty = yp + h.d - h.drum_r;
+  const ty = h.lever ? h.lever.hole_y : yp + h.d - h.drum_r;
+  const sl = P.soft.lever;
+  // soft 실 A 가 올라가는 x (레버 = 레버 끝, 드럼 = 안쪽 접선)
+  const ax = sl ? sx - sl.r * Math.cos(sl.beta_open_deg * deg) : sx - P.soft.drum_r;
   // 좌표: 가로 = x, 세로 = y (위 = +y)
   f.rect(-sx, -sy, sx, sy, "board");
   for (const s of [1, -1]) {
     f.rect(s * sx, -26 * 1, s * (sx + P.soft.root_len), P.soft.drum_y + 5, "board2");
     f.rect(s * (sx + P.soft.root_len), -C.finray.pair_y - 11, s * (sx + P.soft.root_len + 85), -C.finray.pair_y + 11, "flankg");
     f.rect(s * (sx + P.soft.root_len), C.finray.pair_y - 11, s * (sx + P.soft.root_len + 85), C.finray.pair_y + 11, "flankg");
-    f.rect(s * (sx - P.soft.drum_r), P.soft.drum_y - 4.5, s * (sx + P.soft.drum_r), P.soft.drum_y + 4.5, "drum");
-    f.circle([s * (sx - P.soft.drum_r), P.soft.drum_y], 2.5, "pivot");
+    if (sl) f.rect(s * ax, P.soft.drum_y - 3, s * (sx + 4), P.soft.drum_y + 3, "drum");
+    else f.rect(s * (sx - P.soft.drum_r), P.soft.drum_y - 4.5, s * (sx + P.soft.drum_r), P.soft.drum_y + 4.5, "drum");
+    f.circle([s * ax, P.soft.drum_y], 2.5, "pivot");
     f.zig([s * (sx + 9), -13], [s * (sx - 14), -13], "rubber", 6, 1.2);
   }
   for (const t of [1, -1]) {
     f.rect(-h.width / 2, t * yp, h.width / 2, t * (yp + h.d), "ghost");
     f.circle([0, t * ty], 2.5, "pivot");
   }
-  f.line([-(sx - P.soft.drum_r), P.soft.drum_y], [sx - P.soft.drum_r, P.soft.drum_y], "string");
+  f.line([-ax, P.soft.drum_y], [ax, P.soft.drum_y], "string");
   f.line([0, ty], [0, -ty], "tendon");
-  f.label([-148, 52], "실 A 구멍 없이 드럼 안쪽에서 바로 위로\n(파란선 = 손바닥 위 균형막대)", [-(sx - P.soft.drum_r), P.soft.drum_y]);
+  f.label([-148, 52], sl ? "실 A: 레버 끝(손바닥 위)에서 위로\n(파란선 = 손바닥 위 균형막대)" : "실 A 구멍 없이 드럼 안쪽에서 바로 위로\n(파란선 = 손바닥 위 균형막대)", [-ax, P.soft.drum_y]);
   f.label([60, 52], `텐던 구멍 2개 (x=0, y=±${n(ty)})\n보라선 = 손바닥 위 루프`, [0, ty]);
   f.label([60, -48], "Fin Ray 4개 (점선, 플랩 펼친 상태)", [sx + 60, -C.finray.pair_y]);
   f.label([-148, -48], "hard 손가락 영역 (점선, 앞·뒤)", [-h.width / 2, -yp - 10]);
@@ -335,10 +438,17 @@ export function routingTop() {
   return f.svg();
 }
 
-export const DIAGRAMS = () => [
-  { id: "soft", title: "Soft — 플랩 · 드럼 · 실 A (정면 단면)", svg: softSection() },
-  { id: "hard", title: "Hard — 평행 링크 · 드럼 · 텐던 루프 (측면 단면)", svg: hardSection() },
-  { id: "drum", title: "원형 드럼 만드는 법", svg: drumHowTo() },
-  { id: "hub", title: "바깥 축: 드럼을 링크 막대 사이에 끼우기 (확대)", svg: hubSection() },
-  { id: "route", title: "위에서 본 실 경로", svg: routingTop() },
-];
+/** id 별 단면도. B5E 는 드럼 대신 레버 */
+export const DIAGRAMS = (id: "B5N" | "B5E" = "B5N") => {
+  P = (id === "B5E" ? B5Ep : B5Np) as PP;
+  D = (id === "B5E" ? B5Ec : B5Nc).derived as unknown as Record<string, number>;
+  const lev = id === "B5E";
+  const w = lev ? "레버" : "드럼";
+  return [
+    { id: "soft", title: `Soft — 플랩 · ${w} · 실 A (정면 단면)`, svg: softSection() },
+    { id: "hard", title: `Hard — 평행 링크 · ${w} · 텐던 루프 (측면 단면)`, svg: hardSection() },
+    lev ? { id: "lever", title: "V자 레버 만드는 법", svg: leverHowTo() } : { id: "drum", title: "원형 드럼 만드는 법", svg: drumHowTo() },
+    { id: "hub", title: `바깥 축: ${lev ? "레버를" : "드럼을"} 링크 막대 사이에 끼우기 (확대)`, svg: hubSection() },
+    { id: "route", title: "위에서 본 실 경로", svg: routingTop() },
+  ];
+};

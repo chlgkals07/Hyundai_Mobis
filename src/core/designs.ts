@@ -8,6 +8,7 @@ import B5p from "../../params/B5.json";
 import B5Tp from "../../params/B5T.json";
 import B5Fp from "../../params/B5F.json";
 import B5Np from "../../params/B5N.json";
+import B5Ep from "../../params/B5E.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
@@ -17,6 +18,7 @@ import B5c from "../../calc/out/B5.json";
 import B5Tc from "../../calc/out/B5T.json";
 import B5Fc from "../../calc/out/B5F.json";
 import B5Nc from "../../calc/out/B5N.json";
+import B5Ec from "../../calc/out/B5E.json";
 import { DEG, V, boxPart, clamp, cylPart, lerp, segPart } from "./build";
 import { makeObject, sceneSdf } from "./objects";
 import {
@@ -27,6 +29,7 @@ import {
   Z_TOP,
   across,
   firstContact,
+  leverArm,
   mirrorLine,
   mirrorPart,
   nailFold,
@@ -722,7 +725,16 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
     R.push(segPart(`linkIn${sx}`, "hard_l2", "board", g.P1.clone().setX(sx * bxl), g.E1.clone().setX(sx * bxl), barT, barH, X));
     R.push(segPart(`linkOut${sx}`, "hard", "board", g.P2.clone().setX(sx * bxl), g.E2.clone().setX(sx * bxl), barT, barH, X));
   }
-  R.push(cylPart("drum", "hard", "disk", g.P2.clone(), X, 9, h.drum_r * 2));
+  const lev = (h as { lever?: { r: number; w: number; gamma_open_deg: number; hole_y: number } }).lever;
+  const levTip = (gg: typeof g) => {
+    const ga = lev!.gamma_open_deg * DEG + (psiOpen - gg.psi);
+    return { dir: V(0, -Math.cos(ga), Math.sin(ga)), tip: gg.P2.clone().addScaledVector(V(0, -Math.cos(ga), Math.sin(ga)), lev!.r) };
+  };
+  if (lev) {
+    // B5E: 드럼 자리(바깥 링크 막대 2개 사이)에 레버 판 3겹 면 접착. 바깥 피벗 → 안쪽 피벗 쪽, 닫히면 위로 돎
+    const { dir, tip } = levTip(g);
+    R.push(segPart("lever", "hard", "board", g.P2.clone().addScaledVector(dir, -5), tip.clone().addScaledVector(dir, 4), 9, lev.w, X));
+  } else R.push(cylPart("drum", "hard", "disk", g.P2.clone(), X, 9, h.drum_r * 2));
   R.push(segPart("couplerBar", "hard_c", "board", g.E1.clone().add(V(0, -halfT, 0)), g.E2.clone().add(V(0, 4, 0)), h.width, 2 * halfT, X));
   for (const [n, e] of [["pinIn", g.E1], ["pinOut", g.E2]] as const) R.push(cylPart(n, "hard_c", "straw", e.clone(), X, h.width + 6, C.straw_d));
   // 손끝판 + 패드 + 손톱 (tip 옵션이면 Pv 기준 회전)
@@ -792,12 +804,17 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
     lines.push(mirrorLine(l, 1, -1, ".B", attF.map((s) => s.replace("F", "B"))));
   }
   // 텐던 1가닥 연속 루프: 앞 드럼 안쪽 접선 → 위 → 모터 풀리 → 아래 → 뒤 드럼. 양쪽 장력이 같아 자동 균형.
-  const ty = yp + h.d - h.drum_r;
+  const ty = lev ? lev.hole_y : yp + h.d - h.drum_r;
   const zTopLoop = Z_TOP + 40;
+  const lt = lev ? levTip(g).tip : null;
+  let armNow = h.drum_r;
+  if (lev && lt) armNow = leverArm([lt.y - g.P2.y, lt.z - g.P2.z], [ty - lt.y, 0 - lt.z]);
   lines.push({
     id: "tendonLoop",
     kind: "tendon",
-    pts: [V(0, ty, zP), V(0, ty, zTopLoop), V(0, 0, zTopLoop + 6), V(0, -ty, zTopLoop), V(0, -ty, zP)],
+    pts: lt
+      ? [lt, V(0, ty, 0), V(0, ty, zTopLoop), V(0, 0, zTopLoop + 6), V(0, -ty, zTopLoop), V(0, -ty, 0), V(0, -lt.y, lt.z)]
+      : [V(0, ty, zP), V(0, ty, zTopLoop), V(0, 0, zTopLoop + 6), V(0, -ty, zTopLoop), V(0, -ty, zP)],
     attached: ["hardF", "hardB", "hardF_br", "hardB_br", "palm", "motor"],
   });
   const motor = cylPart("motorPulley", "motor", "disk", V(0, 0, zTopLoop + 3), X, 6, 2 * ty + 6);
@@ -830,7 +847,9 @@ function hardParallel(p: typeof B5p, d: Derived, b: number, objSdf: (v: Vector3)
       { label: "손끝 간격 (쥐는 면)", value: `${(2 * faceY).toFixed(1)} mm` },
       { label: "손톱 끝 높이 (바닥 위)", value: `${(nail.tip.z - floorZ).toFixed(1)} mm` },
       ...compRead,
-      { label: "텐던 루프 당김", value: `${(h.drum_r * q).toFixed(1)} mm (모터 풀리 기준, 손가락당)` },
+      lev
+        ? { label: "hard 레버 모멘트 팔", value: `${armNow.toFixed(1)} mm (r ${lev.r}) · 루프 당김 ≈ ${(armNow * q).toFixed(1)} mm` }
+        : { label: "텐던 루프 당김", value: `${(h.drum_r * q).toFixed(1)} mm (모터 풀리 기준, 손가락당)` },
     ],
   };
 }
@@ -840,11 +859,12 @@ const B5_SUMMARY: Record<string, string> = {
   B5T: "B5 + 손끝판 관절: 손끝판을 커플러에 빨대 핀으로 달고 고무줄로 스토퍼에 눌러 둠. pinch 반력은 스토퍼 쪽, 바닥 힘은 반대쪽으로 돌림(SymPy C1) → 공중에선 평행 pinch, 바닥에선 손끝이 안쪽·위로 꺾임(10 mm 에 46°, 안쪽 14 mm). 꺾이면 패드면이 기움.",
   B5F: "B5 + 플로팅 브래킷: 손가락 전체(브래킷·링크·손끝)를 손바닥 위 굵은 빨대 슬리브 2개에 일반 빨대로 꽂아(손바닥 구멍 통과) 수직 13 mm 이동, 고무줄 프리로드 3 N. 손끝이 기울지 않고 평행 유지. 쥐는 순간 슬리브 마찰로 잠겨 들어올릴 때 처지지 않음.",
   B5N: "B5 + 긴 손톱(14 mm): 손톱 플랩이 바깥·위로 접히며 최대 11.6 mm 순응. 추가 부품 없음. 접히기 전에는 손톱 안쪽 면이 쥐는 면(안쪽 스토퍼).",
+  B5E: "B5N 쉬운 버전(영상용): 형상 그대로, 드럼 6개(18장) → 레버 판 4개. 실은 레버 끝 구멍에 매듭 하나. soft 레버 r26(모멘트 팔 19.6–26, 드럼 13 대비 장력 ↓), hard 레버 r16(13.8–16). soft 열림 30°(팔 결합 기준), 힘은 영상용 pinch 1.5 N · Fin Ray 0.5 N/손가락.",
 };
-const B5P: Record<string, typeof B5p> = { B5: B5p, B5T: B5Tp as unknown as typeof B5p, B5F: B5Fp as unknown as typeof B5p, B5N: B5Np as unknown as typeof B5p };
-const B5C: Record<string, unknown> = { B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc };
+const B5P: Record<string, typeof B5p> = { B5: B5p, B5T: B5Tp as unknown as typeof B5p, B5F: B5Fp as unknown as typeof B5p, B5N: B5Np as unknown as typeof B5p, B5E: B5Ep as unknown as typeof B5p };
+const B5C: Record<string, unknown> = { B5: B5c, B5T: B5Tc, B5F: B5Fc, B5N: B5Nc, B5E: B5Ec };
 
-export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
+export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" | "B5E" = "B5"): Design {
   const p = B5P[id];
   const d = (B5C[id] as { derived: unknown }).derived as Derived;
   const adj: [string, string][] = [
@@ -867,6 +887,8 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
       const floorZ = -ctrl.palmH;
       const obj = ctrl.obj ? makeObject(ctrl.obj, floorZ) : null;
       const sdf = sceneSdf(obj, floorZ);
+      const sl = (p.soft as { lever?: { r: number; w: number; beta_open_deg: number; guide_x: number; guide_dz: number } }).lever;
+      const fv = (p as { force_video?: { soft_per_finger_N: number } }).force_video;
       const soft = softFlap(
         {
           xh: num(d, "soft_hinge_x"),
@@ -876,7 +898,8 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
           drumR: p.soft.drum_r,
           drumY: p.soft.drum_y,
           joint: "score",
-          Flim: C.force.chip_limit_N / 2,
+          Flim: fv ? fv.soft_per_finger_N : C.force.chip_limit_N / 2,
+          lever: sl ? { r: sl.r, w: sl.w, beta0: sl.beta_open_deg * DEG, guideX: sl.guide_x, guideDz: sl.guide_dz } : undefined,
         },
         ctrl.a,
         sdf,
@@ -893,10 +916,12 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" = "B5"): Design {
 }
 
 /** 현재 후보 (B5 계열: 평행 링크 hard + 수직 순응 옵션) */
-export const CURRENT: Design[] = [makeB5("B5N"), makeB5("B5F"), makeB5("B5")];
+export const CURRENT: Design[] = [makeB5("B5E"), makeB5("B5N")];
 /** 보관 (old): 하민 피드백으로 내려간 안. 비교용으로만 유지 */
-export const OLD: Design[] = [makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
+export const OLD: Design[] = [makeB5("B5F"), makeB5("B5"), makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
 export const OLD_REASON: Record<string, string> = {
+  B5F: "플로팅 브래킷 — 순응은 B5N 과 같은 14 mm 인데 텔레스코프 2쌍·손바닥 슬롯이 추가. 하민: 최종(B5N) + 쉬운 버전(B5E) 두 개만 남김 (2026-11-25)",
+  B5: "B5N 의 바탕 (손톱 5 mm, 수직 순응 4 mm) — 긴 손톱(B5N)으로 대체",
   B5T: "손끝판 관절 — 바닥 힘이 손끝을 물체 쪽으로 돌려, 쥐고 있을 때 물체가 막아 순응 안 됨. 반대로 돌리면 pinch 반력과 분리 불가 (SymPy C1·C3)",
   B1: "단일 피벗 hard — 손끝이 비스듬(쐐기 패드 필요), 수직 순응은 손톱 5 mm",
   B2: "직선 슬롯 — 개구 90×71 mm·높이 59 mm 제한 (주방 스펀지 불가)",

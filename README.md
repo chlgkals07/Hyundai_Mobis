@@ -3,7 +3,7 @@
 직교 2축 역할 분담 그리퍼: **soft Fin Ray 4개(x 축)** + **hard 평행 링크 손가락 2개(y 축)**.
 골판지·빨대·실·고무줄·풀로 만드는 영상 과제용 버전을 **치수 파라미터 → SymPy 검증 → 3D 시뮬 → 비교 채점 → 1:1 전개도 → 조립 애니메이션** 으로 반복 설계한다.
 
-현재 기준안: **B5N** (평행 링크 hard + 14 mm 접히는 손톱). 팔 결합은 [`docs/ARM-HANDOFF.md`](docs/ARM-HANDOFF.md).
+현재 기준안: **B5E** — B5N(평행 링크 hard + 14 mm 접히는 손톱)에서 드럼 6개를 레버 판 4개로 바꾼 영상 과제용 쉬운 버전. 전개도 `patterns/B5E/B5E-전개도-A4.pdf`. 팔 결합은 [`docs/ARM-HANDOFF.md`](docs/ARM-HANDOFF.md).
 
 팔을 제작할 때는 [R5-F1 A3 재단도·3D 조립 영상·배선표](arm/R5-F1/README.md)를 사용한다. 이전 설계는 [R4 × B5N 시연·제작 자료](arm/R4-B5N/README.md)에서 볼 수 있다.
 
@@ -12,10 +12,10 @@
 |---|---|
 | [`docs/site/index.html`](docs/site/index.html) | 목록 |
 | `docs/site/bench.html` | 설계안 시뮬레이터 · 비교표 · 전개도 (현재 후보 / 보관) |
-| `docs/site/assembly.html` | B5N 조립 과정: 전체 애니메이션 · 블록별 조립 · 메커니즘 단면도 · 전개도 |
+| `docs/site/assembly.html` | B5E / B5N 조립 과정 (버튼 전환): 전체 애니메이션 · 블록별 조립 · 메커니즘 단면도 · 전개도 |
 | `docs/site/arm.html` | 팔(R4, 가정 치수) + 그리퍼 결합 · 간섭 확인 |
-| `docs/B5N-조립과정.mp4` | 94 초 조립 영상 |
-| `patterns/B5N/B5N-전개도-A4.pdf` | **인쇄용 1:1 전개도** (A4, 실제 크기 100%) |
+| `docs/B5E-조립과정.mp4` · `docs/B5N-조립과정.mp4` | 94 초 조립 영상 (쉬운 버전 · 최종) |
+| `patterns/B5E/B5E-전개도-A4.pdf` · `patterns/B5N/…` | **인쇄용 1:1 전개도** (A4, 실제 크기 100%) |
 
 three.js 는 CDN(cdnjs, jsdelivr)에서 불러오므로 인터넷이 필요하다.
 
@@ -32,7 +32,7 @@ npx tsx scripts/score.ts           # 채점 → docs/COMPARISON.md
 npx tsx scripts/patterns.ts        # 전개도 → patterns/<ID>/ (SVG, A4 PDF, 부품표)
 npx tsx scripts/diagrams.ts        # 메커니즘 단면도 → docs/diagrams/*.svg
 npm run build                      # HTML → out/ + docs/site/
-node scripts/record-assembly.mjs   # 조립 영상 → docs/B5N-조립과정.mp4 (Playwright + ffmpeg)
+node scripts/record-assembly.mjs 20 - B5E   # 조립 영상 → docs/B5E-조립과정.mp4 (B5N 도 가능, Playwright + ffmpeg)
 ```
 **params 를 바꾸면** `calc → score/patterns/diagrams → build` 순서로 다시 돌린다. 스크린샷·PDF·영상은 Playwright Chromium 이 필요하다.
 
@@ -40,7 +40,7 @@ node scripts/record-assembly.mjs   # 조립 영상 → docs/B5N-조립과정.mp4
 ```
 params/            치수 단일 소스 (JSON). Python calc 와 TS 코어가 같이 읽음
   common.json        재료(골판지 3 mm, 빨대 Ø6/Ø12), Fin Ray, 물체 5종, 힘 한계
-  B5N.json …         설계안별 (B1–B5, B5F/B5N/B5T, V5 계열은 코드에서 파생)
+  B5E.json, B5N.json … 설계안별 (B1–B5, B5E/B5F/B5N/B5T, V5 계열은 코드에서 파생)
   arm/R4.json        팔 치수 (⚠ 가정값 — 실측으로 교체)
 calc/              SymPy 검증
   designs.py         설계안별 조건 (S·R·H·C·J 번호) → calc/out/<ID>.json, REPORT.md

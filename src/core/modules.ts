@@ -59,6 +59,14 @@ export interface FlapCfg {
   drumY: number;
   joint: "score" | "axle";
   Flim: number;
+  /** B5E: 드럼 대신 레버 (플랩에 세운 판, 힌지선 → 안쪽·위). beta0 = 열림 자세에서 손바닥 윗면 위로 잰 각(rad) */
+  lever?: { r: number; w: number; beta0: number; guideX: number; guideDz: number };
+}
+
+/** 2D 레버 모멘트 팔 (닫힘 +): 피벗 → 끝 rv, 실 방향 u (같은 평면 좌표 2개) */
+export function leverArm(rv: [number, number], u: [number, number]): number {
+  const n = Math.hypot(u[0], u[1]);
+  return -(rv[0] * u[1] - rv[1] * u[0]) / n;
 }
 
 export interface SoftOut {
@@ -129,17 +137,33 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
   const fr = sol.res;
   R.push(...finrayParts("finray.F", "flap", fr, Y, C.finray.width, C.flank_t, C.straw_d));
   R.push(...finrayParts("finray.B", "flap", mirrorResult(fr, 1, -1), Y, C.finray.width, C.flank_t, C.straw_d));
-  // 드럼 (골판지 원판 3겹: 큰-작은-큰 → 홈)
-  R.push(cylPart("drum", "flap", "disk", h.clone().setY(cfg.drumY), Y, 9, cfg.drumR * 2));
   if (cfg.joint === "axle") {
     R.push(cylPart("axle", "flap", "straw", h.clone().setY(yc), Y, yHi - yLo + 10, C.straw_d));
   }
-  // 실 A: 드럼 안쪽 접선 → 위로 (드럼이 회전해도 접선점은 고정)
-  const tan = V(cfg.xh - cfg.drumR, cfg.drumY, Z_TOP);
-  const wrapC = h.clone().setY(cfg.drumY + 4.6);
-  const wrap = arc(wrapC, cfg.drumR, X.clone().negate(), Z.clone().negate(), 0, Math.PI / 2 - phi * 0.0 + 0.6, 8);
-  RL.push({ id: "stringA", kind: "string", pts: [...wrap.reverse(), V(tan.x, tan.y + 4.6, Z_TOP + 55)], attached: ["flap", "palm"] });
-  tops.push(V(tan.x, tan.y + 4.6, Z_TOP + 55));
+  let armNow = cfg.drumR;
+  if (cfg.lever) {
+    // 레버 판 (2겹, y 두께 6): 플랩과 한 몸. 닫힘(φ 감소)만큼 위로 돎
+    const L = cfg.lever;
+    const be = L.beta0 + (cfg.phiOpen - phi);
+    const dir = V(-Math.cos(be), 0, Math.sin(be));
+    const piv = h.clone().setY(cfg.drumY);
+    const tip = piv.clone().addScaledVector(dir, cfg.lever.r);
+    R.push(segPart("lever", "flap", "board", piv.clone().addScaledVector(dir, -5), tip.clone().addScaledVector(dir, 4), L.w, 2 * C.board_t, Y));
+    const G = V(L.guideX, cfg.drumY, Z_TOP + L.guideDz);
+    RL.push({ id: "stringA", kind: "string", pts: [tip, G], attached: ["flap", "palm"] });
+    tops.push(G);
+    // x–z 평면을 (x, z) 로: 닫힘 = 시계 방향
+    armNow = leverArm([tip.x - piv.x, tip.z - piv.z], [G.x - tip.x, G.z - tip.z]);
+  } else {
+    // 드럼 (골판지 원판 3겹: 큰-작은-큰 → 홈)
+    R.push(cylPart("drum", "flap", "disk", h.clone().setY(cfg.drumY), Y, 9, cfg.drumR * 2));
+    // 실 A: 드럼 안쪽 접선 → 위로 (드럼이 회전해도 접선점은 고정)
+    const tan = V(cfg.xh - cfg.drumR, cfg.drumY, Z_TOP);
+    const wrapC = h.clone().setY(cfg.drumY + 4.6);
+    const wrap = arc(wrapC, cfg.drumR, X.clone().negate(), Z.clone().negate(), 0, Math.PI / 2 - phi * 0.0 + 0.6, 8);
+    RL.push({ id: "stringA", kind: "string", pts: [...wrap.reverse(), V(tan.x, tan.y + 4.6, Z_TOP + 55)], attached: ["flap", "palm"] });
+    tops.push(V(tan.x, tan.y + 4.6, Z_TOP + 55));
+  }
   // 복원 고무줄: 플랩 바깥면 → 손바닥 윗면 고정점 (상시 열림)
   const rb0 = h.clone().setY(-yf).addScaledVector(A, cfg.rootLen * 0.7).addScaledVector(N, 3.2);
   RL.push({ id: "returnA", kind: "rubber", pts: [rb0, V(cfg.xh - 14, -yf, Z_TOP + 0.5)], attached: ["flap", "palm"] });
@@ -156,13 +180,14 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     // 굵은 빨대 부싱 (손바닥 쪽에 접착)
     for (const s of [1, -1]) parts.push(cylPart(`bush.${s > 0 ? "R" : "L"}`, "palm", "bubble", V(s * cfg.xh, yc, Z_TOP), Y, 20, C.bubble_d));
   }
-  const stretch = (qcmd - q) * cfg.drumR;
-  const T = (2 * sol.Q) / cfg.drumR;
+  const stretch = (qcmd - q) * armNow;
+  const T = (2 * sol.Q) / armNow;
   const readouts: Readout[] = [
     { label: "Soft 플랩 각 φ", value: `${(phi / DEG).toFixed(1)}° (지령 ${((cfg.phiOpen - qcmd) / DEG).toFixed(1)}°, 스토퍼 ${(cfg.phiMin / DEG).toFixed(1)}°)` },
     { label: "Fin Ray 접촉력 (추정, 손가락당)", value: `${sol.F.toFixed(2)} N`, warn: sol.F > cfg.Flim + 0.05 },
     { label: "직렬 고무줄 늘어남 (힘 제한)", value: `${stretch.toFixed(1)} mm` },
     { label: "실 A 장력 (추정)", value: `${T.toFixed(1)} N` },
+    ...(cfg.lever ? [{ label: "soft 레버 모멘트 팔", value: `${armNow.toFixed(1)} mm (r ${cfg.lever.r})` }] : []),
     { label: "Fin Ray 접촉 노드", value: `${fr.nContact} / ${FINRAY.nSeg}` },
   ];
   return { parts, lines, readouts, forces: [sol.F, sol.F, sol.F, sol.F], tops, metrics: { finrayF: sol.F, finrayNodes: fr.nContact, softT: T, softStretch: stretch } };

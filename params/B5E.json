@@ -1,0 +1,61 @@
+{
+  "id": "B5E",
+  "name": "B5E 쉬운 버전 — B5N + 드럼 대신 레버 (영상용)",
+  "palm": {
+    "sx": 60.0,
+    "sy": 88.0
+  },
+  "soft": {
+    "type": "flap",
+    "joint": "score",
+    "root_len": 16.0,
+    "phi_open_deg": 30.0,
+    "drum_y": 33.0,
+    "palm_edge_relief": 1.5,
+    "stop_block_h": 8.0,
+    "lever": {
+      "_doc": "플랩에 세워 붙인 레버 판(2겹). 힌지선에서 안쪽·위로. beta = 손바닥 윗면(안쪽 방향)에서 위로 잰 각, 열림 자세 기준. 닫히면 커짐.",
+      "r": 26.0,
+      "w": 8.0,
+      "beta_open_deg": 23.0,
+      "guide_x": 29.0,
+      "guide_dz": 55.0,
+      "slot_depth": 13.0
+    }
+  },
+  "hard": {
+    "type": "parallel",
+    "_doc": "평행사변형: 손바닥 아래 브래킷의 안쪽·바깥 피벗(P_in, P_out, 수평 간격 d) → 같은 길이 L 링크 2개 → 수평 커플러 + 수직 손끝판(항상 수직). 피벗 y 는 건전지 pinch 에서 링크가 수직이 되도록 SymPy 가 정함. 드럼은 바깥 피벗.",
+    "L": 55.0,
+    "d": 24.0,
+    "width": 24.0,
+    "plies": 3,
+    "link_plies": 2,
+    "nail_len": 14.0,
+    "psi_open_deg": 54.0,
+    "bracket_drop": 20.0,
+    "compliance": {
+      "type": "nail",
+      "nail_len": 14.0,
+      "fold_max_deg": 80.0
+    },
+    "stop_tab_s": 5.0,
+    "nail_plies": 3,
+    "link_bar_h": 12.0,
+    "lever": {
+      "_doc": "바깥 링크 막대 2개 사이에 면 접착하는 레버 판(3겹, 드럼 자리). 바깥 피벗에서 안쪽 피벗 쪽으로. gamma = 안쪽 수평에서 위로 잰 각, 열림 자세 기준. 닫히면 커짐.",
+      "r": 16.0,
+      "w": 8.0,
+      "gamma_open_deg": -16.0,
+      "hole_y": 28.5
+    }
+  },
+  "_doc": "B5N 형상 그대로, 드럼 6개 → 레버 판 4개. 실은 레버 끝 구멍에 매듭 1개. soft 열림 30° (영상·팔 결합 기준, FINAL-CHANGES §3). 힘은 영상용 (FINAL-CHANGES §1).",
+  "force_video": {
+    "_doc": "영상 과제용 힘 목표 (FINAL-CHANGES §1)",
+    "pinch_N": 1.5,
+    "soft_per_finger_N": 0.5,
+    "battery_min_N": 0.85,
+    "hand_T_max_N": 10.0
+  }
+}
