@@ -858,7 +858,7 @@ function buildChapters() {
   }
 }
 // 탭 (hash): full / blocks / sections / patterns
-const TABS = ["full", "blocks", "sections", "patterns"];
+const TABS = ["full", "blocks", "sections", "video", "patterns"];
 const playerBox = document.getElementById("player")!;
 function route() {
   const hsh = location.hash.slice(1);
@@ -870,6 +870,8 @@ function route() {
   playerBox.hidden = !(tab === "full" || tab === "blocks");
   document.getElementById("page-sections")!.hidden = tab !== "sections";
   document.getElementById("page-patterns")!.hidden = tab !== "patterns";
+  document.getElementById("page-video")!.hidden = tab !== "video";
+  if (tab !== "video") (document.getElementById("vid") as HTMLVideoElement).pause();
   if (tab === "full" || tab === "blocks") {
     const newMode = tab as "full" | "blocks";
     if (newMode !== mode) {
@@ -889,6 +891,11 @@ function route() {
 window.addEventListener("hashchange", route);
 // 단면도 + 전개도 페이지 채우기
 const NAMES: Record<DId, string> = { B5E: "B5E 쉬운 버전 (레버)", B5N: "B5N 최종 (드럼)" };
+// 영상·PDF 경로: Artifact 는 media/ (publish 의 files), docs/site 는 빌드가 window.__MEDIA 로 레포 상대 경로를 넣음
+const MEDIA: Record<DId, { video: string; pdf: string }> = (window as unknown as { __MEDIA?: Record<DId, { video: string; pdf: string }> }).__MEDIA ?? {
+  B5E: { video: "media/B5E-assembly.mp4", pdf: "media/B5E-pattern-A4.pdf" },
+  B5N: { video: "media/B5N-assembly.mp4", pdf: "media/B5N-pattern-A4.pdf" },
+};
 function fillPages() {
   document.getElementById("sections")!.innerHTML = DIAGRAMS(DESIGN_ID)
     .map((d) => `<figure class="fig"><figcaption>${d.title}</figcaption>${d.svg}</figure>`)
@@ -897,6 +904,11 @@ function fillPages() {
   document.getElementById("patternBom")!.innerHTML = `<p><b>재료·실 경로</b></p><ul>${pattern.cutList.map((c) => `<li>${c}</li>`).join("")}</ul><p><b>조립 순서</b></p><ol>${pattern.steps.map((c) => `<li>${c}</li>`).join("")}</ol>`;
   document.getElementById("hdrTitle")!.textContent = `골판지 그리퍼 조립 과정 — ${NAMES[DESIGN_ID]}`;
   document.getElementById("patPath")!.textContent = `patterns/${DESIGN_ID}/`;
+  const vid = document.getElementById("vid") as HTMLVideoElement;
+  if (vid.getAttribute("src") !== MEDIA[DESIGN_ID].video) vid.src = MEDIA[DESIGN_ID].video;
+  (document.getElementById("vidLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].video;
+  (document.getElementById("pdfLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].pdf;
+  document.getElementById("pdfLink")!.textContent = `${DESIGN_ID} 전개도 PDF 받기 (A4 3장)`;
   for (const b of document.querySelectorAll<HTMLButtonElement>("#dsel button")) b.setAttribute("aria-pressed", String(b.dataset.d === DESIGN_ID));
 }
 /** 설계 전환: 모든 설계 의존 상태를 다시 만듦 */
@@ -924,6 +936,31 @@ function setDesign(id: DId) {
   fillPages();
 }
 fillPages();
+// 파일 받기: Artifact 뷰어에서는 일반 다운로드 링크가 막혀 있어 downloads 캡ability 로 저장.
+// 로컬(docs/site) 에서는 claude.use 가 없거나 null → 기본 링크 동작.
+type DL = { save: (r: { filename: string; data: Blob }) => Promise<unknown> };
+let downloads: DL | null = null;
+const cl = (window as unknown as { claude?: { use: (n: string) => Promise<unknown> } }).claude;
+if (cl?.use) cl.use("downloads").then((d) => (downloads = (d as DL) ?? null)).catch(() => {});
+const FNAME: Record<string, (id: DId) => string> = { pdfLink: (id) => `${id}-전개도-A4.pdf`, vidLink: (id) => `${id}-조립과정.mp4` };
+for (const id of ["pdfLink", "vidLink"]) {
+  const a = document.getElementById(id) as HTMLAnchorElement;
+  a.addEventListener("click", async (ev) => {
+    if (!downloads) return;
+    ev.preventDefault();
+    const label = a.textContent;
+    try {
+      a.textContent = "준비 중…";
+      const blob = await (await fetch(a.href)).blob();
+      a.textContent = label;
+      await downloads.save({ filename: FNAME[id](DESIGN_ID), data: blob });
+    } catch (e) {
+      a.textContent = label;
+      const code = (e as { code?: string }).code;
+      if (code && code !== "declined") a.insertAdjacentText("afterend", ` (저장 안 됨: ${code})`);
+    }
+  });
+}
 for (const b of document.querySelectorAll<HTMLButtonElement>("#dsel button"))
   b.onclick = () => {
     if (b.dataset.d === DESIGN_ID) return;
