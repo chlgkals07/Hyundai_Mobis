@@ -203,6 +203,9 @@ for (const dp of PATTERNS) {
       });
       return out;
     };
+    // 추가분: 번호판(B5E-전개도-A4.pdf, 부품 1개씩)을 이미 뽑은 사람용 → 각 부품 2번째부터만
+    const expandFrom2 = (list: Placed[], base: number) =>
+      expand(list, base).filter((x) => !/\(1\/\d+\)$/.test(x.label) && /\(\d+\/\d+\)$/.test(x.label));
     const eMain = expand(pages.flat(), 0);
     const eSpare = expand(sparePages.flat(), nMain);
     const fMain = pack(eMain);
@@ -218,6 +221,23 @@ for (const dp of PATTERNS) {
     console.log(dp.id, `전량판 본 ${eMain.length} 조각 ${fMain.length} 장 + 여분 ${eSpare.length} 조각 ${fSpare.length} 장`);
     writeFileSync(`${dir}/full/print.html`, `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${fsvgs.join("\n")}</body></html>`);
     pdfJobs.push({ html: `${dir}/full/print.html`, pdf: `${dir}/${dp.id}-전개도-전량-A4.pdf` });
+    {
+      const aMain = expandFrom2(pages.flat(), 0);
+      const aSpare = expandFrom2(sparePages.flat(), nMain);
+      const pM = pack(aMain);
+      const pS = pack(aSpare);
+      const pA = [...pM, ...pS];
+      mkdirSync(`${dir}/extra`, { recursive: true });
+      const asvgs = pA.map((pg, i) => {
+        const title = i < pM.length ? `${dp.id} 추가분 — 본 부품 (번호판을 이미 뽑았을 때 나머지 수량)` : `${dp.id} 추가분 — 여분 / B5N 전환 나머지 (필요할 때만)`;
+        const svg = pageSvg(title, i + 1, pA.length, pg, 1);
+        writeFileSync(`${dir}/extra/page-${i + 1}.svg`, svg);
+        return svg;
+      });
+      writeFileSync(`${dir}/extra/print.html`, `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${asvgs.join("\n")}</body></html>`);
+      pdfJobs.push({ html: `${dir}/extra/print.html`, pdf: `${dir}/${dp.id}-전개도-추가분-A4.pdf` });
+      console.log(dp.id, `추가분 본 ${aMain.length} 조각 ${pM.length} 장 + 여분 ${aSpare.length} 조각 ${pS.length} 장`);
+    }
   }
   viewerPatterns.push({ id: dp.id, name: dp.name, group: isCurrent(dp.id) ? "current" : "old", sheets: svgs.map((s) => s.replace(/width="210mm" height="297mm"/, "")), bom: dp.cutList, steps: dp.steps });
   console.log(dp.id, `${dp.shapes.length} 부품, ${pages.length} 장`);

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<defs><pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2" stroke="#e08a00" stroke-width=".35"/></pattern></defs>
+<style>
+.cut{fill:none;stroke:#000;stroke-width:.3}
+.score{fill:none;stroke:#1565c0;stroke-width:.35;stroke-dasharray:2 1.2}
+.mark{fill:none;stroke:#777;stroke-width:.25;stroke-dasharray:3 1 .6 1}
+.glue{fill:url(#hatch);stroke:none}
+.hole{fill:none;stroke:#c62828;stroke-width:.3}
+.cross{stroke:#c62828;stroke-width:.2}
+.flute{fill:none;stroke:#2e7d32;stroke-width:.35}
+text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#222}
+.lbl{font-size:3.1px;font-weight:bold}.dim{font-size:2.6px;fill:#666}
+.hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
+</style>
+<rect width="210" height="297" fill="#fff"/>
+<text class="hdr" x="10" y="14">B5E 추가분 — 본 부품 (번호판을 이미 뽑았을 때 나머지 수량) — 전개도 3/5</text>
+<text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
+<polygon class="cut" points="10,24 25,24 10,39"/>
+<text class="lbl" x="10" y="43">#18 레버 삼각 보강 (3/4)</text>
+<text class="dim" x="10" y="46.6">15×15 · B골 3 mm</text>
+<polygon class="cut" points="60.19,24 75.19,24 60.19,39"/>
+<text class="lbl" x="60.19" y="43">#18 레버 삼각 보강 (4/4)</text>
+<text class="dim" x="60.19" y="46.6">15×15 · B골 3 mm</text>
+<polygon class="cut" points="110.39,24 132.39,24 132.39,32 110.39,32"/>
+<path class="flute" d="M118.39 33H128.39M126.39 31L128.39 33L126.39 35M120.39 31L118.39 33L120.39 35"/>
+<text class="lbl" x="110.39" y="36">#13 손톱 스토퍼 (2/2)</text>
+<text class="dim" x="110.39" y="39.6">22×8 · B골 3 mm</text>
+<polygon class="cut" points="110.39,47 130.39,47 130.39,55 110.39,55"/>
+<path class="flute" d="M116.39 56H126.39M124.39 54L126.39 56L124.39 58M118.39 54L116.39 56L118.39 58"/>
+<text class="lbl" x="110.39" y="59">#14 Soft 닫힘 스토퍼 블록 (2/4)</text>
+<text class="dim" x="110.39" y="62.6">20×8 · B골 3 mm (2장 적층 × 좌우)</text>
+<polygon class="cut" points="10,54 30,54 30,62 10,62"/>
+<path class="flute" d="M16 63H26M24 61L26 63L24 65M18 61L16 63L18 65"/>
+<text class="lbl" x="10" y="66">#14 Soft 닫힘 스토퍼 블록 (3/4)</text>
+<text class="dim" x="10" y="69.6">20×8 · B골 3 mm (2장 적층 × 좌우)</text>
+<polygon class="cut" points="110.39,70 130.39,70 130.39,78 110.39,78"/>
+<path class="flute" d="M116.39 79H126.39M124.39 77L126.39 79L124.39 81M118.39 77L116.39 79L118.39 81"/>
+<text class="lbl" x="110.39" y="82">#14 Soft 닫힘 스토퍼 블록 (4/4)</text>
+<text class="dim" x="110.39" y="85.6">20×8 · B골 3 mm (2장 적층 × 좌우)</text>
+<polygon class="cut" points="10,77 22,77 10,89"/>
+<text class="lbl" x="10" y="93">#19 브래킷 삼각 보강 (2/4)</text>
+<text class="dim" x="10" y="96.6">12×12 · B골 3 mm</text>
+<polygon class="cut" points="110.39,93 122.39,93 110.39,105"/>
+<text class="lbl" x="110.39" y="109">#19 브래킷 삼각 보강 (3/4)</text>
+<text class="dim" x="110.39" y="112.6">12×12 · B골 3 mm</text>
+<polygon class="cut" points="10,104 22,104 10,116"/>
+<text class="lbl" x="10" y="120">#19 브래킷 삼각 보강 (4/4)</text>
+<text class="dim" x="10" y="123.6">12×12 · B골 3 mm</text>
+<polygon class="cut" points="155.22,24 161.22,24 161.22,30 155.22,30"/>
+<path class="flute" d="M147.22 33H157.22M155.22 31L157.22 33L155.22 35M149.22 31L147.22 33L149.22 35"/>
+<text class="lbl" x="155.22" y="34">#20 열림 스토퍼 탭 (2/8)</text>
+<text class="dim" x="155.22" y="37.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="110.39,120 116.39,120 116.39,126 110.39,126"/>
+<path class="flute" d="M102.39 129H112.39M110.39 127L112.39 129L110.39 131M104.39 127L102.39 129L104.39 131"/>
+<text class="lbl" x="110.39" y="130">#20 열림 스토퍼 탭 (3/8)</text>
+<text class="dim" x="110.39" y="133.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="10,131 16,131 16,137 10,137"/>
+<path class="flute" d="M2 140H12M10 138L12 140L10 142M4 138L2 140L4 142"/>
+<text class="lbl" x="10" y="141">#20 열림 스토퍼 탭 (4/8)</text>
+<text class="dim" x="10" y="144.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="60.19,131 66.19,131 66.19,137 60.19,137"/>
+<path class="flute" d="M52.19 140H62.19M60.19 138L62.19 140L60.19 142M54.19 138L52.19 140L54.19 142"/>
+<text class="lbl" x="60.19" y="141">#20 열림 스토퍼 탭 (5/8)</text>
+<text class="dim" x="60.19" y="144.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="110.39,141 116.39,141 116.39,147 110.39,147"/>
+<path class="flute" d="M102.39 150H112.39M110.39 148L112.39 150L110.39 152M104.39 148L102.39 150L104.39 152"/>
+<text class="lbl" x="110.39" y="151">#20 열림 스토퍼 탭 (6/8)</text>
+<text class="dim" x="110.39" y="154.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="10,152 16,152 16,158 10,158"/>
+<path class="flute" d="M2 161H12M10 159L12 161L10 163M4 159L2 161L4 163"/>
+<text class="lbl" x="10" y="162">#20 열림 스토퍼 탭 (7/8)</text>
+<text class="dim" x="10" y="165.6">6×6 · B골 3 mm (2장 적층)</text>
+<polygon class="cut" points="60.19,152 66.19,152 66.19,158 60.19,158"/>
+<path class="flute" d="M52.19 161H62.19M60.19 159L62.19 161L60.19 163M54.19 159L52.19 161L54.19 163"/>
+<text class="lbl" x="60.19" y="162">#20 열림 스토퍼 탭 (8/8)</text>
+<text class="dim" x="60.19" y="165.6">6×6 · B골 3 mm (2장 적층)</text>
+<path class="cut" d="M10 281h100"/>
+<path class="cut" d="M10 281v-4"/>
+<path class="cut" d="M20 281v-2.5"/>
+<path class="cut" d="M30 281v-2.5"/>
+<path class="cut" d="M40 281v-2.5"/>
+<path class="cut" d="M50 281v-2.5"/>
+<path class="cut" d="M60 281v-4"/>
+<path class="cut" d="M70 281v-2.5"/>
+<path class="cut" d="M80 281v-2.5"/>
+<path class="cut" d="M90 281v-2.5"/>
+<path class="cut" d="M100 281v-2.5"/>
+<path class="cut" d="M110 281v-4"/>
+<text class="small" x="10" y="285">100 mm — 인쇄 후 자로 재서 100 mm 가 아니면 배율(실제 크기 100%) 확인</text>
+</svg>
