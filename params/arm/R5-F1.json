@@ -1,0 +1,92 @@
+{
+  "_status": "fabrication_nominal_unmeasured",
+  "_doc": "mm, degrees. +x forward, +z up, positive pitch raises both parallel links. R4 JSON keys retained; do not feed parallel bars into a serial-arm IK.",
+  "board_t": 3,
+  "base": {
+    "w": 280,
+    "h": 15,
+    "feet_h": 3,
+    "rotor_od": 160,
+    "ring_od": 210,
+    "ring_id": 146,
+    "yaw_deg": [0, 45]
+  },
+  "column": {
+    "w": 54,
+    "h": 222,
+    "rear_edge_to_pin": 32,
+    "lower_pin_from_foot": 160,
+    "pin_spacing": 40,
+    "inner_gap": 28
+  },
+  "upper": {
+    "L": 140,
+    "w": 26,
+    "t": 36,
+    "rear_overhang": 60,
+    "front_overhang": 15,
+    "web_h": 30
+  },
+  "fore": {
+    "L": 140,
+    "w": 26,
+    "t": 24,
+    "rear_overhang": 15,
+    "front_overhang": 15
+  },
+  "pitch_deg": [3, 18],
+  "end_cheeks": {
+    "length": 39,
+    "height": 73,
+    "plate_t": 6,
+    "inner_gap": 32,
+    "lower_pin_from_rear": 13.5,
+    "lower_pin_from_bottom": 19
+  },
+  "collision_frame": {
+    "origin": "lower front pin",
+    "fixed_ring_center_x": 19,
+    "fixed_ring_z_ranges": [
+      [-33, -30],
+      [-22, -19]
+    ],
+    "rotor_z_range": [-29, -23],
+    "mast_cheek_inner_y": [-14, 14],
+    "end_cheek_inner_y": [-16, 16],
+    "note": "nominal mm; x along table front, z vertical, rings coaxial"
+  },
+
+  "wrist": {
+    "w": 68,
+    "h": 14,
+    "has_roll": true,
+    "pitch": "level",
+    "yaw_axis": "vertical",
+    "roll_deg": [-30, 30],
+    "forward": 19,
+    "upper_ring_top_below_pin": 19,
+    "fixed_bore": 26,
+    "fixed_plate_t": 3,
+    "rotor_od": 40,
+    "rotor_t": 6,
+    "cavity_h": 8,
+    "neck_od": 24,
+    "neck_id": 16,
+    "flange_bottom_below_pin": 38
+  },
+  "mount": { "x": 24, "y": 30, "h": 15 },
+  "gripper": {
+    "design": "B5N",
+    "soft_open_limit_deg": 30,
+    "limit_status": "provisional; test with CAD and hardware",
+    "palm_t": 6
+  },
+  "guides": {
+    "od": 6,
+    "length": 12,
+    "start_from_upper_rear": [92, 155],
+    "inner_face_gap": 14,
+    "wrist_guide_length": 8
+  },
+  "fixture": { "aa_nominal_h": 27 }
+}
