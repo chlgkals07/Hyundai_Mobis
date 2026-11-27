@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 1050 360" role="img" aria-label="B6P 손바닥 아랫면"><style>
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+</style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><polygon class="board2" points="439.5,312 610.5,312 610.5,48 439.5,48"/><polygon class="glue" points="489,144 561,144 561,72 489,72"/><polygon class="glue" points="489,216 561,216 561,288 489,288"/><circle class="pivot" cx="540" cy="180" r="4.5"/><circle class="pivot" cx="510" cy="180" r="4.5"/><circle class="pivot" cx="525" cy="180" r="4.5"/><polygon class="stop" points="591.12,252 609.12,252 609.12,192 591.12,192"/><polygon class="stop" points="458.88,252 440.88,252 440.88,192 458.88,192"/><polyline class="lead" points="9,24 489,120"/><circle class="dot" cx="489" cy="120" r="2"/><text class="lbl" x="9" y="28" text-anchor="start">빗금 = 접는 상자 윗변 풀칠 (x=±12, y=±12…36)</text><polyline class="lead" points="1041,24 561,84"/><circle class="dot" cx="561" cy="84" r="2"/><text class="lbl" x="1041" y="28" text-anchor="end">앞 손가락 (+y)</text><polyline class="lead" points="1041,222 600.12,222"/><circle class="dot" cx="600.12" cy="222" r="2"/><text class="lbl" x="1041" y="226" text-anchor="end">닫힘 블록 6×20×8, 바깥 면 x=±28.04, y=-24…-4</text><polyline class="lead" points="9,300 525,180"/><circle class="dot" cx="525" cy="180" r="2"/><text class="lbl" x="9" y="304" text-anchor="start">구멍 3개는 윗장과 같은 자리</text><polyline class="lead" points="1041,300 610.5,270"/><circle class="dot" cx="610.5" cy="270" r="2"/><text class="lbl" x="1041" y="304" text-anchor="end">아랫장 폭 57 (좌우 1.5 좁음)</text><text class="note" x="525" y="9" text-anchor="middle">아랫면에 붙는 것 (위에서 투시) · 앞 = +y · 단위 mm</text></svg>

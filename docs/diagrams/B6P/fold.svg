@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 780 343.2" role="img" aria-label="접는 상자 만들기"><style>
+.dg .board{fill:#d8b48a;stroke:#6b4a2a;stroke-width:1.2}
+.dg .board2{fill:#c9a274;stroke:#6b4a2a;stroke-width:1.2}
+.dg .ghost{fill:none;stroke:#8a7a68;stroke-width:1;stroke-dasharray:5 4}
+.dg .flank{fill:#f3dfbd;stroke:#9a7a4a;stroke-width:1.2}
+.dg .flankg{fill:none;stroke:#b09a7a;stroke-width:1;stroke-dasharray:5 4}
+.dg .drum{fill:#a87a4c;stroke:#5a3d22;stroke-width:1.2}
+.dg .groove{fill:none;stroke:#3d2714;stroke-width:1;stroke-dasharray:3 3}
+.dg .straw{fill:#f7f5f0;stroke:#888;stroke-width:1}
+.dg .string{fill:none;stroke:#1b3a6b;stroke-width:2.2}
+.dg .tendon{fill:none;stroke:#7d3c98;stroke-width:2.4}
+.dg .rubber{fill:none;stroke:#e4572e;stroke-width:2}
+.dg .stop{fill:#4f7d6c;stroke:#244a3d;stroke-width:1.2}
+.dg .nail{fill:#8a6a45;stroke:#4a3520;stroke-width:1.2}
+.dg .pad{fill:#333}
+.dg .obj{fill:#8f9cad;stroke:#4d5866;stroke-width:1.2}
+.dg .floor{stroke:#2f6b5b;stroke-width:3}
+.dg .pivot{fill:#fff;stroke:#222;stroke-width:1.5}
+.dg .lead{fill:none;stroke:#555;stroke-width:.8}
+.dg .dot{fill:#555}
+.dg .glue{fill:url(#hatch);stroke:none}
+.dg text{font-family:"IBM Plex Sans KR","WenQuanYi Zen Hei","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.dg .lbl{font-size:12.5px;fill:#1d2422}
+.dg .note{font-size:11px;fill:#5b6763}
+.dg .hd{font-size:15px;font-weight:700;fill:#1d2422}
+.dg .dim{font-size:11px;fill:#244a3d;font-family:"IBM Plex Mono",monospace}
+</style><defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V5" stroke="#e08a00" stroke-width="1.6"/></pattern></defs><text class="hd" x="15.6" y="10.4" text-anchor="start">① 띠 1장 (폭 24): 파란 선 4개를 볼펜으로 깊게 누르고 양쪽으로 몇 번 꺾기</text><polygon class="glue" points="15.6,78 89.7,78 89.7,41.6 15.6,41.6"/><polygon class="ghost" points="15.6,78 89.7,78 89.7,41.6 15.6,41.6"/><text class="note" x="52.65" y="67.6" text-anchor="middle">윗변</text><polyline class="groove" points="89.7,83.2 89.7,36.4"/><polygon class="board" points="89.7,78 321.26,78 321.26,41.6 89.7,41.6"/><polygon class="ghost" points="89.7,78 321.26,78 321.26,41.6 89.7,41.6"/><text class="note" x="205.48" y="67.6" text-anchor="middle">바깥 링크</text><polyline class="groove" points="321.26,83.2 321.26,36.4"/><polygon class="board" points="321.26,78 395.36,78 395.36,41.6 321.26,41.6"/><polygon class="ghost" points="321.26,78 395.36,78 395.36,41.6 321.26,41.6"/><text class="note" x="358.31" y="67.6" text-anchor="middle">아랫변</text><polyline class="groove" points="395.36,83.2 395.36,36.4"/><polygon class="board" points="395.36,78 626.93,78 626.93,41.6 395.36,41.6"/><polygon class="ghost" points="395.36,78 626.93,78 626.93,41.6 395.36,41.6"/><text class="note" x="511.14" y="67.6" text-anchor="middle">안쪽 링크</text><polyline class="groove" points="626.93,83.2 626.93,36.4"/><polygon class="glue" points="626.93,78 663.98,78 663.98,41.6 626.93,41.6"/><polygon class="ghost" points="626.93,78 663.98,78 663.98,41.6 626.93,41.6"/><text class="note" x="645.45" y="67.6" text-anchor="middle">탭</text><text class="hd" x="15.6" y="104" text-anchor="start">② 접는 선 바깥 면에 테이프 (양방향으로 굽어도 안 찢어지게)</text><text class="hd" x="15.6" y="135.2" text-anchor="start">③ 윗변을 손바닥 아랫면 빗금에 풀칠 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠 = 납작한 상자</text><polygon class="glue" points="182,187.2 228.8,187.2 228.8,179.4 182,179.4"/><polyline class="string" points="182,187.2 222.02,297.14"/><polyline class="string" points="228.8,187.2 268.82,297.14"/><polygon class="board" points="184.44,186.31 224.46,296.25 219.57,298.03 179.56,188.09"/><polygon class="board" points="231.24,186.31 271.26,296.25 266.37,298.03 226.36,188.09"/><polygon class="board2" points="222.02,297.14 268.82,297.14 268.82,302.34 222.02,302.34"/><text class="note" x="286" y="213.2" text-anchor="start">옆으로 밀면 평행사변형으로 기움</text><text class="note" x="286" y="239.2" text-anchor="start">→ 아랫변은 항상 수평</text><text class="lbl" x="15.6" y="327.6" text-anchor="start">④ 아랫변 밑 안쪽 끝에 손끝판(ㄱ자 2겹) + 손톱. 안쪽 링크 '매듭' 구멍에 실</text></svg>

@@ -7,6 +7,8 @@ import B5Np from "../../params/B5N.json";
 import B5Nc from "../../calc/out/B5N.json";
 import B5Ep from "../../params/B5E.json";
 import B5Ec from "../../calc/out/B5E.json";
+import B6Pp from "../../params/B6P.json";
+import B6Pc from "../../calc/out/B6P.json";
 
 const C = common;
 type SLev = { r: number; w: number; beta_open_deg: number; guide_x: number; guide_dz: number; slot_depth: number };
@@ -517,8 +519,217 @@ export function palmMap(which: "top" | "bottom") {
   return f.svg();
 }
 
+// ================================================================== B6P (쉬운 버전: 매듭 soft + 접는 평행사변형 hard)
+const Q = B6Pp;
+const QD = () => B6Pc.derived as unknown as Record<string, number>;
+
+/** B6P soft 정면 단면: 플랩 매듭 → 손바닥 구멍 → 손잡이 (레버 없음) */
+export function b6SoftSection() {
+  const d = QD();
+  const f = new Fig(-235, 300, -112, 100, 2.0, "B6P soft 정면 단면");
+  const xh = Q.palm.sx / 2;
+  const rel = Q.soft.palm_edge_relief;
+  const Rr = Q.soft.root_len;
+  const L = C.finray.L;
+  const b = C.finray.base;
+  const kn = Q.soft.knot;
+  f.rect(-xh, 3, xh, 6, "board");
+  f.rect(-xh + rel, 0, xh - rel, 3, "board2");
+  for (const s of [1, -1]) {
+    const draw = (phi: number, solid: boolean) => {
+      const A: Pt = [s * Math.sin(phi), -Math.cos(phi)];
+      const N: Pt = [s * Math.cos(phi), Math.sin(phi)];
+      const H: Pt = [s * xh, zt];
+      const pt = (u: number, v: number): Pt => [H[0] + A[0] * u + N[0] * v, H[1] + A[1] * u + N[1] * v];
+      f.poly([pt(0, 0), pt(Rr, 0), pt(Rr, 3), pt(0, 3)], solid ? "board" : "ghost");
+      f.poly([pt(Rr, 0), pt(Rr + L, 0), pt(Rr, b)], solid ? "flank" : "flankg");
+      if (solid) {
+        for (const i of [2, 4, 6, 8]) f.line(pt(Rr + (L * i) / 10, 0), pt(Rr + (L * i) / 10, b * (1 - i / 10)), "straw");
+        // Fin Ray 앞 탭 (플랩 안쪽 면에 풀칠)
+        f.poly([pt(Rr - 12, -1.5), pt(Rr, -1.5)], "glue");
+        const K = pt(kn.s, 0);
+        f.circle(K, 1.6, "pivot");
+        f.poly([K, [s * kn.hole_x, 0], [s * kn.hole_x, 60], [0, 72]], "string", false);
+        f.zig(pt(Rr * 0.7, 3.2), [s * (xh - 14), zt + 0.5], "rubber", 6, 1.2);
+      }
+    };
+    draw(Q.soft.phi_open_deg * deg, false);
+    draw(d.soft_phi_min_deg * deg, true);
+    const fx0 = d.soft_stop_face_x;
+    f.rect(s * (fx0 - 6), -Q.soft.stop_block_h, s * fx0, 0, "stop");
+  }
+  f.circle([0, 74], 4, "drum");
+  f.text([0, 84], "손잡이 (soft 한 가닥 루프)", "lbl", "middle");
+  const Lx = -118;
+  const Rx = 118;
+  f.label([Lx, 72], "실을 위로 당기면 좌·우 플랩이 같이 닫힘", [-kn.hole_x, 50], "end");
+  f.label([Lx, 56], `손바닥 구멍 x=±${kn.hole_x} (가운데 근처)`, [-kn.hole_x, 3], "end");
+  f.label([Rx, 40], `매듭 구멍: 접는 선에서 ${kn.s} mm (플랩 위)`, [xh + 2, zt - kn.s + 2]);
+  f.label([Rx, 24], "레버·드럼·균형막대 없음 — 매듭 1개", [xh - 6, 20]);
+  f.label([Rx, 8], `점선 = 열림 ${Q.soft.phi_open_deg}°, 실선 = 닫힘(−8°)`, [xh + 10, -8]);
+  f.label([Lx, 10], `아랫장 좌우 ${rel} mm 좁게`, [-(xh - rel) + 0.5, 1.5], "end");
+  f.label([Lx, -14], "닫힘 스토퍼 블록 (−8° 에서 멈춤)", [-(d.soft_stop_face_x - 3), -4], "end");
+  f.label([Rx, -40], "Fin Ray 앞 탭(빗금)을 플랩 안쪽 면에 풀칠", [xh + 6, -10]);
+  f.label([Rx, -58], "물체에 닿으면 끝이 물체 쪽으로 감쌈", [xh + 2, -80]);
+  f.label([Lx, -40], "복원 고무줄: 놓으면 열림", [-(xh - 6), 3], "end");
+  f.text([-232, -108], "정면 단면 (x–z) · 단위 mm", "note");
+  return f.svg();
+}
+
+/** B6P hard 측면 단면: 접는 상자(평행사변형) + 매듭 실 */
+export function b6HardSection() {
+  const d = QD();
+  const h = Q.hard;
+  const f = new Fig(-215, 215, -112, 66, 2.3, "B6P hard 측면 단면");
+  const yp = d.hard_pivot_y;
+  const zP = h.hinge_z;
+  const Lc = d.hard_coupler_below_E;
+  const H = d.rigid_palm_height;
+  const halfT = (h.plies * C.board_t) / 2;
+  f.rect(-Q.palm.sy / 2, 0, Q.palm.sy / 2, zt, "board");
+  f.line([-115, -H], [115, -H], "floor");
+  f.circle([0, -H + 7], 7, "obj");
+  for (const t of [1, -1]) {
+    f.rect(t * yp, zP, t * (yp + h.d), 0, "glue");
+    const finger = (psi: number, solid: boolean) => {
+      const u: Pt = [t * Math.sin(psi), -Math.cos(psi)];
+      const P1: Pt = [t * yp, zP];
+      const P2: Pt = [t * (yp + h.d), zP];
+      const E1: Pt = [P1[0] + u[0] * h.L, P1[1] + u[1] * h.L];
+      const E2: Pt = [P2[0] + u[0] * h.L, P2[1] + u[1] * h.L];
+      const cls = solid ? "board" : "ghost";
+      f.bar(P2, E2, 3, cls);
+      f.bar(P1, E1, 3, cls);
+      f.bar([E1[0], E1[1] - 1.5], [E2[0], E2[1] - 1.5], 3, solid ? "board2" : "ghost");
+      const tipZ = E1[1] - Lc;
+      f.rect(E1[0] - halfT, tipZ + h.nail_len, E1[0] + halfT, E1[1] - 3, solid ? "board2" : "ghost");
+      f.rect(E1[0] - t * halfT - 0.5, tipZ, E1[0] - t * halfT + t * 1.5, tipZ + h.nail_len, solid ? "nail" : "ghost");
+      if (solid) {
+        for (const e of [P1, P2, E1, E2]) f.circle(e, 1.8, "pivot");
+        const K: Pt = [P1[0] + u[0] * h.knot.s, P1[1] + u[1] * h.knot.s];
+        f.circle(K, 1.4, "pivot");
+        f.poly([K, [0, 0]], "tendon", false);
+      }
+    };
+    finger(h.psi_open_deg * deg, false);
+    finger(0, true);
+  }
+  f.poly([[0, 0], [0, 48]], "tendon", false);
+  f.circle([0, 50], 4, "drum");
+  f.text([0, 59], "손잡이 (hard 한 가닥 루프)", "lbl", "middle");
+  const Lx = -82;
+  const Rx = 82;
+  f.label([Lx, 40], "앞 매듭 → 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭", [0, 20], "end");
+  f.label([Rx, 26], `윗변(빗금) = 손바닥 아랫면에 풀칠`, [yp + h.d / 2, -1.5]);
+  f.label([Rx, 12], `접는 선 4개 = 관절 (점 4개), 핀 없음`, [yp + h.d, zP]);
+  f.label([Rx, -40], `두 링크 ${h.L} 길이가 같으면 → 아랫변 항상 수평`, [yp + h.d / 2 + 3, zP - 40]);
+  f.label([Rx, -54], "→ 손끝판 항상 수직 (평행 집기)", [yp, -H + 30]);
+  f.label([Lx, -20], `매듭: 안쪽 링크, 윗 접는 선에서 ${h.knot.s}`, [-(yp + 2), zP - h.knot.s], "end");
+  f.label([Rx, -86], "건전지 집기: 링크 수직", [9, -H + 7]);
+  f.label([Lx, -78], `손톱 ${h.nail_len} mm (3겹): 바닥에 눌리면 접힘`, [-yp + halfT, -H + 6], "end");
+  f.text([-212, -108], `측면 단면 (y–z), 점선 = 열림 ${h.psi_open_deg}° · 단위 mm`, "note");
+  return f.svg();
+}
+
+/** 접는 상자 만들기: 펼친 띠 → 접어서 상자 */
+export function b6FoldHowTo() {
+  const h = Q.hard;
+  const f = new Fig(0, 300, -40, 92, 2.6, "접는 상자 만들기");
+  const sc = 0.95;
+  const segs: [string, number][] = [["윗변", h.d], ["바깥 링크", h.L], ["아랫변", h.d], ["안쪽 링크", h.L], ["탭", 12]];
+  let x = 6;
+  f.text([6, 88], "① 띠 1장 (폭 24): 파란 선 4개를 볼펜으로 깊게 누르고 양쪽으로 몇 번 꺾기", "hd");
+  for (const [nm, len] of segs) {
+    const w = len * sc * 1.25;
+    f.rect(x, 62, x + w, 76, nm === "윗변" || nm === "탭" ? "glue" : "board");
+    f.rect(x, 62, x + w, 76, "ghost");
+    f.text([x + w / 2, 66], nm, "note", "middle");
+    x += w;
+    if (nm !== "탭") f.line([x, 60], [x, 78], "groove");
+  }
+  f.text([6, 52], "② 접는 선 바깥 면에 테이프 (양방향으로 굽어도 안 찢어지게)", "hd");
+  f.text([6, 40], "③ 윗변을 손바닥 아랫면 빗금에 풀칠 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠 = 납작한 상자", "hd");
+  // 상자 (기운 평행사변형)
+  const ox = 70;
+  const oz = 20;
+  const ps = 0.6;
+  const sk = Math.sin(20 * deg) * h.L * ps;
+  const dz = Math.cos(20 * deg) * h.L * ps;
+  f.rect(ox, oz, ox + h.d * ps * 1.25, oz + 3, "glue");
+  f.poly([[ox, oz], [ox + sk, oz - dz]], "string", false);
+  f.poly([[ox + h.d * ps * 1.25, oz], [ox + h.d * ps * 1.25 + sk, oz - dz]], "string", false);
+  f.bar([ox, oz], [ox + sk, oz - dz], 2, "board");
+  f.bar([ox + h.d * ps * 1.25, oz], [ox + h.d * ps * 1.25 + sk, oz - dz], 2, "board");
+  f.bar([ox + sk, oz - dz - 1], [ox + h.d * ps * 1.25 + sk, oz - dz - 1], 2, "board2");
+  f.text([ox + 40, oz - 10], "옆으로 밀면 평행사변형으로 기움", "note");
+  f.text([ox + 40, oz - 20], "→ 아랫변은 항상 수평", "note");
+  f.text([6, -34], "④ 아랫변 밑 안쪽 끝에 손끝판(ㄱ자 2겹) + 손톱. 안쪽 링크 '매듭' 구멍에 실", "lbl");
+  return f.svg();
+}
+
+/** B6P 손바닥 지도 (위에서, 실제 좌표) */
+export function b6PalmMap(which: "top" | "bottom") {
+  const d = QD();
+  const sx = Q.palm.sx / 2;
+  const sy = Q.palm.sy / 2;
+  const h = Q.hard;
+  const yp = d.hard_pivot_y;
+  const rl = Q.soft.root_len;
+  const kn = Q.soft.knot;
+  const rel = Q.soft.palm_edge_relief;
+  const yf = C.finray.pair_y;
+  const yLo = -yf - C.finray.width / 2 - 2;
+  const yHi = yf + C.finray.width / 2 + 2;
+  const f = new Fig(-175, 175, -60, 60, 3.0, which === "top" ? "B6P 손바닥 윗면" : "B6P 손바닥 아랫면");
+  if (which === "top") {
+    f.rect(-sx, -sy, sx, sy, "board");
+    for (const s of [1, -1]) f.rect(s * sx, yLo, s * (sx + rl), yHi, "board2");
+    for (const s of [1, -1]) f.line([s * sx, yLo], [s * sx, yHi], "groove");
+    for (const s of [1, -1]) for (const t of [1, -1]) f.rect(s * (sx + 2), t * yf - C.finray.width / 2, s * (sx + rl - 1), t * yf + C.finray.width / 2, "glue");
+    for (const s of [1, -1]) {
+      f.circle([s * kn.hole_x, 0], 1.5, "pivot");
+      f.circle([s * (sx + kn.s), 0], 1.5, "pivot");
+      f.circle([s * (sx - 14), -yf], 1.5, "pivot");
+    }
+    f.circle([0, 0], 1.5, "pivot");
+    f.rect(-12, -15, 12, 15, "ghost");
+    f.label([-172, 52], `soft 실 구멍 Ø3 (x=±${kn.hole_x}, y=0)`, [-kn.hole_x, 0], "start");
+    f.label([-172, 40], "hard 실 구멍 Ø3 (가운데 1개, 앞·뒤 같이)", [0, 0], "start");
+    f.label([172, 52], `매듭 구멍 Ø3 (플랩, 접는 선에서 ${kn.s})`, [sx + kn.s, 0], "end");
+    f.label([172, 40], "빗금 = Fin Ray 앞 탭 풀칠 (플랩 아랫면)", [sx + 8, yf], "end");
+    f.label([-172, -32], `고무줄 구멍 Ø3 (x=±${sx - 14}, y=${-yf})`, [-(sx - 14), -yf], "start");
+    f.label([-172, -50], "팔 장착 24×30 (가운데)", [-12, -15], "start");
+    f.label([172, -50], `파란 점선 = 접는 선 (x=±${sx})`, [sx, yLo + 3], "end");
+    f.text([0, 57], "위에서 본 손바닥 윗장 (펼친 상태) · 앞 = +y · 단위 mm", "note", "middle");
+  } else {
+    const bw = sx - rel;
+    f.rect(-bw, -sy, bw, sy, "board2");
+    for (const t of [1, -1]) f.rect(-h.width / 2, t * yp, h.width / 2, t * (yp + h.d), "glue");
+    for (const s of [1, -1]) f.circle([s * kn.hole_x, 0], 1.5, "pivot");
+    f.circle([0, 0], 1.5, "pivot");
+    const fx0 = d.soft_stop_face_x;
+    const [y0, y1] = Q.soft.stop_block_y;
+    for (const s of [1, -1]) f.rect(s * (fx0 - 6), y0, s * fx0, y1, "stop");
+    f.label([-172, 52], `빗금 = 접는 상자 윗변 풀칠 (x=±${h.width / 2}, y=±${n(yp)}…${n(yp + h.d)})`, [-h.width / 2, yp + 8], "start");
+    f.label([172, 52], "앞 손가락 (+y)", [h.width / 2, yp + h.d - 4], "end");
+    f.label([172, -14], `닫힘 블록 6×20×8, 바깥 면 x=±${n(fx0)}, y=${y0}…${y1}`, [fx0 - 3, (y0 + y1) / 2], "end");
+    f.label([-172, -40], "구멍 3개는 윗장과 같은 자리", [0, 0], "start");
+    f.label([172, -40], `아랫장 폭 ${n(2 * bw)} (좌우 1.5 좁음)`, [bw, -30], "end");
+    f.text([0, 57], "아랫면에 붙는 것 (위에서 투시) · 앞 = +y · 단위 mm", "note", "middle");
+  }
+  return f.svg();
+}
+
 /** id 별 단면도. B5E 는 드럼 대신 레버 */
-export const DIAGRAMS = (id: "B5N" | "B5E" = "B5N") => {
+export const DIAGRAMS = (id: "B5N" | "B5E" | "B6P" = "B5N") => {
+  if (id === "B6P")
+    return [
+      { id: "soft", title: "Soft — 플랩 · 매듭 · 한 가닥 실 (정면 단면)", svg: b6SoftSection() },
+      { id: "hard", title: "Hard — 접는 상자(평행사변형) · 매듭 실 (측면 단면)", svg: b6HardSection() },
+      { id: "fold", title: "접는 상자 만드는 법", svg: b6FoldHowTo() },
+      { id: "palm-top", title: "손바닥 윗장: 구멍·Fin Ray 풀칠 자리 (실제 좌표)", svg: b6PalmMap("top") },
+      { id: "palm-bottom", title: "손바닥 아랫면: 접는 상자·스토퍼 블록 자리 (실제 좌표)", svg: b6PalmMap("bottom") },
+    ];
   P = (id === "B5E" ? B5Ep : B5Np) as PP;
   D = (id === "B5E" ? B5Ec : B5Nc).derived as unknown as Record<string, number>;
   const lev = id === "B5E";

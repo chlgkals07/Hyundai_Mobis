@@ -8,24 +8,27 @@ import { PATTERNS } from "../core/pattern";
 import type { Assembly, Part } from "../core/types";
 import viewerData from "../../data/viewer-data.json";
 import { DIAGRAMS } from "../core/diagrams";
-import manualMd from "../../docs/B5E-제작설명서.md?raw";
+import manualB5E from "../../docs/B5E-제작설명서.md?raw";
+import manualB6P from "../../docs/B6P-제작설명서.md?raw";
 import { mdToHtml } from "./md";
 
-type DId = "B5E" | "B5N";
-const DESIGNS: DId[] = ["B5E", "B5N"];
+type DId = "B6P" | "B5N" | "B5E";
+const DESIGNS: DId[] = ["B6P", "B5N", "B5E"];
 const qs = new URLSearchParams(location.search);
 let DESIGN_ID: DId = (() => {
   const q = qs.get("d");
-  if (q === "B5E" || q === "B5N") return q;
+  if (DESIGNS.includes(q as DId)) return q as DId;
   try {
     const v = localStorage.getItem("asm-design");
-    if (v === "B5E" || v === "B5N") return v;
+    if (DESIGNS.includes(v as DId)) return v as DId;
   } catch {
     /* 저장소 없음 */
   }
-  return "B5E";
+  return "B6P";
 })();
 let LEV = DESIGN_ID === "B5E";
+/** B6P: 접는 상자 hard + 매듭 soft (레버·드럼 없음) */
+let FOLD = DESIGN_ID === "B6P";
 let design = ALL.find((d) => d.id === DESIGN_ID)!;
 let pattern = PATTERNS.find((p) => p.id === DESIGN_ID)!;
 const sheetsOf = (id: string): string[] => ((viewerData as { patterns?: { id: string; sheets: string[] }[] }).patterns ?? []).find((p) => p.id === id)?.sheets ?? [];
@@ -61,6 +64,7 @@ interface Step {
 }
 const T_PATTERN = [4, 22]; // 2D 전개도
 function stepsOf(): Step[] {
+  if (FOLD) return stepsB6P();
   const fv = LEV;
   return [
     { t0: 0, t1: 4, title: `${DESIGN_ID} 골판지 그리퍼 — 만드는 과정`, craft: LEV ? "B5N 과 같은 형상, 드럼 대신 V자 레버 (영상용 쉬운 버전) · 1:1 전개도 A4 3장" : "평행 링크 hard (긴 손톱) + 플랩 Fin Ray soft · 1:1 전개도 A4 3장", feas: "", level: 1 },
@@ -82,6 +86,24 @@ function stepsOf(): Step[] {
       ? { t0: 64, t1: 70, title: "11. 실·텐던·고무줄", craft: "soft: 레버 끝 매듭 → 위로 → 균형막대. hard: 텐던 1가닥 루프(앞 레버 끝 매듭 → 손바닥 구멍 → 손잡이 → 뒤 레버 끝 매듭). 복원 고무줄은 약하게", feas: "감기 없이 매듭 4개. 실 길이는 테이프로 임시 고정 후 조정", level: 1 }
       : { t0: 64, t1: 70, title: "11. 실·텐던·고무줄", craft: "soft: 드럼 → 위로 → 균형막대. hard: 텐던 1가닥 루프(앞 드럼 → 손잡이/모터 → 뒤 드럼). 복원 고무줄", feas: "실 길이 맞추기·매듭이 의외로 시간 소모 (30분 이상)", level: 2 },
     { t0: 70, t1: 84, title: "12. 동작 — 건전지 (Rigid) · 감자칩 (Soft)", craft: fv ? "실 B 를 당기면 앞·뒤 손끝판이 수직을 유지한 채 닫힘 · 실 A 를 당기면 Fin Ray 가 감쌈 (영상용: 손가락당 0.5 N, pinch 1.5 N)" : "실 B 를 당기면 앞·뒤 손끝판이 수직을 유지한 채 닫힘 · 실 A 를 당기면 Fin Ray 가 감쌈 (직렬 고무줄 2.5 N/손가락 제한)", feas: "시뮬 결과 재생 (마찰·골판지 휨 미포함)", level: 1 },
+    { t0: 84, t1: 94, title: "실현 가능한가?", craft: "", feas: "", level: 1 },
+  ];
+}
+function stepsB6P(): Step[] {
+  return [
+    { t0: 0, t1: 4, title: "B6P 골판지 그리퍼 — 만드는 과정", craft: "접는 상자(평행사변형) hard + 매듭 soft · 핀·빨대 구멍 0 · 전량판 A4 4장", feas: "", level: 1 },
+    { t0: 4, t1: 10, title: "1. 도면 출력 → 골판지에 붙이기 → 자르기", craft: "A4 실제 크기(100%) 인쇄, 100 mm 눈금 확인 → 딱풀로 택배상자에 → 커터칼+쇠자로 실선 자르기. 수량만큼 모두 그려진 전량판이라 따라 그릴 필요 없음", feas: `판 부품 ${FEAS.boardPieces}개 · 자르기 약 ${Math.round(FEAS.cutMin / 10) * 10}분 (추정)`, level: 1 },
+    { t0: 10, t1: 16, title: "2. 접는 선·구멍", craft: "파란 점선 = 볼펜으로 자 대고 꾹. 빨간 원 = 송곳으로 Ø3 실 구멍 (빨대 구멍 없음)", feas: "정밀 구멍 없음 — 위치가 1–2 mm 틀려도 동작", level: 1 },
+    { t0: 16, t1: 22, title: "3. Fin Ray 띠 — 한쪽 라이너 벗기기", craft: "Fin Ray 띠 4개: 한쪽 겉종이를 물에 살짝 적셔 벗김 → 길이 방향으로 잘 휨", feas: "벗기기 + 건조 (드라이어 5분)", level: 2 },
+    { t0: 22, t1: 27, title: "4. 잘린 부품들", craft: "손바닥 2장, Fin Ray 띠 4, 접는 상자 띠 2, 손끝판·손톱·스토퍼", feas: "적층은 손끝판(2장)·손톱(3장)·스토퍼 블록(2장)뿐", level: 1 },
+    { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장·아랫장(좌우 1.5 mm 좁게) 골 방향 엇갈려 풀칠, 플랩 부분 풀칠 금지. 구멍 7개 함께 뚫기. 닫힘 스토퍼 블록", feas: "쉬움", level: 1 },
+    { t0: 33, t1: 41, title: "6. Fin Ray 접기 + 리브", craft: "띠를 접는 선 4곳에서 접어 삼각형 → 끝 탭 풀칠. 빨대 리브 4개를 R2–R8 에 테이프 힌지", feas: "Fin Ray 4개 × 약 10분", level: 2 },
+    { t0: 41, t1: 46, title: "7. Fin Ray → 플랩", craft: "Fin Ray 앞 탭(12 mm)을 플랩 안쪽 면 빗금 자리에 풀칠 → contact 면이 플랩과 한 줄. 플랩 하나에 2개", feas: "밑판·레버 없음", level: 1 },
+    { t0: 46, t1: 52, title: "8. 접는 상자 만들기 → 손바닥에", craft: "띠의 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠(납작한 상자) → 윗변을 손바닥 아랫면 빗금 자리에 풀칠", feas: "안쪽 링크(매듭 구멍)가 손바닥 가운데 쪽", level: 2 },
+    { t0: 52, t1: 58, title: "9. 접는 상자 — 링크·아랫변", craft: "바깥 링크·아랫변·안쪽 링크가 평행사변형으로 매달림. 손으로 밀어 아랫변이 수평을 유지하는지 확인", feas: "두 링크(75 mm) 길이가 같으면 평행 — 구멍 정렬 필요 없음", level: 2 },
+    { t0: 58, t1: 64, title: "10. 손끝판 + 손톱", craft: "ㄱ자 손끝판(2장)을 아랫변 아래 안쪽 끝에 풀칠 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼 + 고무줄 2바퀴", feas: "손끝판이 수직인지 상자를 기울여 확인", level: 2 },
+    { t0: 64, t1: 70, title: "11. 실·고무줄", craft: "soft: 좌 매듭 → 구멍 → 손잡이 → 구멍 → 우 매듭 (한 가닥). hard: 앞 매듭 → 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭 (한 가닥). 복원 고무줄은 약하게", feas: "매듭 4개, 균형막대 없음. 실 장력 약 10 N — 매끄러운 실", level: 1 },
+    { t0: 70, t1: 84, title: "12. 동작 — 건전지 (Rigid) · 감자칩 (Soft)", craft: "hard 실을 당기면 손끝판이 수직을 유지한 채 닫힘 · soft 실을 당기면 Fin Ray 가 감쌈 (영상용 0.5 N/손가락)", feas: "시뮬 결과 재생 (마찰·골판지 휨 미포함)", level: 1 },
     { t0: 84, t1: 94, title: "실현 가능한가?", craft: "", feas: "", level: 1 },
   ];
 }
@@ -130,8 +152,8 @@ function stepOf(p: Part): number {
   if (/^palm/.test(id) || /^flap\./.test(id)) return 5;
   if (/^finray/.test(id)) return 6; // 6 접기 → 7 부착
   if (/^(drum|lever)/.test(id) && p.body.startsWith("flap")) return 7;
-  if (/^(bracket|axle)/.test(id)) return 8;
-  if (/^(link|drum|lever)/.test(id)) return 9;
+  if (/^(bracket|axle|foldTop)/.test(id)) return 8;
+  if (/^(link|drum|lever|foldOut|foldIn|foldBot)/.test(id)) return 9;
   return 10;
 }
 
@@ -359,7 +381,16 @@ const timeEl = document.getElementById("time")!;
 function fillEnd() {
   const h = (m: number) => (m >= 60 ? `${(m / 60).toFixed(1)} h` : `${m} min`);
   const cutTot = FEAS.cutMin + 20; // 인쇄·붙이기 20 분
-  const rows = [
+  const rows = FOLD
+    ? ([
+        [`인쇄·붙이기·자르기 (판 ${FEAS.boardPieces}장)`, cutTot, "가능 — 전량판, 따라 그리기 없음", true],
+        ["Fin Ray 4개 (라이너 벗기기·리브)", 60, "가능 — 띠 1개 먼저 시험", true],
+        ["손바닥·플랩·Fin Ray 붙이기", 20, "쉬움 — 레버·밑판 없음", true],
+        ["접는 상자 2개", 30, "두 링크 길이만 맞으면 평행. 관절 테이프 수명은 실물 확인", false],
+        ["손끝판·손톱", 20, "손톱 3겹 테이프 힌지", true],
+        ["실·고무줄·조정", 25, "매듭 4개, 실 장력 약 10 N — 매끄러운 실", false],
+      ] as [string, number, string, boolean][])
+    : [
     [`인쇄·붙이기·자르기 (판 ${FEAS.boardPieces}장, 그중 원판 ${FEAS.circles})`, cutTot, "가능 — 2인 분담 시 절반", true],
     ["Fin Ray 4개 (라이너 벗기기·리브)", 60, "가능 — 띠 1개 먼저 시험", true],
     LEV ? ["손바닥·플랩·soft 레버", 25, "V자 레버 발 풀칠 + 삼각 보강 (원판 없음)", true] : ["손바닥·플랩·드럼", 30, "드럼 직각 접착 → 삼각 보강", false],
@@ -369,7 +400,7 @@ function fillEnd() {
   ] as [string, number, string, boolean][];
   const tot = rows.reduce((a, r) => a + r[1], 0);
   document.getElementById("endRows")!.innerHTML = rows.map((r) => `<tr><td>${r[0]}</td><td>${h(r[1])}</td><td class="${r[3] ? "ok" : "warn"}">${r[2]}</td></tr>`).join("");
-  document.getElementById("endSum")!.innerHTML = `합계 약 <b>${(tot / 60).toFixed(1)} 시간 (1인)</b>, 2인이면 약 ${(tot / 60 / 1.7).toFixed(1)} 시간. 골판지 면적 ${FEAS.areaM2.toFixed(2)} m² → 택배상자 약 ${FEAS.boxes}–${FEAS.boxes + 1}개 + Fin Ray 용 여분. 그 외: 일반 빨대 10개${LEV ? "" : ", 버블티 빨대 2개"}, 고무줄, 실, 테이프, 목공풀. 시간은 모두 추정.`;
+  document.getElementById("endSum")!.innerHTML = `합계 약 <b>${(tot / 60).toFixed(1)} 시간 (1인)</b>, 2인이면 약 ${(tot / 60 / 1.7).toFixed(1)} 시간. 골판지 면적 ${FEAS.areaM2.toFixed(2)} m² → 택배상자 약 ${FEAS.boxes}–${FEAS.boxes + 1}개 + Fin Ray 용 여분. 그 외: 일반 빨대 ${FOLD ? "3개 (Fin Ray 리브만)" : "10개"}${LEV || FOLD ? "" : ", 버블티 빨대 2개"}, 고무줄, 실, 테이프, 목공풀. 시간은 모두 추정.`;
 }
 fillEnd();
 let shownSheet = -1;
@@ -571,7 +602,60 @@ const LEVER_BLOCK: Block = {
     }
   },
 };
+// B6P: 블록 A = 접는 상자 만들기 (펼친 띠 → 납작한 상자 → 기울기)
+const FOLD_BLOCK: Block = {
+  id: "drum",
+  title: "A. 접는 상자 만들기 (hard 손가락 1개)",
+  dur: 10,
+  parts: () => false,
+  lines: null,
+  steps: [
+    { t0: 0, t1: 2.5, match: R_("x"), from: [0, 0, 0], cap: "띠 1장: 윗변 24 · 바깥 링크 75 · 아랫변 24 · 안쪽 링크 75 · 탭 12 — 접는 선 4개를 깊게 누르고 바깥 면 테이프" },
+    { t0: 2.5, t1: 6, match: R_("x"), from: [0, 0, 0], cap: "접어서 납작한 상자로: 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠 → 그다음 윗변을 손바닥 아랫면에 풀칠" },
+    { t0: 6, t1: 10, match: R_("x"), from: [0, 0, 0], cap: "옆으로 밀면 평행사변형으로 기움 → 아랫변은 항상 수평 = 손끝판 항상 수직" },
+  ],
+  feas: "핀·빨대 구멍 0. 두 링크 길이(75)만 같으면 평행",
+  custom: (t, g) => {
+    const d = 24;
+    const L = 75;
+    const W = 24;
+    const u = ease(Math.min(1, Math.max(0, (t - 2.5) / 3)));
+    const sk = ease(Math.min(1, Math.max(0, (t - 6) / 2.5)));
+    const ang = (Math.sin(t * 1.2) * 0.5 + 0.5) * 30 * sk * (Math.PI / 180) + (10 * Math.PI) / 180 * u;
+    // 접힌 상자 꼭짓점 (y–z): 윗변 (0,0)-(d,0), 바깥 링크 (d,0)→(d+s,−c), 아랫변 → (s,−c), 안쪽 링크 → (0,0), 탭 (0,0)→(12,0)
+    const s = L * Math.sin(ang);
+    const c = L * Math.cos(ang);
+    const fold: [number, number][] = [[0, 0], [d, 0], [d + s, -c], [s, -c], [0, 0], [12, 0]];
+    const flat: [number, number][] = [[0, 0], [d, 0], [d + L, 0], [2 * d + L, 0], [2 * d + 2 * L, 0], [2 * d + 2 * L + 12, 0]];
+    const raw = fold.map((f, i) => [flat[i][0] + (f[0] - flat[i][0]) * u, flat[i][1] + (f[1] - flat[i][1]) * u] as [number, number]);
+    // 화면 가운데로 (카메라는 원점을 봄)
+    const cy = (Math.min(...raw.map((q) => q[0])) + Math.max(...raw.map((q) => q[0]))) / 2;
+    const cz = (Math.min(...raw.map((q) => q[1])) + Math.max(...raw.map((q) => q[1]))) / 2;
+    const pts = raw.map((q) => [q[0] - cy + 60, q[1] - cz - 40] as [number, number]);
+    const cols = [0xe0a24a, 0x9c7046, 0x8a6038, 0x9c7046, 0xe0a24a];
+    for (let i = 0; i < 5; i++) {
+      const a = new THREE.Vector3(0, pts[i][0] - 60, pts[i][1] + 40);
+      const b = new THREE.Vector3(0, pts[i + 1][0] - 60, pts[i + 1][1] + 40);
+      const len = a.distanceTo(b);
+      const m = new THREE.Mesh(boxGeo, new THREE.MeshStandardMaterial({ color: cols[i], roughness: 0.85 }));
+      m.position.copy(a).add(b).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+      m.scale.set(W, Math.max(len, 0.5), 3);
+      g.add(m);
+    }
+    // 관절 테이프 (접는 선 4개)
+    for (const i of [1, 2, 3, 4]) {
+      const tp = new THREE.Mesh(boxGeo, new THREE.MeshStandardMaterial({ color: 0xd9d9d9 }));
+      tp.position.set(0, pts[i][0] - 60, pts[i][1] + 40);
+      tp.scale.set(W + 1, 4, 4);
+      g.add(tp);
+    }
+  },
+};
 function makeBlocks(): Block[] {
+  return FOLD ? blocksB6P() : makeBlocksBase();
+}
+function makeBlocksBase(): Block[] {
   return [
     LEV ? LEVER_BLOCK : 
   {
@@ -683,6 +767,46 @@ function makeBlocks(): Block[] {
   },
 ];
 }
+function blocksB6P(): Block[] {
+  const base = makeBlocksBase();
+  const fin = base.find((b) => b.id === "finray")!;
+  const str = base.find((b) => b.id === "strings")!;
+  return [
+    FOLD_BLOCK,
+    fin,
+    {
+      id: "soft",
+      title: "C. Soft 플랩 모듈 (오른쪽)",
+      dur: 12,
+      parts: isSoftR,
+      lines: /^(stringA|returnA)\.R$/,
+      steps: [
+        { t0: 0, t1: 2.5, match: R_("^(palm|flap)"), from: [0, 0, -60], cap: "윗장(플랩 포함) + 아랫장(좌우 1.5 mm 좁게) 풀칠. 플랩은 접는 선 = 힌지. 매듭 구멍은 접는 선에서 14 mm" },
+        { t0: 2.5, t1: 4, match: R_("softStop"), from: [0, 0, -50], cap: "닫힘 스토퍼 블록 (실 경로 y=0 을 피해 뒤쪽): 플랩이 −8° 에서 기댐" },
+        { t0: 4, t1: 6.5, match: R_("^finray"), from: [60, 0, -40], cap: "Fin Ray 2개: 앞 탭을 플랩 안쪽 면 빗금 자리에 풀칠 → contact 면이 플랩과 한 줄" },
+        { t0: 6.5, t1: 7.5, match: R_("zzz"), from: [0, 0, 0], cap: "실: 플랩 매듭 → 손바닥 구멍 → 위 (좌·우 한 가닥) · 복원 고무줄: 플랩 ↔ 손바닥 구멍" },
+      ],
+      act: [7.5, (uu) => ({ a: uu < 0.5 ? uu * 2 : 2 - uu * 2, b: 0, obj: null })],
+      feas: "레버·밑판 없음 — 매듭 하나로 구동",
+    },
+    {
+      id: "hard",
+      title: "D. Hard 손가락 (앞쪽) — 접는 상자",
+      dur: 13,
+      parts: isHardF,
+      lines: /^(returnB)\.F$/,
+      steps: [
+        { t0: 0, t1: 2.5, match: R_("^(palm$|foldTop)"), from: [0, 0, -50], cap: "접는 상자 윗변을 손바닥 아랫면 빗금 자리에 풀칠" },
+        { t0: 2.5, t1: 5.5, match: R_("^(foldOut|foldIn|foldBot)"), from: [0, 0, -45], cap: "미리 접어 둔 상자의 바깥 링크·아랫변·안쪽 링크 (관절 = 접는 선 + 테이프). 안쪽 링크가 가운데 쪽" },
+        { t0: 5.5, t1: 8.5, match: R_("^(tipPlate|pad|nail)"), from: [0, -20, -60], cap: "ㄱ자 손끝판(2겹)을 아랫변 밑 안쪽 끝에 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼" },
+        { t0: 8.5, t1: 9.5, match: R_("zzz"), from: [0, 0, 0], cap: "안쪽 링크 '매듭' 구멍에 실 → 손바닥 가운데 구멍 · 복원 고무줄" },
+      ],
+      act: [9.5, (uu) => ({ a: 0, b: uu < 0.55 ? uu / 0.55 : 1 - (uu - 0.55) / 0.45, obj: "battery" })],
+      feas: "손으로 기울여 손끝판이 수직인지 확인 — 기울면 두 링크 길이 차이",
+    },
+    { ...str, steps: [{ t0: 0, t1: 4, match: R_("zzz"), from: [0, 0, 0], cap: "soft 실(파랑): 좌 매듭 → 구멍 → 손잡이 → 구멍 → 우 매듭 · hard 실(보라): 앞 매듭 → 가운데 구멍 → 손잡이 → 뒤 매듭 (각각 한 가닥)" }] },
+  ];
+}
 let BLOCKS: Block[] = makeBlocks();
 let mode: "full" | "blocks" = "full";
 let blockIdx = 0;
@@ -720,8 +844,8 @@ function renderBlock(t: number) {
   blockGroup.visible = true;
   // 카메라
   const anc = blockAnchor.get(b.id)!;
-  const dist = b.id === "drum" ? 110 : b.id === "finray" ? 190 : b.id === "strings" ? 420 : 260;
-  const az = b.id === "hard" ? 0.9 : b.id === "soft" ? -0.25 : -0.6;
+  const dist = b.id === "drum" ? (FOLD ? 300 : 110) : b.id === "finray" ? 190 : b.id === "strings" ? 420 : 260;
+  const az = b.id === "hard" ? 0.9 : b.id === "soft" ? -0.25 : FOLD && b.id === "drum" ? 1.35 : -0.6;
   const target = b.id === "drum" ? new THREE.Vector3() : anc.clone();
   camera.clearViewOffset();
   const r0 = stage.getBoundingClientRect();
@@ -893,20 +1017,24 @@ function route() {
 }
 window.addEventListener("hashchange", route);
 // 단면도 + 전개도 페이지 채우기
-const NAMES: Record<DId, string> = { B5E: "B5E 쉬운 버전 (레버)", B5N: "B5N 최종 (드럼)" };
+const NAMES: Record<DId, string> = { B6P: "B6P 쉬운 버전 (접는 상자)", B5N: "B5N 기준 (드럼)", B5E: "B5E 보관 (레버)" };
 // 영상·PDF 경로: Artifact 는 media/ (publish 의 files), docs/site 는 빌드가 window.__MEDIA 로 레포 상대 경로를 넣음
 const MEDIA: Record<DId, { video: string; pdf: string }> = (window as unknown as { __MEDIA?: Record<DId, { video: string; pdf: string }> }).__MEDIA ?? {
+  B6P: { video: "media/B6P-assembly.mp4", pdf: "media/B6P-pattern-A4.pdf" },
   B5E: { video: "media/B5E-assembly.mp4", pdf: "media/B5E-pattern-A4.pdf" },
   B5N: { video: "media/B5N-assembly.mp4", pdf: "media/B5N-pattern-A4.pdf" },
 };
-// 제작 설명서 (B5E 기준, docs/B5E-제작설명서.md). 그림은 B5E 단면도·지도를 인라인으로
-{
-  const figs = Object.fromEntries(DIAGRAMS("B5E").map((d) => [d.id, d]));
-  // 설명서 사진: Artifact 는 media/manual/ (publish 의 files), docs/site 는 빌드가 window.__IMG_BASE 로 레포 경로
+// 제작 설명서: B6P → docs/B6P-제작설명서.md, B5E → docs/B5E-제작설명서.md (B5N 은 B5E 설명서 + 부록)
+// 사진: Artifact 는 media/manual/ (publish 의 files), docs/site 는 빌드가 window.__IMG_BASE 로 레포 경로
+function fillManual() {
+  const id: "B6P" | "B5E" = DESIGN_ID === "B6P" ? "B6P" : "B5E";
+  const figs = Object.fromEntries(DIAGRAMS(id).map((d) => [d.id, d]));
   const imgBase = (window as unknown as { __IMG_BASE?: string }).__IMG_BASE ?? "media/manual/";
-  document.getElementById("manual")!.innerHTML = mdToHtml(manualMd, figs, imgBase);
+  const note = DESIGN_ID === "B5N" ? `<p class="note">B5N 전용 설명서는 없어요. B5E 설명서의 '부록: B5N(드럼)으로 바꿀 때'를 보세요.</p>` : "";
+  document.getElementById("manual")!.innerHTML = note + mdToHtml(id === "B6P" ? manualB6P : manualB5E, figs, imgBase);
 }
 function fillPages() {
+  fillManual();
   document.getElementById("sections")!.innerHTML = DIAGRAMS(DESIGN_ID)
     .map((d) => `<figure class="fig"><figcaption>${d.title}</figcaption>${d.svg}</figure>`)
     .join("");
@@ -918,13 +1046,14 @@ function fillPages() {
   if (vid.getAttribute("src") !== MEDIA[DESIGN_ID].video) vid.src = MEDIA[DESIGN_ID].video;
   (document.getElementById("vidLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].video;
   (document.getElementById("pdfLink") as HTMLAnchorElement).href = MEDIA[DESIGN_ID].pdf;
-  document.getElementById("pdfLink")!.textContent = LEV ? "B5E 전량판 PDF 받기 (A4 9장: 수량만큼 모두 그림 — 본 6 + 여분 3)" : "B5N 전개도 PDF 받기 (A4 3장)";
+  document.getElementById("pdfLink")!.textContent = FOLD ? "B6P 전량판 PDF 받기 (A4 4장: 수량만큼 모두 그림)" : LEV ? "B5E 전량판 PDF 받기 (A4 9장: 수량만큼 모두 그림 — 본 6 + 여분 3)" : "B5N 전개도 PDF 받기 (A4 3장)";
   for (const b of document.querySelectorAll<HTMLButtonElement>("#dsel button")) b.setAttribute("aria-pressed", String(b.dataset.d === DESIGN_ID));
 }
 /** 설계 전환: 모든 설계 의존 상태를 다시 만듦 */
 function setDesign(id: DId) {
   DESIGN_ID = id;
   LEV = id === "B5E";
+  FOLD = id === "B6P";
   try {
     localStorage.setItem("asm-design", id);
   } catch {
