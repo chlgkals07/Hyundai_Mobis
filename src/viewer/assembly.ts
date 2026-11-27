@@ -99,8 +99,8 @@ function stepsB6P(): Step[] {
     { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장(날개 30 mm 포함)·아랫장 골 방향 엇갈려 풀칠, 날개 부분 풀칠 금지. 실 구멍 4개(Ø6.5)에 빨대 슬리브 10 mm, 매듭·고무줄 구멍. 닫힘 스토퍼 블록", feas: "빨대 슬리브 끝은 둥글게 — 실이 걸리지 않게", level: 1 },
     { t0: 33, t1: 41, title: "6. Fin Ray 접기 + 리브", craft: "띠를 접는 선 4곳에서 접어 삼각형 → 끝 탭 풀칠. 빨대 리브 4개를 R2–R8 에 테이프 힌지", feas: "Fin Ray 4개 × 약 10분", level: 2 },
     { t0: 41, t1: 46, title: "7. Fin Ray → 플랩", craft: "Fin Ray 앞 탭(26 mm)을 날개 안쪽 면 빗금 자리에 통째로 풀칠 (접는 선 쪽 4 mm 는 비움) → contact 면이 날개와 한 줄. 날개 하나에 2개", feas: "면 접착이라 단단함. 밑판·레버 없음", level: 1 },
-    { t0: 46, t1: 52, title: "8. 접는 상자 만들기 → 손바닥에", craft: "띠 한 장(자르지 않음)의 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠(납작한 상자) → 윗변을 손바닥 아랫면 빗금 자리에 풀칠", feas: "안쪽 링크(매듭 구멍)가 손바닥 가운데 쪽", level: 2 },
-    { t0: 52, t1: 58, title: "9. 접는 상자 — 링크·아랫변", craft: "바깥 링크·아랫변·안쪽 링크가 평행사변형으로 매달림. 손으로 밀어 아랫변이 수평을 유지하는지 확인", feas: "두 링크(75 mm) 길이가 같으면 평행 — 구멍 정렬 필요 없음", level: 2 },
+    { t0: 46, t1: 52, title: "8. 띠 한 장을 접어 상자 → 손바닥에", craft: "띠 한 장(자르지 않음)의 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠(납작한 상자) → 윗변을 손바닥 아랫면 빗금 자리에 풀칠", feas: "안쪽 링크(매듭 구멍)가 손바닥 가운데 쪽", level: 2 },
+    { t0: 52, t1: 58, title: "9. 접는 상자 확인", craft: "상자(띠 한 장)가 평행사변형으로 매달림. 손으로 밀어 아랫변이 수평을 유지하는지 확인", feas: "두 링크(75 mm) 길이가 같으면 평행 — 구멍 정렬 필요 없음", level: 2 },
     { t0: 58, t1: 64, title: "10. 손끝판 + 손톱", craft: "ㄱ자 손끝판(2장)을 아랫변 아래 안쪽 끝에 풀칠 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼 + 고무줄 2바퀴", feas: "손끝판이 수직인지 상자를 기울여 확인", level: 2 },
     { t0: 64, t1: 70, title: "11. 실·고무줄", craft: "교차 실 — soft: 오른쪽 날개 매듭 → 왼쪽 구멍 → 손잡이 → 오른쪽 구멍 → 왼쪽 날개 매듭. hard: 앞 매듭 → 뒤쪽 구멍 → 손잡이 → 앞쪽 구멍 → 뒤 매듭. 손바닥 밑에서 X 자. 복원 고무줄은 약하게", feas: "교차로 지렛대 ↑: 실 장력 약 6 N, 당김 약 15 mm. 매끄러운 실", level: 1 },
     { t0: 70, t1: 84, title: "12. 동작 — 건전지 (Rigid) · 감자칩 (Soft)", craft: "hard 실을 당기면 손끝판이 수직을 유지한 채 닫힘 · soft 실을 당기면 Fin Ray 가 감쌈 (영상용 0.5 N/손가락)", feas: "시뮬 결과 재생 (마찰·골판지 휨 미포함)", level: 1 },
@@ -152,8 +152,8 @@ function stepOf(p: Part): number {
   if (/^palm/.test(id) || /^flap\./.test(id)) return 5;
   if (/^finray/.test(id)) return 6; // 6 접기 → 7 부착
   if (/^(drum|lever)/.test(id) && p.body.startsWith("flap")) return 7;
-  if (/^(bracket|axle|foldTop)/.test(id)) return 8;
-  if (/^(link|drum|lever|foldOut|foldIn|foldBot)/.test(id)) return 9;
+  if (/^(bracket|axle|fold)/.test(id)) return 8;
+  if (/^(link|drum|lever)/.test(id)) return 9;
   return 10;
 }
 
@@ -468,6 +468,86 @@ function setCaption(t: number) {
   timeEl.textContent = `${t.toFixed(1)} / ${T_END} s`;
 }
 
+
+// ------------------------------------------------------------------ B6P 접는 띠: 한 장이 매트에서 접혀 상자가 된 뒤 통째로 손바닥 밑으로
+const foldGroup = new THREE.Group();
+scene.add(foldGroup);
+/** 최종 조립에서 손가락(F/B)별 상자 꼭짓점: 안쪽 접는 선 P1, 바깥 P2, 아랫변 E2, E1 (세그먼트 부품 양 끝에서) */
+function foldVerts(sfx: "F" | "B") {
+  const ends = (id: string) => {
+    const p = finalAsm.parts.find((q) => q.id === id);
+    if (!p) return null;
+    const m = p.m as unknown as THREE.Matrix4;
+    const c = new THREE.Vector3().setFromMatrixPosition(m);
+    const ex = new THREE.Vector3().setFromMatrixColumn(m, 0).normalize();
+    return [c.clone().addScaledVector(ex, -p.size[0] / 2), c.clone().addScaledVector(ex, p.size[0] / 2)];
+  };
+  const o = ends(`foldOut.${sfx}`);
+  const i = ends(`foldIn.${sfx}`);
+  if (!o || !i) return null;
+  return { P1: i[0], E1: i[1], P2: o[0], E2: o[1] };
+}
+function drawFoldStrips(t: number) {
+  foldGroup.clear();
+  if (!FOLD) return;
+  const w8 = stepWin(8);
+  const lens = [24, 75, 24, 75, 12];
+  for (const sfx of ["F", "B"] as const) {
+    const v = foldVerts(sfx);
+    if (!v) continue;
+    const sg = sfx === "F" ? 1 : -1;
+    // 국소 좌표 (u = 띠 방향, w = 두께 방향): 최종 = 손가락 y–z 단면 그대로
+    const loc = (p: THREE.Vector3) => [sg * (p.y - v.P1.y), p.z - v.P1.z] as [number, number];
+    const tabEnd = v.P1.clone().add(v.P2.clone().sub(v.P1).normalize().multiplyScalar(12)).add(new THREE.Vector3(0, 0, -3));
+    const fin = [v.P1, v.P2, v.E2, v.E1, v.P1.clone().add(new THREE.Vector3(0, 0, -3)), tabEnd].map(loc);
+    const flat: [number, number][] = [[0, 0]];
+    for (const L of lens) flat.push([flat[flat.length - 1][0] + L, 0]);
+    // 시간 (8단계 6초): 0–20% 매트 구석 → 그리퍼 앞 작업 자리로 띠째 이동, 20–55% 그 자리에서 접기, 60–95% 상자째 손바닥 밑으로
+    const tt = (t - w8.t0) / (w8.t1 - w8.t0);
+    const us = ease(Math.min(1, Math.max(0, tt / 0.2)));
+    const uf = ease(Math.min(1, Math.max(0, (tt - 0.2) / 0.35)));
+    const um = ease(Math.min(1, Math.max(0, (tt - 0.6) / 0.35)));
+    const pts = flat.map((f, k) => [f[0] + (fin[k][0] - f[0]) * uf, f[1] + (fin[k][1] - f[1]) * uf] as [number, number]);
+    // 놓는 자리: 매트 (띠 방향 = 월드 x, 폭 = y) → 작업 자리(그리퍼 앞, 공중 높이) → 최종 (띠 방향 = ±y, 폭 = x)
+    const oMat = new THREE.Vector3(150, sfx === "F" ? -255 : -290, MAT_Z + 1.6);
+    const oWork = new THREE.Vector3(-110, sfx === "F" ? -90 : -150, v.P1.z - 40);
+    const oFlat = oMat.clone().lerp(oWork, us);
+    oFlat.z += 30 * Math.sin(Math.PI * us);
+    const qFlat = new THREE.Quaternion();
+    const qFin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), (sg * Math.PI) / 2);
+    const o = oFlat.clone().lerp(v.P1, um);
+    o.z += 40 * Math.sin(Math.PI * um);
+    const q = qFlat.clone().slerp(qFin, um);
+    const toW = (p: [number, number]) => new THREE.Vector3(p[0], 0, p[1]).applyQuaternion(q).add(o);
+    const active = t >= w8.t0 && t < w8.t1;
+    for (let k = 0; k < 5; k++) {
+      const a = toW(pts[k]);
+      const b = toW(pts[k + 1]);
+      const len = a.distanceTo(b);
+      if (len < 0.2) continue;
+      const ex = b.clone().sub(a).normalize();
+      const ey = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+      const ez = ex.clone().cross(ey).normalize();
+      const ey2 = ez.clone().cross(ex);
+      const m = new THREE.Matrix4().makeBasis(ex, ey2, ez).setPosition(a.clone().add(b).multiplyScalar(0.5));
+      const mesh = new THREE.Mesh(boxGeo, mat(k === 0 || k === 4 ? "pad" : "board", false, active));
+      if (k === 0 || k === 4) (mesh.material as THREE.MeshStandardMaterial) = mat("board", false, active);
+      mesh.matrixAutoUpdate = false;
+      mesh.matrix.copy(m).multiply(new THREE.Matrix4().makeScale(len, 24, 3));
+      foldGroup.add(mesh);
+    }
+    // 접는 선 테이프 (흰 띠)
+    for (const k of [1, 2, 3, 4]) {
+      const c = toW(pts[k]);
+      const tp = new THREE.Mesh(boxGeo, new THREE.MeshStandardMaterial({ color: 0xe8e8e8 }));
+      tp.position.copy(c);
+      tp.quaternion.copy(q);
+      tp.scale.set(3, 25, 3.6);
+      foldGroup.add(tp);
+    }
+  }
+}
+
 // ------------------------------------------------------------------ 메인 렌더
 function render(t: number) {
   blockGroup.visible = false;
@@ -485,6 +565,7 @@ function render(t: number) {
   const live = t >= 70;
   group.visible = !live;
   liveGroup.visible = live;
+  foldGroup.visible = !live;
   if (!live) {
     for (const a of anims) {
       let m: THREE.Matrix4;
@@ -499,10 +580,14 @@ function render(t: number) {
         m = blend(a.start, a.final, ease((t - w.t0) / (w.t1 - w.t0 - 1.5)), 70);
       }
       a.mesh.matrix.copy(m).multiply(localScale(a.part));
+      // B6P 접는 상자 판들은 drawFoldStrips 가 한 장짜리 띠로 그림
+      a.mesh.visible = !(FOLD && /^fold(Top|Out|Bot|In)\./.test(a.part.id));
       const w = stepWin(Math.min(a.step, 11));
       const active = t >= w.t0 && t < w.t1;
       (a.mesh.material as THREE.Material) = mat(a.part.kind, !!a.part.ghost, active && !a.part.ghost);
     }
+    drawFoldStrips(t);
+    foldGroup.visible = true;
     const w11 = stepWin(11);
     drawLines(finalAsm, ease((t - w11.t0) / (w11.t1 - w11.t0 - 1)));
     lineGroup.visible = t >= w11.t0;
@@ -812,8 +897,8 @@ function blocksB6P(): Block[] {
       parts: isHardF,
       lines: /^(returnB)\.F$/,
       steps: [
-        { t0: 0, t1: 2.5, match: R_("^(palm$|foldTop)"), from: [0, 0, -50], cap: "접는 상자 윗변을 손바닥 아랫면 빗금 자리에 풀칠" },
-        { t0: 2.5, t1: 5.5, match: R_("^(foldOut|foldIn|foldBot)"), from: [0, 0, -45], cap: "미리 접어 둔 상자의 바깥 링크·아랫변·안쪽 링크 (관절 = 접는 선 + 테이프). 안쪽 링크가 가운데 쪽" },
+        { t0: 0, t1: 1.5, match: R_("^palm$"), from: [0, 0, -40], cap: "손바닥 (아랫면 빗금 = 상자 윗변 자리)" },
+        { t0: 1.5, t1: 5.5, match: R_("^fold"), from: [0, 0, -70], cap: "미리 접어 만든 상자를 통째로: 윗변을 손바닥 아랫면 빗금 자리에 풀칠 (안쪽 링크 = 매듭 구멍 쪽이 가운데)" },
         { t0: 5.5, t1: 8.5, match: R_("^(tipPlate|pad|nail)"), from: [0, -20, -60], cap: "ㄱ자 손끝판(2겹)을 아랫변 밑 안쪽 끝에 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼" },
         { t0: 8.5, t1: 9.5, match: R_("zzz"), from: [0, 0, 0], cap: "안쪽 링크 '매듭' 구멍에 실 → 손바닥 밑을 지나 반대쪽(뒤쪽) 구멍 · 복원 고무줄" },
       ],
@@ -857,6 +942,7 @@ function renderBlock(t: number) {
   liveGroup.visible = false;
   lineGroup.visible = false;
   matMesh.visible = false;
+  foldGroup.visible = false;
   blockGroup.visible = true;
   // 카메라
   const anc = blockAnchor.get(b.id)!;

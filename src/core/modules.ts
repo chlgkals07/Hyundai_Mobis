@@ -65,6 +65,8 @@ export interface FlapCfg {
   knot?: { s: number; holeX: number; dy?: number; cross?: boolean };
   /** Fin Ray 길이 (B6P 71). 없으면 common */
   finrayL?: number;
+  /** B6P: Fin Ray 앞 탭 길이 — 날개 안쪽 면 바깥 쪽에 통째로 면 접착 */
+  finrayTab?: number;
 }
 
 /** 2D 레버 모멘트 팔 (닫힘 +): 피벗 → 끝 rv, 실 방향 u (같은 평면 좌표 2개) */
@@ -140,6 +142,13 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
   const a0 = h.clone().setY(yc).addScaledVector(N, 1.5);
   R.push(segPart("flap", "flap", "board", a0, a0.clone().addScaledVector(A, cfg.rootLen), yHi - yLo, C.board_t, Y));
   const fr = sol.res;
+  if (cfg.finrayTab) {
+    // Fin Ray 앞 탭: 날개 안쪽 면(N 음의 쪽)에 rootLen−tab … rootLen 구간 면 접착 (Fin Ray 2개 각각)
+    for (const [nm, yy] of [["finray.F.tab", yf], ["finray.B.tab", -yf]] as const) {
+      const t0 = h.clone().setY(yy).addScaledVector(A, cfg.rootLen - cfg.finrayTab).addScaledVector(N, -C.flank_t / 2);
+      R.push(segPart(nm, "flap", "flank", t0, t0.clone().addScaledVector(A, cfg.finrayTab), C.finray.width, C.flank_t, Y));
+    }
+  }
   R.push(...finrayParts("finray.F", "flap", fr, Y, C.finray.width, C.flank_t, C.straw_d));
   R.push(...finrayParts("finray.B", "flap", mirrorResult(fr, 1, -1), Y, C.finray.width, C.flank_t, C.straw_d));
   if (cfg.joint === "axle") {

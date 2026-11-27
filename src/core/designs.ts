@@ -1061,6 +1061,7 @@ export function makeB6(id: "B6P" | "B6F"): Design {
           Flim: p.force_video.soft_per_finger_N,
           knot: { s: p.soft.knot.s, holeX: p.soft.knot.hole_x, dy: (p.soft.knot as { dy?: number }).dy, cross: (p.soft.knot as { cross?: boolean }).cross },
           finrayL: (p.soft as { finray_L?: number }).finray_L,
+          finrayTab: (p.soft as { finray_tab?: number }).finray_tab,
         },
         ctrl.a,
         sdf,
