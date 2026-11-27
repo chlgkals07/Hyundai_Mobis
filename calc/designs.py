@@ -282,9 +282,15 @@ def hard_tendon(r: Report, z_top, soft_tip_batt, soft_tip_chip):
     pull = h["r1"] * (t10 - t1p) + h["r2"] * (t20 - t2p)
     r.put("hard_pull_mm", pull)
     # 손끝 8 N: 원위 관절 모멘트 ≈ F * l2 → T = F l2 / r2 (스프링 몫 제외 하한)
-    T = c["force"]["pinch_target_N"] * l2 / h["r2"]
-    r.put("hard_string_T_N", T)
-    r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한)", T, hi=60, unit="N")
+    fvid = d.get("force_video")
+    if fvid:  # 영상용 힘 (B6F)
+        T = fvid["pinch_N"] * l2 / h["r2"]
+        r.put("hard_string_T_N", T)
+        r.check("H1", f"영상용 pinch {fvid['pinch_N']} N 에서 텐던 장력 ≤ 손 한계 (원위 관절 기준)", T, hi=fvid["hand_T_max_N"], unit="N")
+    else:
+        T = c["force"]["pinch_target_N"] * l2 / h["r2"]
+        r.put("hard_string_T_N", T)
+        r.check("H1", "pinch 8 N 에서 텐던 장력 ≤ 60 N (원위 관절 기준 하한)", T, hi=60, unit="N")
     r.put("hard_face_wedge_deg", -td / deg)
     if "path_ratio" in h:
         # J: jam-free — 공중 경로가 pinch 보다 바깥에서 바닥에 닿고, 바닥 미끄럼 구간에서 텐던 당김 → 손톱 안쪽
@@ -615,8 +621,140 @@ def b5(name="B5"):
     return r.dump()
 
 
+# ---------------------------------------------------------------- B6 (쉬운 버전: 매듭 soft + 접는 평행사변형 / 2마디 손가락)
+
+def point_arm(piv, pt_of, a_rng, guide, sign=1.0, n=121):
+    """피벗에 대해 '관절과 함께 도는 점'(매듭) → 고정 구멍(guide) 으로 당기는 실의 모멘트 팔 (2D, 닫힘 +).
+    pt_of(a) = 각 a 에서 매듭 위치 (sympy 식). 반환: 최소/최대 팔, 식."""
+    a = sp.symbols("a", real=True)
+    K = sp.Matrix(pt_of(a))
+    u = sp.Matrix(guide) - K
+    rr = K - sp.Matrix(piv)
+    m = sign * (-(rr[0] * u[1] - rr[1] * u[0]) / sp.sqrt(u.dot(u)))
+    a0, a1 = a_rng
+    vals = [f(m.subs(a, a0 + (a1 - a0) * k / (n - 1))) for k in range(n)]
+    return dict(m=m, a=a, min=min(vals), max=max(vals), vals=vals)
+
+
+def soft_knot(r: Report, s: dict):
+    """soft 플랩: 레버·드럼 없이 플랩 안쪽 면 매듭(힌지에서 s) → 손바닥 구멍(x=g, 아랫면) 으로 당김.
+    좌우 한 가닥 루프 → 균형막대 없이 자동 균형."""
+    c, d = r.c, r.d
+    so, fv = d["soft"], d["force_video"]
+    K = so["knot"]
+    xh, zt = d["palm"]["sx"] / 2, s["z_top"]
+    phi_o = so["phi_open_deg"] * deg
+    # 매듭 = 힌지 + s·A(φ),  A = (sinφ, −cosφ)
+    res = point_arm((xh, zt), lambda a: [xh + K["s"] * sp.sin(a), zt - K["s"] * sp.cos(a)], (phi_o, s["phi_min"]), (K["hole_x"], 0))
+    r.put("soft_knot_arm_min", res["min"])
+    r.put("soft_knot_arm_max", res["max"])
+    r.check("S6", "soft 매듭 실의 모멘트 팔 (열림 30° … 닫힘 −8°) 최소 ≥ 8 mm", res["min"], lo=8, unit="mm")
+    r.check("S7", "soft 매듭이 플랩 위 (s ≤ 뿌리 길이 − 2)", K["s"], hi=so["root_len"] - 2, unit="mm")
+    Rs = so["root_len"] + c["finray"]["L"]
+    T = 2 * fv["soft_per_finger_N"] * Rs / res["min"]
+    r.put("soft_string_T_video_N", T)
+    r.check("S8", "영상용 0.5 N/손가락에서 soft 실 장력 ≤ 손 한계", T, hi=fv["hand_T_max_N"], unit="N")
+    pull = sp.Integral(res["m"], (res["a"], s["phi_min"], phi_o)).evalf(8)
+    r.put("soft_pull_mm", abs(f(pull)))
+    # 닫힘 스토퍼 블록은 매듭 실(y=0)과 겹치지 않게 y = stop_block_y
+    y0, y1 = so["stop_block_y"]
+    r.check("S9", "닫힘 스토퍼 블록이 실 경로(y=0)에서 떨어짐 (블록 y 끝 ≤ −2)", y1, hi=-2, unit="mm")
+    hb = so.get("stop_block_h", 8.0)
+    r.put("soft_stop_face_x", d["palm"]["sx"] / 2 - (zt + hb) * sp.tan(abs(s["phi_min"])))
+    need = zt * sp.tan(abs(s["phi_min"]))
+    r.put("soft_edge_interference_mm", need)
+    r.check("S5", "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min|", so.get("palm_edge_relief", 0), lo=need, unit="mm")
+
+
+def b6p():
+    """B6P: hard = 띠 한 장을 접은 평행사변형 (윗변이 손바닥 아래 → 피벗 z = hinge_z). 핀·빨대 구멍 없음."""
+    c, d = load("common"), load("B6P")
+    r = Report(d, c)
+    h, fv = d["hard"], d["force_video"]
+    s = soft_flap(r, h["width"])
+    soft_knot(r, s)
+    o = c["objects"]
+    half_t = h["plies"] * c["board_t"] / 2
+    face = half_t + c["pad_t"]
+    L, dd = h["L"], h["d"]
+    yp = o["battery"]["d"] / 2 + face
+    r.put("hard_pivot_y", yp)
+    zP = h["hinge_z"]
+    psi, Lc = sp.symbols("psi Lc", real=True)
+    tip_z = zP - L * sp.cos(psi) - Lc
+    face_y = yp + L * sp.sin(psi) - face
+    soft_tip_batt = s["tip_z"].subs(s["phi"], s["phi_b"])
+    lo, hi = c["finray_window"]
+    Lc_val = sp.solve(sp.Eq(soft_tip_batt - tip_z.subs(psi, 0), (lo + hi) / 2), Lc)[0]
+    r.put("hard_coupler_below_E", Lc_val)
+    tip_z = tip_z.subs(Lc, Lc_val)
+    z_floor = tip_z.subs(psi, 0)
+    r.put("rigid_palm_height", -z_floor)
+    finray_window(r, soft_tip_batt, z_floor)
+    for nm, rad in (("cable", o["cable"]["d"] / 2), ("cap", o["cap"]["d"] / 2)):
+        pv = sp.nsolve(face_y - rad, psi, 0.05)
+        r.put(f"hard_psi_{nm}_deg", pv / deg)
+        r.put(f"hard_tip_rise_{nm}_mm", tip_z.subs(psi, pv) - z_floor)
+    psi_min = sp.nsolve(face_y, psi, -0.1)
+    r.put("hard_psi_min_deg", psi_min / deg)
+    rise_cable = tip_z.subs(psi, sp.nsolve(face_y - o["cable"]["d"] / 2, psi, 0)) - z_floor
+    r.check("H4", "케이블 파지 시 손톱 끝 상승 ≤ 케이블 반지름", rise_cable, hi=o["cable"]["d"] / 2, unit="mm")
+    psi_open = h["psi_open_deg"] * deg
+    soft_tip_chip = s["tip_z"].subs(s["phi"], s["phi_c"])
+    gap = tip_z.subs(psi, psi_open) - soft_tip_chip
+    r.put("soft_mode_hard_above_finray", gap)
+    r.check("R1", "Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위", gap, lo=c["margin_soft"], unit="mm")
+    r.put("hard_opening_mm", 2 * (yp + L * sp.sin(psi_open) - face))
+    # 접은 상자: 두 링크 판(두께 panel_t)이 평행 거리 d·cosψ 로 떨어짐
+    r.check("F1", "열림에서 두 링크 판 사이 ≥ 판 두께 + 2 (d·cos ψ_open)", dd * sp.cos(psi_open), lo=h["panel_t"] + 2, unit="mm")
+    r.check("H8", "바깥 접는 선이 손바닥 안 (yp + d + 2 ≤ sy/2)", yp + dd + 2, hi=d["palm"]["sy"] / 2, unit="mm")
+    # 실: 안쪽 링크(가운데 쪽 면) 매듭 → 손바닥 가운데 구멍. 앞 손가락은 닫힘 = 시계 방향 (y–z)
+    K = h["knot"]
+    res = point_arm((yp, zP), lambda a: [yp + K["s"] * sp.sin(a), zP - K["s"] * sp.cos(a)], (psi_open, psi_min), (K["hole_y"], 0))
+    r.put("hard_knot_arm_min", res["min"])
+    r.put("hard_knot_arm_max", res["max"])
+    # 쥐는 구간(맞닿음 … 뚜껑 ψ)에서 팔이 커야 하고, 완전 열림에서는 복원 고무줄만 이기면 되므로 작아도 됨
+    psi_cap = sp.nsolve(face_y - o["cap"]["d"] / 2, psi, 0.05)
+    grip = [f(res["m"].subs(res["a"], psi_min + (psi_cap - psi_min) * k / 40)) for k in range(41)]
+    r.put("hard_knot_arm_grip_min", min(grip))
+    r.check("F2", "hard 매듭 실의 모멘트 팔: 쥐는 구간(맞닿음 … 뚜껑) 최소 ≥ 8 mm", min(grip), lo=8, unit="mm")
+    r.check("F2b", "완전 열림(54°)에서도 실이 닫는 방향 팔 ≥ 2 mm (약한 복원 고무줄을 이기고 출발)", f(res["m"].subs(res["a"], psi_open)), lo=2, unit="mm")
+    r.check("F3", "매듭이 링크 위 (10 ≤ s ≤ L − 5)", K["s"], lo=10, hi=L - 5, unit="mm")
+    # 장력: 손끝 수평력 F → 링크 토크 F·L·cosψ (ψ=0 최대) → 실 하나가 안쪽 링크에만 걸림
+    arm0 = f(res["m"].subs(res["a"], 0))
+    Th = fv["pinch_N"] * L / arm0
+    r.put("hard_knot_arm_at_pinch", arm0)
+    r.put("hard_string_T_video_N", Th)
+    r.put("hard_string_T_N", Th)
+    r.check("F4", "영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계", Th, hi=fv["hand_T_max_N"], unit="N")
+    r.check("E10", "영상용 pinch ≥ 건전지 최소 0.85 N", fv["pinch_N"], lo=fv["battery_min_N"], unit="N")
+    pull = sp.Integral(res["m"], (res["a"], psi_min, psi_open)).evalf(8)
+    r.put("hard_pull_mm", abs(f(pull)))
+    r.put("hard_face_wedge_deg", 0)
+    comp = h["compliance"]
+    rise = comp["nail_len"] * (1 - sp.cos(comp["fold_max_deg"] * deg))
+    r.put("vertical_compliance_mm", rise)
+    r.check("C1", "손톱이 접히며 얻는 상승 ≥ 10 mm", rise, lo=10.0, unit="mm")
+    # 띠 길이 (전개도): 윗변 d + 링크 L + 아랫변 d + 링크 L + 풀칠 탭 12
+    r.put("fold_strip_len", 2 * dd + 2 * L + 12)
+    return r.dump()
+
+
+def b6f():
+    """B6F: hard = B3 2마디 텐던 손가락 (테이프 힌지 + 빨대 터널), soft = 매듭. 영상용 힘."""
+    c, d = load("common"), load("B6F")
+    r = Report(d, c)
+    s = soft_flap(r, d["hard"]["width"])
+    soft_knot(r, s)
+    hard_tendon(r, s["z_top"], s["tip_z"].subs(s["phi"], s["phi_b"]), s["tip_z"].subs(s["phi"], s["phi_c"]))
+    fv = d["force_video"]
+    r.put("hard_string_T_video_N", r.derived["hard_string_T_N"])
+    r.check("E10", "영상용 pinch ≥ 건전지 최소 0.85 N", fv["pinch_N"], lo=fv["battery_min_N"], unit="N")
+    return r.dump()
+
+
 def main():
-    res = [b1(), b2(), b3(), b3o(), b4(), b5(), b5("B5T"), b5("B5F"), b5("B5N"), b5("B5E")]
+    res = [b1(), b2(), b3(), b3o(), b4(), b5(), b5("B5T"), b5("B5F"), b5("B5N"), b5("B5E"), b6p(), b6f()]
     lines = ["# SymPy 검증 리포트", "", "`python3 calc/run_all.py` 로 재생성. 단위 mm / deg / N.", ""]
     for d in res:
         lines += [f"## {d['name']}  —  {'PASS' if d['pass'] else 'FAIL'}", "",

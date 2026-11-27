@@ -191,7 +191,7 @@ for (const dp of PATTERNS) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${svgs.join("\n")}</body></html>`;
   writeFileSync(`${dir}/print.html`, html);
   pdfJobs.push({ html: `${dir}/print.html`, pdf: `${dir}/${dp.id}-전개도-A4.pdf` });
-  if (dp.spare) {
+  if (dp.spare || dp.full) {
     // 전량판: 수량만큼 모두 그려서 '인쇄 → 붙이기 → 자르기' 만 하면 되게. 번호는 위 전개도의 # 와 같음
     const nMain = pages.flat().length;
     const expand = (list: Placed[], base: number) => {
@@ -221,7 +221,7 @@ for (const dp of PATTERNS) {
     console.log(dp.id, `전량판 본 ${eMain.length} 조각 ${fMain.length} 장 + 여분 ${eSpare.length} 조각 ${fSpare.length} 장`);
     writeFileSync(`${dir}/full/print.html`, `<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:0}body{margin:0}svg{display:block;page-break-after:always}</style></head><body>${fsvgs.join("\n")}</body></html>`);
     pdfJobs.push({ html: `${dir}/full/print.html`, pdf: `${dir}/${dp.id}-전개도-전량-A4.pdf` });
-    {
+    if (dp.spare) {
       const aMain = expandFrom2(pages.flat(), 0);
       const aSpare = expandFrom2(sparePages.flat(), nMain);
       const pM = pack(aMain);

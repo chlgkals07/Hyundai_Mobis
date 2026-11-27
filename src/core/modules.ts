@@ -61,6 +61,8 @@ export interface FlapCfg {
   Flim: number;
   /** B5E: 드럼 대신 레버 (플랩에 세운 판, 힌지선 → 안쪽·위). beta0 = 열림 자세에서 손바닥 윗면 위로 잰 각(rad) */
   lever?: { r: number; w: number; beta0: number; guideX: number; guideDz: number };
+  /** B6: 레버 없이 플랩 안쪽 면 매듭(힌지에서 s, y=0) → 손바닥 구멍(x=holeX) → 위 */
+  knot?: { s: number; holeX: number };
 }
 
 /** 2D 레버 모멘트 팔 (닫힘 +): 피벗 → 끝 rv, 실 방향 u (같은 평면 좌표 2개) */
@@ -141,7 +143,14 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     R.push(cylPart("axle", "flap", "straw", h.clone().setY(yc), Y, yHi - yLo + 10, C.straw_d));
   }
   let armNow = cfg.drumR;
-  if (cfg.lever) {
+  if (cfg.knot) {
+    const K = h.clone().addScaledVector(A, cfg.knot.s);
+    const G = V(cfg.knot.holeX, 0, 0);
+    const top = V(cfg.knot.holeX, 0, Z_TOP + 50);
+    RL.push({ id: "stringA", kind: "string", pts: [K, G, top], attached: ["flap", "palm"] });
+    tops.push(top);
+    armNow = leverArm([K.x - h.x, K.z - h.z], [G.x - K.x, G.z - K.z]);
+  } else if (cfg.lever) {
     // 레버 판 (2겹, y 두께 6): 플랩과 한 몸. 닫힘(φ 감소)만큼 위로 돎
     const L = cfg.lever;
     const be = L.beta0 + (cfg.phiOpen - phi);

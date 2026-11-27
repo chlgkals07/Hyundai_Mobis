@@ -9,6 +9,8 @@ import B5Tp from "../../params/B5T.json";
 import B5Fp from "../../params/B5F.json";
 import B5Np from "../../params/B5N.json";
 import B5Ep from "../../params/B5E.json";
+import B6Pp from "../../params/B6P.json";
+import B6Fp from "../../params/B6F.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
@@ -19,6 +21,8 @@ import B5Tc from "../../calc/out/B5T.json";
 import B5Fc from "../../calc/out/B5F.json";
 import B5Nc from "../../calc/out/B5N.json";
 import B5Ec from "../../calc/out/B5E.json";
+import B6Pc from "../../calc/out/B6P.json";
+import B6Fc from "../../calc/out/B6F.json";
 import { DEG, V, boxPart, clamp, cylPart, lerp, segPart } from "./build";
 import { makeObject, sceneSdf } from "./objects";
 import {
@@ -90,9 +94,11 @@ function assemble(
     lines.push({ id: "seriesSpring.soft", kind: "rubber", pts: [ma.clone().setZ(Z_TOP + 62), ma.clone().setZ(Z_TOP + 72)], attached: ["whiffle.A", "whiffle.S"] });
     lines.push({ id: "preload.hard", kind: "rubber", pts: [mb.clone().setZ(Z_TOP + 50), mb.clone().setZ(Z_TOP + 72)], attached: ["whiffle.B", "whiffle.S"] });
   } else {
-    const ws = whiffletree(soft.tops, Z_TOP + 55, "A", Z_TOP + 95);
-    parts.push(...ws.parts);
-    lines.push(...ws.lines);
+    if (soft.tops.length === 2) {
+      const ws = whiffletree(soft.tops, Z_TOP + 55, "A", Z_TOP + 95);
+      parts.push(...ws.parts);
+      lines.push(...ws.lines);
+    }
     if (hard.tops.length === 2) {
       const wh = whiffletree(hard.tops, Z_TOP + 45, "B", Z_TOP + 95);
       parts.push(...wh.parts);
@@ -148,7 +154,8 @@ function hardPivot(p: typeof B1p, d: Derived, b: number, sdf: (v: Vector3) => nu
   const R: Part[] = [];
   R.push(segPart("bar", "hard", "board", P, end, h.width, 2 * halfT, X));
   R.push(cylPart("drum", "hard", "disk", P.clone(), X, 9, h.drum_r * 2));
-  R.push(cylPart("axle", "hard", "straw", P.clone(), X, h.width + 14, C.straw_d));
+  const tape = (h as { tape_hinge?: boolean }).tape_hinge === true;
+  if (!tape) R.push(cylPart("axle", "hard", "straw", P.clone(), X, h.width + 14, C.straw_d));
   R.push(wedgePad("pad", "hard", end, A, N, wedge, halfT, 25, h.width - 4).part);
   // V홈 표시 (패드 중앙의 노치) — 렌더용 고스트
   const nail = nailFold(end.clone().addScaledVector(N, -halfT + 1), A, N, h.nail_len, floorZ);
@@ -170,8 +177,9 @@ function hardPivot(p: typeof B1p, d: Derived, b: number, sdf: (v: Vector3) => nu
     parts.push(mirrorPart(pp, 1, -1, ".B", "hardB"));
   }
   // 손바닥 쪽 부싱 (굵은 빨대 2개, 손가락 양옆)
-  for (const t of [1, -1]) for (const sx of [1, -1])
-    parts.push(cylPart(`bushH.${t}${sx}`, "palm", "bubble", V(sx * (h.width / 2 + 4), t * yp, Z_TOP), X, 7, C.bubble_d));
+  if (!tape)
+    for (const t of [1, -1]) for (const sx of [1, -1])
+      parts.push(cylPart(`bushH.${t}${sx}`, "palm", "bubble", V(sx * (h.width / 2 + 4), t * yp, Z_TOP), X, 7, C.bubble_d));
   for (const l of RL) {
     lines.push({ ...l, id: l.id + ".F", attached: ["hardF", "palm"] });
     lines.push(mirrorLine(l, 1, -1, ".B", ["hardB", "palm"]));
@@ -503,7 +511,8 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard & { precurl
   R.push(segPart("phal1", "hard", "board", P, k.J2, h.width, 2 * halfT, X));
   const nailStart = k.tip.clone().addScaledVector(k.A2, -h.nail_len);
   R.push(segPart("phal2", "hard2", "board", k.J2, nailStart, h.width, 2 * halfT, X));
-  R.push(cylPart("axle", "hard", "straw", P.clone(), X, h.width + 14, C.straw_d));
+  const tape = (h as { tape_hinge?: boolean }).tape_hinge === true;
+  if (!tape) R.push(cylPart("axle", "hard", "straw", P.clone(), X, h.width + 14, C.straw_d));
   R.push(wedgePad("pad", "hard2", k.tip.clone().addScaledVector(k.A2, -h.nail_len), k.A2, k.N2, wedge, halfT, 22, h.width - 4).part);
   // 손톱: 원위지골 끝 고정 (얇은 골판지 3겹 + 테이프)
   R.push(segPart("nail", "hard2", "nail", nailStart.clone().addScaledVector(k.A2, -3), k.tip.clone(), h.width - 2, 2, X));
@@ -528,8 +537,9 @@ function hardTendon(p: { palm: { sy: number }; hard: typeof B3p.hard & { precurl
     parts.push({ ...pp, id: pp.id + ".F", body });
     parts.push(mirrorPart(pp, 1, -1, ".B", body.replace("F", "B")));
   }
-  for (const t of [1, -1]) for (const sx of [1, -1])
-    parts.push(cylPart(`bushH.${t}${sx}`, "palm", "bubble", V(sx * (h.width / 2 + 4), t * yp, Z_TOP), X, 7, C.bubble_d));
+  if (!tape)
+    for (const t of [1, -1]) for (const sx of [1, -1])
+      parts.push(cylPart(`bushH.${t}${sx}`, "palm", "bubble", V(sx * (h.width / 2 + 4), t * yp, Z_TOP), X, 7, C.bubble_d));
   for (const l of RL) {
     lines.push({ ...l, id: l.id + ".F", attached: ["hardF", "hard2F", "palm"] });
     lines.push(mirrorLine(l, 1, -1, ".B", ["hardB", "hard2B", "palm"]));
@@ -915,11 +925,168 @@ export function makeB5(id: "B5" | "B5T" | "B5F" | "B5N" | "B5E" = "B5"): Design 
   };
 }
 
+// ================================================================== B6 (쉬운 버전: 매듭 soft + 접는 평행사변형 / 2마디 손가락)
+
+type B6PP = typeof B6Pp;
+/** B6P hard: 띠 한 장을 접은 평행사변형 상자. 윗변 = 손바닥 아래 풀칠, 링크 판 2장(폭 24, 두께 3), 아랫변 + 손끝판·손톱 */
+function hardFold(p: B6PP, d: Derived, b: number, objSdf: (v: Vector3) => number, floorZ: number): HardOut {
+  const h = p.hard;
+  const halfT = (h.plies * C.board_t) / 2;
+  const pt = h.panel_t;
+  const yp = num(d, "hard_pivot_y");
+  const Lc = num(d, "hard_coupler_below_E");
+  const psiOpen = h.psi_open_deg * DEG;
+  const psiMin = (num(d, "hard_psi_min_deg") + 0.3) * DEG;
+  const qmax = psiOpen - psiMin;
+  const zP = h.hinge_z;
+  const at = (q: number) => {
+    const psi = psiOpen - q;
+    const u = V(0, Math.sin(psi), -Math.cos(psi));
+    const P1 = V(0, yp, zP);
+    const P2 = V(0, yp + h.d, zP);
+    const E1 = P1.clone().addScaledVector(u, h.L);
+    const E2 = P2.clone().addScaledVector(u, h.L);
+    return { psi, u, P1, P2, E1, E2, tip: E1.clone().add(V(0, 0, -Lc)) };
+  };
+  const pen = (q: number) => {
+    const g = at(q);
+    for (const x of across(h.width)) {
+      for (let k = 0; k <= 8; k++) {
+        const sp = V(x, g.tip.y - halfT - C.pad_t, g.tip.z + h.nail_len + ((g.E1.z - 3 - g.tip.z - h.nail_len) * k) / 8);
+        if (objSdf(sp) < 0.2) return true;
+      }
+      for (let k = 0; k <= 4; k++) if (objSdf(V(x, g.tip.y - halfT, g.tip.z + 0.5 + (h.nail_len * k) / 4)) < 0.2) return true;
+    }
+    return false;
+  };
+  const qcmd = clamp(b, 0, 1) * qmax;
+  const q = firstContact(qcmd, pen);
+  const g = at(q);
+  const R: Part[] = [];
+  const W = h.width;
+  // 윗변(손바닥에 풀칠), 두 링크 판, 아랫변 (판 두께 pt, 링크 판은 서로 마주보는 면이 접는 선)
+  R.push(boxPart("foldTop", "palm", "board", [W, h.d + pt, pt], V(0, yp + h.d / 2, zP + pt / 2)));
+  R.push(segPart("foldOut", "hard", "board", g.P2, g.E2, W, pt, X));
+  R.push(segPart("foldIn", "hard_l2", "board", g.P1, g.E1, W, pt, X));
+  R.push(segPart("foldBot", "hard_c", "board", g.E1.clone().add(V(0, 0, -pt / 2)), g.E2.clone().add(V(0, 0, -pt / 2)), W, pt, X));
+  // 손끝판 (2겹, 아랫변 안쪽 끝에서 수직으로) + 패드 + 손톱
+  const plateTop = g.E1.clone().add(V(0, 0, -pt));
+  const plateBot = g.tip.clone().add(V(0, 0, h.nail_len));
+  R.push(segPart("tipPlate", "hard_c", "board", plateTop, plateBot, W, 2 * halfT, X));
+  const padLen = Math.min(22, plateTop.z - plateBot.z - 2);
+  const N = V(0, 1, 0);
+  const padBot = plateBot.clone().addScaledVector(N, -halfT - C.pad_t / 2);
+  R.push(segPart("pad", "hard_c", "pad", padBot.clone().add(V(0, 0, padLen)), padBot, W - 4, C.pad_t, X));
+  const hingeN = plateBot.clone().addScaledVector(N, -halfT + 1);
+  const nail = nailFold(hingeN, V(0, 0, -1), N, h.nail_len, floorZ);
+  R.push(segPart("nail", "hard_c", "nail", hingeN, nail.tip, W - 2, 2, X));
+  const RL: Line[] = [];
+  // 복원 고무줄: 아랫변 바깥 끝 ↔ 손바닥 아랫면 바깥쪽
+  RL.push({ id: "returnB", kind: "rubber", pts: [g.E2.clone().add(V(W / 2 - 3, 2, 0)), V(W / 2 - 3, yp + h.d + 4, 0)], attached: ["hard_c", "palm", "hard"] });
+  const parts: Part[] = [];
+  const lines: Line[] = [];
+  const bF = (b0: string) => (b0 === "palm" ? "palm" : b0.replace("hard", "hardF"));
+  const bB = (b0: string) => (b0 === "palm" ? "palm" : b0.replace("hard", "hardB"));
+  for (const pp of R) {
+    parts.push({ ...pp, id: pp.id + ".F", body: bF(pp.body) });
+    parts.push(mirrorPart(pp, 1, -1, ".B", bB(pp.body)));
+  }
+  const attF = ["hardF", "hardF_l2", "hardF_c", "palm"];
+  for (const l of RL) {
+    lines.push({ ...l, id: l.id + ".F", attached: attF });
+    lines.push(mirrorLine(l, 1, -1, ".B", attF.map((x) => x.replace("F", "B"))));
+  }
+  // 텐던 1가닥 루프: 앞 안쪽 링크 매듭 → 손바닥 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭
+  const K = g.P1.clone().addScaledVector(g.u, h.knot.s).add(V(0, -pt / 2, 0));
+  const G = V(0, h.knot.hole_y, 0);
+  const top = V(0, 0, Z_TOP + 40);
+  lines.push({ id: "tendonLoop", kind: "tendon", pts: [K, G, top, G.clone().setY(-G.y), V(K.x, -K.y, K.z)], attached: ["hardF_l2", "hardB_l2", "palm", "hardF", "hardB"] });
+  const armNow = leverArm([K.y - g.P1.y, K.z - g.P1.z], [G.y - K.y, G.z - K.z]);
+  const faceY = plateBot.y - halfT - C.pad_t;
+  const nailRise = h.nail_len * (1 - Math.cos(nail.al));
+  return {
+    parts,
+    lines,
+    tops: [],
+    metrics: { gap: 2 * Math.min(faceY, nail.tip.y - 1), tipZ: nail.tip.z - floorZ, hardTravel: q / qmax, vdef: nailRise },
+    readouts: [
+      { label: "링크 각 ψ (0 = 수직)", value: `${(g.psi / DEG).toFixed(1)}° (지령 ${((psiOpen - qcmd) / DEG).toFixed(1)}°)` },
+      { label: "손끝 간격 (쥐는 면)", value: `${(2 * faceY).toFixed(1)} mm` },
+      { label: "손톱 끝 높이 (바닥 위)", value: `${(nail.tip.z - floorZ).toFixed(1)} mm` },
+      { label: "손톱 플랩 접힘", value: `${(nail.al / DEG).toFixed(0)}° (${nailRise.toFixed(1)} mm)`, warn: nail.al > 79 * DEG },
+      { label: "매듭 실 모멘트 팔", value: `${armNow.toFixed(1)} mm` },
+    ],
+  };
+}
+
+const B6_SUMMARY: Record<string, string> = {
+  B6P: "쉬운 버전 (평행 유지): hard 평행 링크를 띠 한 장을 접은 '납작한 상자'로 — 윗변은 손바닥 아래 풀칠, 두 링크 판·아랫변은 접는 선 + 테이프 힌지. 핀·빨대 구멍 0, 길이만 맞으면 평행. 실은 안쪽 링크 매듭 → 손바닥 가운데 구멍(앞·뒤 한 가닥 루프). soft 는 레버 없이 플랩 매듭 → 손바닥 구멍(좌·우 한 가닥 루프). 손톱 수직 순응은 B5N 과 같음.",
+  B6F: "쉬운 버전 (손가락형): hard 를 2마디 텐던 손가락으로 — 손바닥 가장자리 테이프 힌지(J1) + 마디 테이프 힌지(J2), 안쪽 빨대 터널(받침으로 띄워 모멘트 팔), 바깥 고무줄 복원. 당기면 말려 들어가며 손톱이 물체 밑을 떠서 쥠(B3 계열). 공중에서 60% 당겨 원위를 말고 → 내림 → 조임 순서. soft 는 B6P 와 같음.",
+};
+
+export function makeB6(id: "B6P" | "B6F"): Design {
+  const p = (id === "B6P" ? B6Pp : B6Fp) as unknown as B6PP & typeof B6Fp;
+  const d = (id === "B6P" ? B6Pc : B6Fc).derived as unknown as Derived;
+  const adj: [string, string][] = [
+    ["palm", "flapR"],
+    ["palm", "flapL"],
+  ];
+  if (id === "B6P")
+    for (const s of ["F", "B"]) adj.push(["palm", `hard${s}`], ["palm", `hard${s}_l2`], [`hard${s}`, `hard${s}_c`], [`hard${s}_l2`, `hard${s}_c`]);
+  else adj.push(["palm", "hardF"], ["palm", "hardB"], ["hardF", "hard2F"], ["hardB", "hard2B"]);
+  return {
+    id,
+    name: p.name,
+    summary: B6_SUMMARY[id],
+    oneString: false,
+    adjacent: adj,
+    preset: (mode, obj) => presetFlap(d, d, mode, obj, false, p.soft.phi_open_deg),
+    build(ctrl) {
+      const floorZ = -ctrl.palmH;
+      const obj = ctrl.obj ? makeObject(ctrl.obj, floorZ) : null;
+      const sdf = sceneSdf(obj, floorZ);
+      const soft = softFlap(
+        {
+          xh: num(d, "soft_hinge_x"),
+          rootLen: p.soft.root_len,
+          phiOpen: p.soft.phi_open_deg * DEG,
+          phiMin: num(d, "soft_phi_min_deg") * DEG,
+          drumR: 10,
+          drumY: p.soft.drum_y,
+          joint: "score",
+          Flim: p.force_video.soft_per_finger_N,
+          knot: { s: p.soft.knot.s, holeX: p.soft.knot.hole_x },
+        },
+        ctrl.a,
+        sdf,
+      );
+      let hard: HardOut;
+      if (id === "B6P") hard = hardFold(p, d, ctrl.b, obj ? obj.sdf : () => 1e9, floorZ);
+      else {
+        const pf = { ...B6Fp, hard: { ...B6Fp.hard, tape_hinge: true } } as unknown as Parameters<typeof hardTendon>[0];
+        hard = hardTendon(pf, d, ctrl.b, sdf);
+        hard.metrics.tipZ -= floorZ;
+      }
+      // soft 실은 한 가닥 루프 (균형막대 없음): 좌·우 구멍 위에서 손잡이 한 점으로
+      const handle = V(0, 0, Z_TOP + 70);
+      for (const l of soft.lines) if (l.id.startsWith("stringA")) l.pts.push(handle);
+      soft.tops = [];
+      // soft 닫힘 스토퍼 블록 (실 경로 y=0 을 피해 stop_block_y)
+      const hb = p.soft.stop_block_h;
+      const [y0, y1] = p.soft.stop_block_y;
+      const fx0 = num(d, "soft_stop_face_x");
+      for (const sx of [1, -1]) soft.parts.push(boxPart(`softStop${sx}`, "palm", "board", [6, y1 - y0, hb], V(sx * (fx0 - 3), (y0 + y1) / 2, -hb / 2)));
+      return assemble({ id, oneString: false }, palmPart(p.palm.sx, p.palm.sy), soft, hard, floorZ, obj, []);
+    },
+  };
+}
+
 /** 현재 후보 (B5 계열: 평행 링크 hard + 수직 순응 옵션) */
-export const CURRENT: Design[] = [makeB5("B5E"), makeB5("B5N")];
+export const CURRENT: Design[] = [makeB6("B6P"), makeB6("B6F"), makeB5("B5N")];
 /** 보관 (old): 하민 피드백으로 내려간 안. 비교용으로만 유지 */
-export const OLD: Design[] = [makeB5("B5F"), makeB5("B5"), makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
+export const OLD: Design[] = [makeB5("B5E"), makeB5("B5F"), makeB5("B5"), makeB5("B5T"), makeB1(), makeB2(), makeB3(), makeB3(false, true), makeB4(), makeB1(true), makeB3(true)];
 export const OLD_REASON: Record<string, string> = {
+  B5E: "실물 시도(2026-11-27): 판 82조각·빨대 구멍 16개 — 골판지로 ±1 mm 구멍 정렬이 안 나오고 조립이 너무 어려움 → B6P/B6F 로 단순화",
   B5F: "플로팅 브래킷 — 순응은 B5N 과 같은 14 mm 인데 텔레스코프 2쌍·손바닥 슬롯이 추가. 하민: 최종(B5N) + 쉬운 버전(B5E) 두 개만 남김 (2026-11-25)",
   B5: "B5N 의 바탕 (손톱 5 mm, 수직 순응 4 mm) — 긴 손톱(B5N)으로 대체",
   B5T: "손끝판 관절 — 바닥 힘이 손끝을 물체 쪽으로 돌려, 쥐고 있을 때 물체가 막아 순응 안 됨. 반대로 돌리면 pinch 반력과 분리 불가 (SymPy C1·C3)",

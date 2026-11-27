@@ -13,6 +13,8 @@ import B5p from "../../params/B5.json";
 import B5Fp from "../../params/B5F.json";
 import B5Np from "../../params/B5N.json";
 import B5Ep from "../../params/B5E.json";
+import B6Pp from "../../params/B6P.json";
+import B6Fp from "../../params/B6F.json";
 import B1c from "../../calc/out/B1.json";
 import B2c from "../../calc/out/B2.json";
 import B3c from "../../calc/out/B3.json";
@@ -22,6 +24,8 @@ import B5c from "../../calc/out/B5.json";
 import B5Fc from "../../calc/out/B5F.json";
 import B5Nc from "../../calc/out/B5N.json";
 import B5Ec from "../../calc/out/B5E.json";
+import B6Pc from "../../calc/out/B6P.json";
+import B6Fc from "../../calc/out/B6F.json";
 
 export type P2 = [number, number];
 export interface Shape {
@@ -49,6 +53,8 @@ export interface DesignPattern {
   steps: string[];
   /** 같은 PDF 뒤에 붙이는 여분·전환 부품 (B5E: 실패 잦은 부품 여분 + B5N 드럼 전환용) */
   spare?: { title: string; shapes: Shape[]; notes: string[] };
+  /** 수량만큼 모두 그린 전량판 PDF 도 만들기 */
+  full?: boolean;
 }
 
 const C = common;
@@ -693,6 +699,193 @@ function b5(pIn: typeof B5p = B5p, dIn: Record<string, unknown> = B5c.derived): 
   };
 }
 
+// ---------------------------------------------------------------------------- B6 (쉬운 버전)
+
+type B6Soft = typeof B6Pp.soft;
+/** B6 공용 soft: 손바닥 윗장(플랩 포함)·아랫장·Fin Ray 띠(플랩 풀칠 탭 포함)·닫힘 스토퍼. 레버·슬롯·밑판 없음 */
+function b6Soft(palm: { sx: number; sy: number }, so: B6Soft, d: Record<string, number>, hardHoles: P2[], hardNote: string): Shape[] {
+  const sx = palm.sx;
+  const sy = palm.sy;
+  const rl = so.root_len;
+  const yf = FR.pair_y;
+  const yLo = -yf - FR.width / 2 - 2;
+  const yHi = yf + FR.width / 2 + 2;
+  const oy = (y: number) => y + sy / 2;
+  const kn = so.knot;
+  const top = blank("손바닥 윗장 + Soft 플랩", 1, "B골 3 mm", sx + 2 * rl, sy, `좌우 플랩은 파란 점선에서 아래로 접힘. 가운데 구멍: soft 실 2 (x=±${kn.hole_x}) + hard 실 ${hardHoles.length}. 플랩 매듭 구멍 2 (접는 선에서 ${kn.s}). 고무줄 구멍 2. ${hardNote}`);
+  top.cut.push({ pts: [[0, oy(yLo)], [rl, oy(yLo)], [rl, 0], [rl + sx, 0], [rl + sx, oy(yLo)], [2 * rl + sx, oy(yLo)], [2 * rl + sx, oy(yHi)], [rl + sx, oy(yHi)], [rl + sx, sy], [rl, sy], [rl, oy(yHi)], [0, oy(yHi)]], closed: true });
+  top.score.push([[rl, oy(yLo)], [rl, oy(yHi)]], [[rl + sx, oy(yLo)], [rl + sx, oy(yHi)]]);
+  const cx = rl + sx / 2;
+  for (const s of [1, -1]) top.holes.push({ c: [cx + s * kn.hole_x, oy(0)], d: 3 });
+  for (const hh of hardHoles) top.holes.push({ c: [cx + hh[0], oy(hh[1])], d: 3 });
+  for (const s of [-1, 1]) top.holes.push({ c: [s > 0 ? rl + sx + kn.s : rl - kn.s, oy(0)], d: 3 });
+  top.text.push({ p: [rl - kn.s - 4, oy(0) - 3], s: "매듭", size: 2.4 }, { p: [rl + sx + kn.s - 4, oy(0) - 3], s: "매듭", size: 2.4 });
+  for (const s of [-1, 1]) top.holes.push({ c: [cx + s * (sx / 2 - 14), oy(-yf)], d: 3 });
+  // Fin Ray 띠 풀칠 위치 (플랩 안쪽 면 = 윗장 아랫면 쪽 표시)
+  for (const s of [-1, 1]) for (const t of [-1, 1]) {
+    const x0 = s > 0 ? rl + sx + 1 : 1;
+    const y0 = oy(t * yf - FR.width / 2);
+    top.mark.push([[x0, y0], [x0 + rl - 2, y0]], [[x0, y0 + FR.width], [x0 + rl - 2, y0 + FR.width]]);
+  }
+  top.text.push({ p: [rl + 4, sy / 2 + 14], s: "윗장 (골 ↔)", size: 4 });
+  top.flute = "x";
+  const rel = so.palm_edge_relief;
+  const bw = sx - 2 * rel;
+  const bot = rect("손바닥 아랫장", 1, "B골 3 mm", bw, sy, `윗장보다 좌우 ${rel} mm 씩 좁게 (플랩이 −8° 까지 닫힐 공간). 윗장과 골 방향 엇갈림. 가운데 구멍은 윗장과 같은 자리.`, "y");
+  for (const s of [1, -1]) bot.holes.push({ c: [bw / 2 + s * kn.hole_x, oy(0)], d: 3 });
+  for (const hh of hardHoles) bot.holes.push({ c: [bw / 2 + hh[0], oy(hh[1])], d: 3 });
+  // 닫힘 스토퍼 블록 위치 표시
+  const [by0, by1] = so.stop_block_y;
+  for (const s of [1, -1]) {
+    const xo = bw / 2 + s * (Number(d.soft_stop_face_x) - 3) - 3;
+    bot.mark.push([[xo, oy(by0)], [xo + 6, oy(by0)]], [[xo, oy(by1)], [xo + 6, oy(by1)]], [[xo, oy(by0)], [xo, oy(by1)]], [[xo + 6, oy(by0)], [xo + 6, oy(by1)]]);
+  }
+  const shapes: Shape[] = [top, bot];
+  // Fin Ray 띠: [플랩 풀칠 탭 | contact | back | 밑변 | 닫는 탭]
+  const L = FR.L;
+  const b = FR.base;
+  const Lb = Math.hypot(L, b);
+  const t0 = 12;
+  const tab = 12;
+  const W = FR.width;
+  for (let k = 1; k <= 4; k++) {
+    const total = t0 + L + Lb + b + tab;
+    const st = blank(`Fin Ray 띠 ${k}/4`, 1, "단면 골판지 (한쪽 라이너 벗김)", total, W, `앞 탭 ${t0} 을 플랩 안쪽 면(접는 선 아래, 표시 위치)에 풀칠 → contact 면이 플랩과 한 줄. 접는 선 3개로 삼각형 → 끝 탭을 contact 뿌리 안쪽에 풀칠. 리브 R2–R8 빨대는 테이프 힌지.`);
+    rectCut(st, 0, 0, total, W);
+    for (const x of [t0, t0 + L, t0 + L + Lb, t0 + L + Lb + b]) st.score.push([[x, 0], [x, W]]);
+    st.glue.push({ x: 0, y: 0, w: t0, h: W }, { x: t0 + L + Lb + b, y: 0, w: tab, h: W });
+    for (const i of [2, 4, 6, 8]) {
+      const xc = t0 + (i * L) / 10;
+      const xb = t0 + L + ((10 - i) * Lb) / 10;
+      st.mark.push([[xc, 2], [xc, W - 2]], [[xb, 2], [xb, W - 2]]);
+      st.text.push({ p: [xc + 1, W / 2], s: `R${i}`, size: 3 }, { p: [xb + 1, W / 2], s: `R${i}`, size: 3 });
+    }
+    st.text.push({ p: [t0 + L / 2 - 14, 4], s: "contact (물체 쪽)", size: 3 }, { p: [t0 + L + Lb / 2 - 6, 4], s: "back", size: 3 }, { p: [1, W - 3], s: "플랩", size: 2.6 });
+    st.flute = "y";
+    shapes.push(st);
+  }
+  shapes.push(rect("Soft 닫힘 스토퍼 블록", 4, "B골 3 mm (2장 적층 × 좌우)", by1 - by0, so.stop_block_h, `2장 겹쳐 6 mm 블록 → 손바닥 아랫면 표시 위치(바깥 면 x=±${fx(Number(d.soft_stop_face_x))}, y=${by0}…${by1}). 플랩이 −8° 에서 기댐. 실 경로(y=0)를 피함.`, "x"));
+  return shapes;
+}
+
+function b6Common(p: { soft: B6Soft; force_video: { pinch_N: number; soft_per_finger_N: number } }, d: Record<string, number>) {
+  return {
+    soft: [
+      `일반 빨대(Ø${C.straw_d}) Fin Ray 리브: 손가락당 ${[2, 4, 6, 8].map((i) => fx(FR.base * (1 - i / 10))).join(" / ")} mm (도면 길이, 실제는 벽 두께만큼 약 2 mm 짧게) × 4개 손가락, 양끝 테이프 힌지`,
+      `soft 실 (좌우 한 가닥 루프): 오른쪽 플랩 매듭 구멍 → 손바닥 구멍 x=+${p.soft.knot.hole_x} 위로 → 손잡이 → x=−${p.soft.knot.hole_x} 아래로 → 왼쪽 플랩 매듭. 균형막대 불필요 (한 가닥이 양쪽을 같이 당김)`,
+      `soft 복원 고무줄 2: 손바닥 윗장 고무줄 구멍 ↔ 플랩 바깥면. soft 열림 제한 실: 플랩 ↔ 손바닥, 열림 ${p.soft.phi_open_deg}° 에서 팽팽하게`,
+      `영상용 힘: Fin Ray 손가락당 ${p.force_video.soft_per_finger_N} N → soft 실 ${fx(Number(d.soft_string_T_video_N))} N, hard pinch ${p.force_video.pinch_N} N → hard 실 ${fx(Number(d.hard_string_T_video_N))} N. 복원 고무줄은 이보다 확실히 약하게`,
+    ],
+  };
+}
+
+function b6p(): DesignPattern {
+  const p = B6Pp;
+  const d = B6Pc.derived as unknown as Record<string, number>;
+  const h = p.hard;
+  const shapes = b6Soft(p.palm, p.soft, d, [[0, h.knot.hole_y]], `hard 실 구멍은 가운데 1개 (앞·뒤 같이).`);
+  const yp = d.hard_pivot_y;
+  // 손바닥 아랫장에 접는 상자 윗변 풀칠 위치 (y = yp … yp+d, x = ±w/2)
+  const bot = shapes[1];
+  const bw = p.palm.sx - 2 * p.soft.palm_edge_relief;
+  for (const t of [1, -1]) {
+    const y0 = p.palm.sy / 2 + t * yp;
+    const y1 = p.palm.sy / 2 + t * (yp + h.d);
+    bot.glue.push({ x: bw / 2 - h.width / 2, y: Math.min(y0, y1), w: h.width, h: Math.abs(y1 - y0) });
+  }
+  bot.note += ` 빗금 2곳 = 접는 상자 윗변 풀칠 자리 (x=±${h.width / 2}, y=±${fx(yp)}…${fx(yp + h.d)}).`;
+  // 접는 상자 띠: [윗변 d | 바깥 링크 L | 아랫변 d | 안쪽 링크 L | 탭 12]
+  const W = h.width;
+  const L = h.L;
+  const dd = h.d;
+  const tot = dd + L + dd + L + 12;
+  const st = blank("접는 평행사변형 띠", 2, "B골 3 mm (1겹)", tot, W, `손가락당 1개. 접는 선 4개(파란 점선) = 관절: 볼펜으로 깊게 누르고 양방향으로 몇 번 꺾은 뒤 바깥 면에 테이프. 윗변(빗금)을 손바닥 아랫면 표시에 풀칠, 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠 → 납작한 상자. 두 링크(${L})의 길이가 같아야 평행. 안쪽 링크 '매듭' 구멍에 hard 실.`);
+  rectCut(st, 0, 0, tot, W);
+  for (const x of [dd, dd + L, dd + L + dd, dd + L + dd + L]) st.score.push([[x, 0], [x, W]]);
+  st.glue.push({ x: 0, y: 0, w: dd, h: W }, { x: tot - 12, y: 0, w: 12, h: W });
+  const kx = dd + L + dd + L - h.knot.s;
+  st.holes.push({ c: [kx, W / 2], d: 3 });
+  st.text.push({ p: [2, W - 3], s: "윗변", size: 2.8 }, { p: [dd + 2, W - 3], s: "바깥 링크", size: 2.8 }, { p: [dd + L + 2, W - 3], s: "아랫변", size: 2.8 }, { p: [dd + L + dd + 2, W - 3], s: "안쪽 링크", size: 2.8 }, { p: [kx + 3, W / 2 + 1], s: "매듭", size: 2.6 });
+  st.flute = "y";
+  shapes.push(st);
+  // 손끝판: ㄱ자 (아랫변 밑 풀칠 12 | 손끝판) 2장 적층
+  const plateH = d.hard_coupler_below_E - h.nail_len + 2;
+  const tp = blank("손끝판 (ㄱ자)", 4, "B골 3 mm, 2장 적층", 12 + plateH, W, `손가락당 2장 적층. 접는 선에서 90° 꺾어 12 mm 쪽을 아랫변 아랫면 '안쪽 끝'에 풀칠 → 손끝판이 아래로 수직. 삼각 보강 1개.`);
+  rectCut(tp, 0, 0, 12 + plateH, W);
+  tp.score.push([[12, 0], [12, W]]);
+  tp.glue.push({ x: 0, y: 0, w: 12, h: W });
+  tp.flute = "x";
+  shapes.push(tp);
+  const gs = blank("손끝판 삼각 보강", 2, "B골 3 mm", 12, 12, "손끝판 바깥면 ↔ 아랫변 아랫면 (ㄱ자 안쪽 모서리).");
+  gs.cut.push({ pts: [[0, 0], [12, 0], [0, 12]], closed: true });
+  shapes.push(gs);
+  const nail = rect("손톱 플랩", 6, "B골 3 mm, 3장 적층", W - 2, h.nail_len + 6, `3장 중 1장만 위 6 mm 탭을 남기고 2장은 탭을 잘라 아래 ${h.nail_len} 만 겹침. 탭을 손끝판 바깥면에 붙이고 접는 선을 손끝판 아래 모서리에 맞춰 테이프로 감쌈. 바닥에 눌리면 바깥·위로 접힘.`, "x");
+  nail.score.push([[0, 6], [W - 2, 6]]);
+  shapes.push(nail);
+  shapes.push(rect("손톱 스토퍼", 2, "B골 3 mm", W - 2, 8, "손끝판 안쪽 면(물체 쪽) 아래, 손끝판 모서리보다 2 mm 아래로 튀어나오게 → 손톱이 안쪽으로 못 접힘.", "x"));
+  const com = b6Common(p, d);
+  return {
+    id: "B6P",
+    name: p.name,
+    shapes,
+    full: true,
+    cutList: [
+      `손톱 ${h.nail_len} mm (3겹): 접히면 최대 ${fx(d.vertical_compliance_mm)} mm 순응`,
+      ...com.soft,
+      `hard 실 (앞·뒤 한 가닥 루프): 앞 안쪽 링크 매듭 → 손바닥 가운데 구멍 위로 → 손잡이 → 같은 구멍 아래로 → 뒤 안쪽 링크 매듭. 쥘 때 모멘트 팔 ${fx(d.hard_knot_arm_grip_min)}–${fx(d.hard_knot_arm_max)} mm`,
+      `hard 복원 고무줄 2: 아랫변 바깥 끝 ↔ 손바닥 아랫면 바깥쪽 (약하게). hard 열림 제한 실: 아랫변 ↔ 손바닥, 열림 ${h.psi_open_deg}° 에서 팽팽하게`,
+      `테이프: 접는 상자 관절 4줄 × 2, Fin Ray 리브, 손톱 힌지. 빨대 핀·축 없음`,
+    ],
+    steps: [
+      "손바닥: 윗장(플랩 포함) + 아랫장(좌우 1.5 mm 좁게) 엇갈려 풀칠, 플랩 부분 풀칠 금지. 가운데 구멍 3개와 플랩 매듭 구멍 2개, 고무줄 구멍 2개를 함께 뚫음. 닫힘 스토퍼 블록 2개를 아랫면 표시에.",
+      "Fin Ray 4개: 겉종이 벗긴 띠를 접어 삼각형, 리브 빨대 테이프 힌지 → 앞 탭을 플랩 안쪽 면 표시에 풀칠 (플랩 하나에 2개).",
+      "접는 상자 2개: 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 윗변을 손바닥 아랫면 빗금에 풀칠 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠. 손으로 밀어 납작한 상자가 평행사변형으로 기우는지 확인.",
+      "손끝판(ㄱ자 2장 적층)을 아랫변 아래 안쪽 끝에 풀칠 + 삼각 보강, 손톱(3겹) 테이프 힌지 + 손톱 스토퍼 + 고무줄 2바퀴.",
+      "실: soft 한 가닥(좌 매듭 → 구멍 → 손잡이 → 구멍 → 우 매듭), hard 한 가닥(앞 매듭 → 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭). 복원 고무줄과 열림 제한 실 → 전 범위 동작 확인.",
+    ],
+  };
+}
+
+function b6f(): DesignPattern {
+  const p = B6Fp;
+  const d = B6Fc.derived as unknown as Record<string, number>;
+  const h = p.hard;
+  const halfT = (h.plies * C.board_t) / 2;
+  const yp = p.palm.sy / 2 + halfT;
+  const ty = yp - h.r1;
+  const shapes = b6Soft(p.palm, p.soft, d, [[0, ty], [0, -ty]], `hard 실 구멍 2 (x=0, y=±${fx(ty)}).`);
+  const W = h.width;
+  const prox = rect("근위 마디 판", 4, "B골 3 mm, 2장 적층", W, h.l1, `손가락당 2장 적층. 위 끝을 손바닥 아랫장 앞(뒤) 가장자리에 바깥 면 테이프 힌지(J1, 틈 1 mm). 안쪽 면 가운데에 빨대 터널 2개(양 끝 쪽, 각 12 mm).`, "y");
+  shapes.push(prox);
+  const dist = rect("원위 마디 판", 4, "B골 3 mm, 2장 적층", W, h.l2, `손가락당 2장 적층. 근위 끝과 바깥 면 테이프 힌지(J2, 틈 1 mm). 안쪽 면에 빨대 터널 2개, 끝에서 ${h.nail_len + 8} mm 위 '매듭' 구멍. 끝 ${h.nail_len} mm 는 손톱(고무줄 2바퀴 = 패드).`, "y");
+  dist.holes.push({ c: [W / 2, h.l2 - h.nail_len - 8], d: 3 });
+  dist.text.push({ p: [W / 2 + 3, h.l2 - h.nail_len - 7], s: "매듭", size: 2.6 });
+  dist.mark.push([[0, h.l2 - h.nail_len], [W, h.l2 - h.nail_len]]);
+  shapes.push(dist);
+  const com = b6Common(p, d);
+  const k2k1 = d.tendon_k2_over_k1;
+  return {
+    id: "B6F",
+    name: p.name,
+    shapes,
+    full: true,
+    cutList: [
+      ...com.soft,
+      `빨대 터널: 손가락당 4개 × 12 mm (근위 2, 원위 2), 판 안쪽 면 가운데에 테이프 → 실 모멘트 팔 약 ${h.r1} mm (판 6 + 빨대 반지름 3)`,
+      `hard 실 (손가락마다 1가닥, 또는 앞·뒤를 손잡이에서 묶음): 원위 '매듭' 구멍 → 원위 터널 2 → 근위 터널 2 → 손바닥 구멍 y=±${fx(ty)} 위로 → 손잡이`,
+      `복원 고무줄: J1(손바닥 윗면 ↔ 근위 바깥면) 1, J2(근위 바깥면 ↔ 원위 바깥면) 1 — J2 쪽을 J1 의 약 ${fx(k2k1)} 배 세게 (고무줄 2겹 등). 휴지 자세: 근위 ${h.theta1_rest_deg}° 벌어짐, 원위 곧게`,
+      `조작 순서: 공중에서 실을 60% 당겨 원위를 먼저 말고 → 내림 → 끝까지 조임 (바닥에 손톱이 먼저 닿은 채 말면 걸림, B3 시뮬에서 발견)`,
+    ],
+    steps: [
+      "손바닥: 윗장(플랩 포함) + 아랫장 풀칠(플랩 풀칠 금지), 구멍(soft 2, hard 2, 매듭 2, 고무줄 2) 함께 뚫기, 닫힘 스토퍼 블록.",
+      "Fin Ray 4개 → 플랩 안쪽 면 표시에 앞 탭 풀칠.",
+      "손가락 2개: 근위·원위 판 각 2장 적층 → 1 mm 띄워 놓고 바깥 면 테이프 힌지(J2) → 근위 위 끝을 손바닥 아랫장 가장자리에 테이프 힌지(J1). 안쪽 면에 빨대 터널 4개.",
+      "실: 원위 매듭 → 터널 4개 → 손바닥 구멍 → 위. 복원 고무줄 J1·J2 (J2 를 더 세게) → 휴지 자세(근위 40° 벌어짐) 확인.",
+      "동작: 공중에서 60% 당겨 원위를 말고 → 내림 → 조임. soft 실로 Fin Ray 감싸기.",
+    ],
+  };
+}
+
 /** B5E + 여분 시트: 실패가 잦은 부품 여분 + B5N(드럼)으로 바꿀 때 필요한 부품 */
 function b5eWithSpare(): DesignPattern {
   const e = b5(B5Ep as unknown as typeof B5p, B5Ec.derived);
@@ -729,6 +922,8 @@ function b5eWithSpare(): DesignPattern {
 }
 
 export const PATTERNS: DesignPattern[] = [
+  b6p(),
+  b6f(),
   b5eWithSpare(),
   b5(B5Np as unknown as typeof B5p, B5Nc.derived),
   b5(B5Fp as unknown as typeof B5p, B5Fc.derived),

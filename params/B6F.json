@@ -1,0 +1,51 @@
+{
+  "id": "B6F",
+  "name": "B6F 쉬운 버전 — 2마디 손가락 hard + 매듭 soft (영상용)",
+  "_doc": "B3 의 2마디 텐던 손가락을 테이프 힌지 + 빨대 터널로. 손바닥 가장자리 힌지(J1)와 마디(J2), 안쪽 빨대 터널(받침으로 띄워 모멘트 팔 r1, r2), 바깥 고무줄로 복원. soft 는 B6P 와 같음.",
+  "palm": {
+    "sx": 60.0,
+    "sy": 80.0
+  },
+  "soft": {
+    "type": "flap",
+    "joint": "score",
+    "root_len": 16.0,
+    "phi_open_deg": 30.0,
+    "drum_y": 33.0,
+    "palm_edge_relief": 1.5,
+    "stop_block_h": 8.0,
+    "stop_block_y": [
+      -24.0,
+      -4.0
+    ],
+    "knot": {
+      "_doc": "레버 없이: 플랩 안쪽 면 매듭 구멍(힌지에서 s, y=0) → 손바닥 구멍(x=±hole_x, y=0) → 위. 좌우 한 가닥 루프",
+      "s": 14.0,
+      "hole_x": 5.0
+    },
+    "finray_tab": 12.0
+  },
+  "hard": {
+    "type": "tendon",
+    "l1": 65.0,
+    "l2": 50.0,
+    "width": 24.0,
+    "plies": 2,
+    "nail_len": 6.0,
+    "theta1_rest_deg": 40.0,
+    "theta2_rest_deg": 0.0,
+    "r1": 9.0,
+    "r2": 9.0,
+    "target_tip_y": 9.0,
+    "target_distal_deg": -30.0,
+    "hole_y": 0.0,
+    "_doc_r": "모멘트 팔 r = 2겹 판(6) + 빨대 반지름(3): 빨대를 판 안쪽 면에 바로 테이프 (받침 없음). 힌지 테이프는 바깥 면"
+  },
+  "force_video": {
+    "_doc": "영상 과제용 힘 목표 (FINAL-CHANGES §1)",
+    "pinch_N": 1.5,
+    "soft_per_finger_N": 0.5,
+    "battery_min_N": 0.85,
+    "hand_T_max_N": 10.0
+  }
+}

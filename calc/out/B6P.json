@@ -1,0 +1,206 @@
+{
+  "id": "B6P",
+  "name": "B6P 쉬운 버전 — 접는 평행사변형 hard + 매듭 soft (영상용)",
+  "derived": {
+    "soft_hinge_x": 30.0,
+    "soft_reach": 101.0,
+    "soft_phi_min_deg": -7.9676,
+    "soft_x_min": 16.0,
+    "soft_phi_battery_deg": -2.8376,
+    "soft_phi_chip_deg": -2.8376,
+    "soft_phi_sponge_deg": 2.8376,
+    "soft_open_half_width": 104.7487,
+    "soft_knot_arm_min": 10.5924,
+    "soft_knot_arm_max": 13.749,
+    "soft_string_T_video_N": 9.5351,
+    "soft_pull_mm": 8.217,
+    "soft_stop_face_x": 28.0405,
+    "soft_edge_interference_mm": 0.8398,
+    "hard_pivot_y": 12.0,
+    "hard_coupler_below_E": 23.3762,
+    "rigid_palm_height": 101.3762,
+    "rigid_finray_tip_above_floor": 6.5,
+    "hard_psi_cable_deg": -3.4398,
+    "hard_tip_rise_cable_mm": 0.1351,
+    "hard_psi_cap_deg": 6.1232,
+    "hard_tip_rise_cap_mm": 0.4279,
+    "hard_psi_min_deg": -5.3554,
+    "soft_mode_hard_above_finray": 24.4161,
+    "hard_opening_mm": 135.3525,
+    "hard_knot_arm_min": 3.9686,
+    "hard_knot_arm_max": 11.7412,
+    "hard_knot_arm_grip_min": 10.8136,
+    "hard_knot_arm_at_pinch": 11.3545,
+    "hard_string_T_video_N": 9.908,
+    "hard_string_T_N": 9.908,
+    "hard_pull_mm": 8.7031,
+    "hard_face_wedge_deg": 0.0,
+    "vertical_compliance_mm": 11.5689,
+    "fold_strip_len": 210.0
+  },
+  "checks": [
+    {
+      "id": "S1",
+      "desc": "건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음)",
+      "value": -2.838,
+      "unit": "deg",
+      "lo": -7.968,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S2",
+      "desc": "스펀지 폭이 개방 범위 안",
+      "value": 2.838,
+      "unit": "deg",
+      "lo": null,
+      "hi": 30.0,
+      "pass": true
+    },
+    {
+      "id": "S6",
+      "desc": "soft 매듭 실의 모멘트 팔 (열림 30° … 닫힘 −8°) 최소 ≥ 8 mm",
+      "value": 10.592,
+      "unit": "mm",
+      "lo": 8.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "S7",
+      "desc": "soft 매듭이 플랩 위 (s ≤ 뿌리 길이 − 2)",
+      "value": 14.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 14.0,
+      "pass": true
+    },
+    {
+      "id": "S8",
+      "desc": "영상용 0.5 N/손가락에서 soft 실 장력 ≤ 손 한계",
+      "value": 9.535,
+      "unit": "N",
+      "lo": null,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "S9",
+      "desc": "닫힘 스토퍼 블록이 실 경로(y=0)에서 떨어짐 (블록 y 끝 ≤ −2)",
+      "value": -4.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": -2.0,
+      "pass": true
+    },
+    {
+      "id": "S5",
+      "desc": "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min|",
+      "value": 1.5,
+      "unit": "mm",
+      "lo": 0.84,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "R2",
+      "desc": "Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음",
+      "value": 6.5,
+      "unit": "mm",
+      "lo": 3.0,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "H4",
+      "desc": "케이블 파지 시 손톱 끝 상승 ≤ 케이블 반지름",
+      "value": 0.135,
+      "unit": "mm",
+      "lo": null,
+      "hi": 2.5,
+      "pass": true
+    },
+    {
+      "id": "R1",
+      "desc": "Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위",
+      "value": 24.416,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "F1",
+      "desc": "열림에서 두 링크 판 사이 ≥ 판 두께 + 2 (d·cos ψ_open)",
+      "value": 14.107,
+      "unit": "mm",
+      "lo": 5.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "H8",
+      "desc": "바깥 접는 선이 손바닥 안 (yp + d + 2 ≤ sy/2)",
+      "value": 38.0,
+      "unit": "mm",
+      "lo": null,
+      "hi": 44.0,
+      "pass": true
+    },
+    {
+      "id": "F2",
+      "desc": "hard 매듭 실의 모멘트 팔: 쥐는 구간(맞닿음 … 뚜껑) 최소 ≥ 8 mm",
+      "value": 10.814,
+      "unit": "mm",
+      "lo": 8.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "F2b",
+      "desc": "완전 열림(54°)에서도 실이 닫는 방향 팔 ≥ 2 mm (약한 복원 고무줄을 이기고 출발)",
+      "value": 3.969,
+      "unit": "mm",
+      "lo": 2.0,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "F3",
+      "desc": "매듭이 링크 위 (10 ≤ s ≤ L − 5)",
+      "value": 70.0,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": 70.0,
+      "pass": true
+    },
+    {
+      "id": "F4",
+      "desc": "영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계",
+      "value": 9.908,
+      "unit": "N",
+      "lo": null,
+      "hi": 10.0,
+      "pass": true
+    },
+    {
+      "id": "E10",
+      "desc": "영상용 pinch ≥ 건전지 최소 0.85 N",
+      "value": 1.5,
+      "unit": "N",
+      "lo": 0.85,
+      "hi": null,
+      "pass": true
+    },
+    {
+      "id": "C1",
+      "desc": "손톱이 접히며 얻는 상승 ≥ 10 mm",
+      "value": 11.569,
+      "unit": "mm",
+      "lo": 10.0,
+      "hi": null,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

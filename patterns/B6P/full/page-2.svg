@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<defs><pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2" stroke="#e08a00" stroke-width=".35"/></pattern></defs>
+<style>
+.cut{fill:none;stroke:#000;stroke-width:.3}
+.score{fill:none;stroke:#1565c0;stroke-width:.35;stroke-dasharray:2 1.2}
+.mark{fill:none;stroke:#777;stroke-width:.25;stroke-dasharray:3 1 .6 1}
+.glue{fill:url(#hatch);stroke:none}
+.hole{fill:none;stroke:#c62828;stroke-width:.3}
+.cross{stroke:#c62828;stroke-width:.2}
+.flute{fill:none;stroke:#2e7d32;stroke-width:.35}
+text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#222}
+.lbl{font-size:3.1px;font-weight:bold}.dim{font-size:2.6px;fill:#666}
+.hdr{font-size:4.2px;font-weight:bold}.small{font-size:2.6px;fill:#555}
+</style>
+<rect width="210" height="297" fill="#fff"/>
+<text class="hdr" x="10" y="14">B6P 전량판 — 본 부품 (수량만큼 모두 그림, # = 부품 번호) — 전개도 2/4</text>
+<text class="small" x="10" y="19">실선 자르기 · 파란 점선 접기(score) · 회색 일점쇄선 붙일 위치 · 주황 빗금 풀칠 · 빨간 원 구멍 · 초록 화살표 골 방향 · 1:1 mm</text>
+<polygon class="glue" points="10,234 10,210 34,210 34,234"/>
+<polygon class="glue" points="10,36 10,24 34,24 34,36"/>
+<polygon class="cut" points="10,234 10,24 34,24 34,234"/>
+<polyline class="score" points="10,210 34,210"/>
+<polyline class="score" points="10,135 34,135"/>
+<polyline class="score" points="10,111 34,111"/>
+<polyline class="score" points="10,36 34,36"/>
+<circle class="hole" cx="22" cy="106" r="1.5"/>
+<path class="cross" d="M21 106h2M22 105v2"/>
+<text x="31" y="232" font-size="2.8" transform="rotate(-90 31 232)">윗변</text>
+<text x="31" y="208" font-size="2.8" transform="rotate(-90 31 208)">바깥 링크</text>
+<text x="31" y="133" font-size="2.8" transform="rotate(-90 31 133)">아랫변</text>
+<text x="31" y="109" font-size="2.8" transform="rotate(-90 31 109)">안쪽 링크</text>
+<text x="23" y="103" font-size="2.6" transform="rotate(-90 23 103)">매듭</text>
+<path class="flute" d="M20 33H30M28 31L30 33L28 35M22 31L20 33L22 35"/>
+<text class="lbl" x="10" y="238">#2 접는 평행사변형 띠 (2/2)</text>
+<text class="dim" x="10" y="241.6">210×24 · B골 3 mm (1겹)</text>
+<polygon class="glue" points="64.88,250.49 64.88,238.49 86.88,238.49 86.88,250.49"/>
+<polygon class="glue" points="64.88,36 64.88,24 86.88,24 86.88,36"/>
+<polygon class="cut" points="64.88,250.49 64.88,24 86.88,24 86.88,250.49"/>
+<polyline class="score" points="64.88,238.49 86.88,238.49"/>
+<polyline class="score" points="64.88,153.49 86.88,153.49"/>
+<polyline class="score" points="64.88,64 86.88,64"/>
+<polyline class="score" points="64.88,36 86.88,36"/>
+<polyline class="mark" points="66.88,221.49 84.88,221.49"/>
+<polyline class="mark" points="66.88,81.9 84.88,81.9"/>
+<polyline class="mark" points="66.88,204.49 84.88,204.49"/>
+<polyline class="mark" points="66.88,99.8 84.88,99.8"/>
+<polyline class="mark" points="66.88,187.49 84.88,187.49"/>
+<polyline class="mark" points="66.88,117.7 84.88,117.7"/>
+<polyline class="mark" points="66.88,170.49 84.88,170.49"/>
+<polyline class="mark" points="66.88,135.59 84.88,135.59"/>
+<text x="75.88" y="220.49" font-size="3" transform="rotate(-90 75.88 220.49)">R2</text>
+<text x="75.88" y="80.9" font-size="3" transform="rotate(-90 75.88 80.9)">R2</text>
+<text x="75.88" y="203.49" font-size="3" transform="rotate(-90 75.88 203.49)">R4</text>
+<text x="75.88" y="98.8" font-size="3" transform="rotate(-90 75.88 98.8)">R4</text>
+<text x="75.88" y="186.49" font-size="3" transform="rotate(-90 75.88 186.49)">R6</text>
+<text x="75.88" y="116.7" font-size="3" transform="rotate(-90 75.88 116.7)">R6</text>
+<text x="75.88" y="169.49" font-size="3" transform="rotate(-90 75.88 169.49)">R8</text>
+<text x="75.88" y="134.59" font-size="3" transform="rotate(-90 75.88 134.59)">R8</text>
+<text x="68.88" y="209.99" font-size="3" transform="rotate(-90 68.88 209.99)">contact (물체 쪽)</text>
+<text x="68.88" y="114.75" font-size="3" transform="rotate(-90 68.88 114.75)">back</text>
+<text x="83.88" y="249.49" font-size="2.6" transform="rotate(-90 83.88 249.49)">플랩</text>
+<path class="flute" d="M72.88 33H82.88M80.88 31L82.88 33L80.88 35M74.88 31L72.88 33L74.88 35"/>
+<text class="lbl" x="64.88" y="254.49">#7 Fin Ray 띠 1/4</text>
+<text class="dim" x="64.88" y="258.09">226.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
+<polygon class="glue" points="134.9,250.49 134.9,238.49 156.9,238.49 156.9,250.49"/>
+<polygon class="glue" points="134.9,36 134.9,24 156.9,24 156.9,36"/>
+<polygon class="cut" points="134.9,250.49 134.9,24 156.9,24 156.9,250.49"/>
+<polyline class="score" points="134.9,238.49 156.9,238.49"/>
+<polyline class="score" points="134.9,153.49 156.9,153.49"/>
+<polyline class="score" points="134.9,64 156.9,64"/>
+<polyline class="score" points="134.9,36 156.9,36"/>
+<polyline class="mark" points="136.9,221.49 154.9,221.49"/>
+<polyline class="mark" points="136.9,81.9 154.9,81.9"/>
+<polyline class="mark" points="136.9,204.49 154.9,204.49"/>
+<polyline class="mark" points="136.9,99.8 154.9,99.8"/>
+<polyline class="mark" points="136.9,187.49 154.9,187.49"/>
+<polyline class="mark" points="136.9,117.7 154.9,117.7"/>
+<polyline class="mark" points="136.9,170.49 154.9,170.49"/>
+<polyline class="mark" points="136.9,135.59 154.9,135.59"/>
+<text x="145.9" y="220.49" font-size="3" transform="rotate(-90 145.9 220.49)">R2</text>
+<text x="145.9" y="80.9" font-size="3" transform="rotate(-90 145.9 80.9)">R2</text>
+<text x="145.9" y="203.49" font-size="3" transform="rotate(-90 145.9 203.49)">R4</text>
+<text x="145.9" y="98.8" font-size="3" transform="rotate(-90 145.9 98.8)">R4</text>
+<text x="145.9" y="186.49" font-size="3" transform="rotate(-90 145.9 186.49)">R6</text>
+<text x="145.9" y="116.7" font-size="3" transform="rotate(-90 145.9 116.7)">R6</text>
+<text x="145.9" y="169.49" font-size="3" transform="rotate(-90 145.9 169.49)">R8</text>
+<text x="145.9" y="134.59" font-size="3" transform="rotate(-90 145.9 134.59)">R8</text>
+<text x="138.9" y="209.99" font-size="3" transform="rotate(-90 138.9 209.99)">contact (물체 쪽)</text>
+<text x="138.9" y="114.75" font-size="3" transform="rotate(-90 138.9 114.75)">back</text>
+<text x="153.9" y="249.49" font-size="2.6" transform="rotate(-90 153.9 249.49)">플랩</text>
+<path class="flute" d="M142.9 33H152.9M150.9 31L152.9 33L150.9 35M144.9 31L142.9 33L144.9 35"/>
+<text class="lbl" x="134.9" y="254.49">#8 Fin Ray 띠 2/4</text>
+<text class="dim" x="134.9" y="258.09">226.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
+<polygon class="cut" points="10,249 22,249 10,261"/>
+<text class="lbl" x="10" y="265">#10 손끝판 삼각 보강 (1/2)</text>
+<text class="dim" x="10" y="268.6">12×12 · B골 3 mm</text>
+<path class="cut" d="M10 281h100"/>
+<path class="cut" d="M10 281v-4"/>
+<path class="cut" d="M20 281v-2.5"/>
+<path class="cut" d="M30 281v-2.5"/>
+<path class="cut" d="M40 281v-2.5"/>
+<path class="cut" d="M50 281v-2.5"/>
+<path class="cut" d="M60 281v-4"/>
+<path class="cut" d="M70 281v-2.5"/>
+<path class="cut" d="M80 281v-2.5"/>
+<path class="cut" d="M90 281v-2.5"/>
+<path class="cut" d="M100 281v-2.5"/>
+<path class="cut" d="M110 281v-4"/>
+<text class="small" x="10" y="285">100 mm — 인쇄 후 자로 재서 100 mm 가 아니면 배율(실제 크기 100%) 확인</text>
+</svg>
