@@ -63,7 +63,7 @@ def soft_flap(r: Report, w_hard: float):
     c, d = r.c, r.d
     z_top = c["board_t"] * c["palm_layers"]
     xh = d["palm"]["sx"] / 2  # 힌지 x (손바닥 윗면 바깥 모서리)
-    Rs = d["soft"]["root_len"] + c["finray"]["L"]  # 힌지 → Fin Ray 끝 (contact flank 위)
+    Rs = d["soft"]["root_len"] + d["soft"].get("finray_L", c["finray"]["L"])  # 힌지 → Fin Ray 끝 (contact flank 위)
     phi = sp.symbols("phi", real=True)
     tip_x = xh + Rs * sp.sin(phi)
     tip_z = z_top - Rs * sp.cos(phi)
@@ -645,15 +645,27 @@ def soft_knot(r: Report, s: dict):
     xh, zt = d["palm"]["sx"] / 2, s["z_top"]
     phi_o = so["phi_open_deg"] * deg
     # 매듭 = 힌지 + s·A(φ),  A = (sinφ, −cosφ)
-    res = point_arm((xh, zt), lambda a: [xh + K["s"] * sp.sin(a), zt - K["s"] * sp.cos(a)], (phi_o, s["phi_min"]), (K["hole_x"], 0))
+    gx = -K["hole_x"] if K.get("cross") else K["hole_x"]  # 교차 실이면 반대쪽 구멍
+    res = point_arm((xh, zt), lambda a: [xh + K["s"] * sp.sin(a), zt - K["s"] * sp.cos(a)], (phi_o, s["phi_min"]), (gx, 0))
     r.put("soft_knot_arm_min", res["min"])
     r.put("soft_knot_arm_max", res["max"])
     r.check("S6", "soft 매듭 실의 모멘트 팔 (열림 30° … 닫힘 −8°) 최소 ≥ 8 mm", res["min"], lo=8, unit="mm")
     r.check("S7", "soft 매듭이 플랩 위 (s ≤ 뿌리 길이 − 2)", K["s"], hi=so["root_len"] - 2, unit="mm")
-    Rs = so["root_len"] + c["finray"]["L"]
+    Rs = so["root_len"] + so.get("finray_L", c["finray"]["L"])
     T = 2 * fv["soft_per_finger_N"] * Rs / res["min"]
     r.put("soft_string_T_video_N", T)
     r.check("S8", "영상용 0.5 N/손가락에서 soft 실 장력 ≤ 손 한계", T, hi=fv["hand_T_max_N"], unit="N")
+    # 한 가닥 루프: 손잡이는 두 가닥을 같이 당김 → 손 힘 = 2T (구멍 마찰 전)
+    r.put("soft_hand_loop_N", 2 * T)
+    if K.get("cross"):
+        r.check("X1", "soft 교차 구멍이 팔 장착 영역 안 (|x| ≤ 12)", K["hole_x"], hi=12, unit="mm")
+    if "sleeve" in d:
+        sl = d["sleeve"]
+        Kc = (xh + K["s"] * math.sin(f(s["phi_c"])), zt - K["s"] * math.cos(f(s["phi_c"])))
+        th = math.pi / 2 - math.atan2(abs(0 - Kc[1]), abs(gx - Kc[0]))
+        r.put("soft_hole_bend_deg", th * 180 / math.pi)
+        r.put("soft_hand_loop_straw_N", 2 * T * math.exp(sl["mu_straw"] * th))
+        r.put("soft_hand_loop_cardboard_N", 2 * T * math.exp(sl["mu_cardboard"] * th))
     pull = sp.Integral(res["m"], (res["a"], s["phi_min"], phi_o)).evalf(8)
     r.put("soft_pull_mm", abs(f(pull)))
     # 닫힘 스토퍼 블록은 매듭 실(y=0)과 겹치지 않게 y = stop_block_y
@@ -710,7 +722,11 @@ def b6p():
     r.check("H8", "바깥 접는 선이 손바닥 안 (yp + d + 2 ≤ sy/2)", yp + dd + 2, hi=d["palm"]["sy"] / 2, unit="mm")
     # 실: 안쪽 링크(가운데 쪽 면) 매듭 → 손바닥 가운데 구멍. 앞 손가락은 닫힘 = 시계 방향 (y–z)
     K = h["knot"]
-    res = point_arm((yp, zP), lambda a: [yp + K["s"] * sp.sin(a), zP - K["s"] * sp.cos(a)], (psi_open, psi_min), (K["hole_y"], 0))
+    gy = -K["hole_y"] if K.get("cross") else K["hole_y"]  # 교차 실: 앞 손가락 실 → 뒤쪽 구멍
+    res = point_arm((yp, zP), lambda a: [yp + K["s"] * sp.sin(a), zP - K["s"] * sp.cos(a)], (psi_open, psi_min), (gy, 0))
+    if K.get("cross"):
+        r.check("X2", "hard 교차 구멍이 반대 손가락 안쪽 접는 선에서 ≥ 3 떨어짐 (yp − hole_y)", yp - K["hole_y"], lo=3, unit="mm")
+        r.check("X3", "hard 교차 구멍이 팔 장착 영역 안 (|y| ≤ 15)", K["hole_y"], hi=15, unit="mm")
     r.put("hard_knot_arm_min", res["min"])
     r.put("hard_knot_arm_max", res["max"])
     # 쥐는 구간(맞닿음 … 뚜껑 ψ)에서 팔이 커야 하고, 완전 열림에서는 복원 고무줄만 이기면 되므로 작아도 됨
@@ -727,6 +743,19 @@ def b6p():
     r.put("hard_string_T_video_N", Th)
     r.put("hard_string_T_N", Th)
     r.check("F4", "영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계", Th, hi=fv["hand_T_max_N"], unit="N")
+    r.put("hard_hand_loop_N", 2 * Th)
+    # 구멍 마찰 (캡스턴 T_out = T_in·e^{μθ}): 손바닥 밑 실 → 구멍에서 위로 꺾이는 각 θ, 골판지 vs 빨대 슬리브
+    if "sleeve" in d:
+        sl = d["sleeve"]
+        P0 = sp.Matrix([yp + K["s"] * sp.sin(0), zP - K["s"] * sp.cos(0)])
+        dv = sp.Matrix([gy, 0]) - P0
+        # 구멍으로 들어오는 실(쥘 때, ψ=0)의 수평 기울기 → 구멍에서 수직 위로 꺾이는 각 = 90° − 상승각
+        th = f(sp.pi / 2 - sp.atan2(abs(dv[1]), abs(dv[0])))
+        r.put("hard_hole_bend_deg", th * 180 / math.pi)
+        for nm, mu in (("cardboard", sl["mu_cardboard"]), ("straw", sl["mu_straw"])):
+            r.put(f"hard_hole_friction_{nm}", math.exp(mu * th))
+        r.put("hard_hand_loop_straw_N", 2 * Th * math.exp(sl["mu_straw"] * th))
+        r.put("hard_hand_loop_cardboard_N", 2 * Th * math.exp(sl["mu_cardboard"] * th))
     r.check("E10", "영상용 pinch ≥ 건전지 최소 0.85 N", fv["pinch_N"], lo=fv["battery_min_N"], unit="N")
     pull = sp.Integral(res["m"], (res["a"], psi_min, psi_open)).evalf(8)
     r.put("hard_pull_mm", abs(f(pull)))

@@ -42,7 +42,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="14" y="114.75" font-size="3" transform="rotate(-90 14 114.75)">back</text>
 <text x="29" y="249.49" font-size="2.6" transform="rotate(-90 29 249.49)">플랩</text>
 <path class="flute" d="M18 33H28M26 31L28 33L26 35M20 31L18 33L20 35"/>
-<text class="lbl" x="10" y="254.49">7. Fin Ray 띠 1/4 ×1</text>
+<text class="lbl" x="10" y="254.49">9. Fin Ray 띠 1/4 ×1</text>
 <text class="dim" x="10" y="258.09">226.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
 <polygon class="glue" points="80.02,250.49 80.02,238.49 102.02,238.49 102.02,250.49"/>
 <polygon class="glue" points="80.02,36 80.02,24 102.02,24 102.02,36"/>
@@ -71,16 +71,8 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="84.02" y="114.75" font-size="3" transform="rotate(-90 84.02 114.75)">back</text>
 <text x="99.02" y="249.49" font-size="2.6" transform="rotate(-90 99.02 249.49)">플랩</text>
 <path class="flute" d="M88.02 33H98.02M96.02 31L98.02 33L96.02 35M90.02 31L88.02 33L90.02 35"/>
-<text class="lbl" x="80.02" y="254.49">8. Fin Ray 띠 2/4 ×1</text>
+<text class="lbl" x="80.02" y="254.49">10. Fin Ray 띠 2/4 ×1</text>
 <text class="dim" x="80.02" y="258.09">226.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>
-<polygon class="cut" points="150.04,24 172.04,24 172.04,44 150.04,44"/>
-<polyline class="score" points="150.04,30 172.04,30"/>
-<path class="flute" d="M158.04 33H168.04M166.04 31L168.04 33L166.04 35M160.04 31L158.04 33L160.04 35"/>
-<text class="lbl" x="150.04" y="48">9. 손톱 플랩 ×6</text>
-<text class="dim" x="150.04" y="51.6">22×20 · B골 3 mm, 3장 적층</text>
-<polygon class="cut" points="150.04,59 162.04,59 150.04,71"/>
-<text class="lbl" x="150.04" y="75">10. 손끝판 삼각 보강 ×2</text>
-<text class="dim" x="150.04" y="78.6">12×12 · B골 3 mm</text>
 <path class="cut" d="M10 281h100"/>
 <path class="cut" d="M10 281v-4"/>
 <path class="cut" d="M20 281v-2.5"/>

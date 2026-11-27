@@ -996,11 +996,15 @@ function hardFold(p: B6PP, d: Derived, b: number, objSdf: (v: Vector3) => number
     lines.push({ ...l, id: l.id + ".F", attached: attF });
     lines.push(mirrorLine(l, 1, -1, ".B", attF.map((x) => x.replace("F", "B"))));
   }
-  // 텐던 1가닥 루프: 앞 안쪽 링크 매듭 → 손바닥 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭
-  const K = g.P1.clone().addScaledVector(g.u, h.knot.s).add(V(0, -pt / 2, 0));
-  const G = V(0, h.knot.hole_y, 0);
+  // 텐던 1가닥 루프. 교차 실: 앞 안쪽 링크 매듭 → 뒤쪽 구멍(+dx, −hole_y) → 손잡이 → 앞쪽 구멍(−dx, +hole_y) → 뒤 매듭
+  const kn = h.knot as { s: number; hole_y: number; dx?: number; cross?: boolean };
+  const K = g.P1.clone().addScaledVector(g.u, kn.s).add(V(0, -pt / 2, 0));
+  const hy = kn.cross ? -kn.hole_y : kn.hole_y;
+  const dx = kn.dx ?? 0;
+  const G = V(dx, hy, 0);
+  const GB = V(-dx, -hy, 0);
   const top = V(0, 0, Z_TOP + 40);
-  lines.push({ id: "tendonLoop", kind: "tendon", pts: [K, G, top, G.clone().setY(-G.y), V(K.x, -K.y, K.z)], attached: ["hardF_l2", "hardB_l2", "palm", "hardF", "hardB"] });
+  lines.push({ id: "tendonLoop", kind: "tendon", pts: [K, G, G.clone().setZ(Z_TOP), top, GB.clone().setZ(Z_TOP), GB, V(K.x, -K.y, K.z)], attached: ["hardF_l2", "hardB_l2", "palm", "hardF", "hardB"] });
   const armNow = leverArm([K.y - g.P1.y, K.z - g.P1.z], [G.y - K.y, G.z - K.z]);
   const faceY = plateBot.y - halfT - C.pad_t;
   const nailRise = h.nail_len * (1 - Math.cos(nail.al));
@@ -1055,7 +1059,8 @@ export function makeB6(id: "B6P" | "B6F"): Design {
           drumY: p.soft.drum_y,
           joint: "score",
           Flim: p.force_video.soft_per_finger_N,
-          knot: { s: p.soft.knot.s, holeX: p.soft.knot.hole_x },
+          knot: { s: p.soft.knot.s, holeX: p.soft.knot.hole_x, dy: (p.soft.knot as { dy?: number }).dy, cross: (p.soft.knot as { cross?: boolean }).cross },
+          finrayL: (p.soft as { finray_L?: number }).finray_L,
         },
         ctrl.a,
         sdf,

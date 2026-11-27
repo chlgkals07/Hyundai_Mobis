@@ -9,7 +9,7 @@
   "soft": {
     "type": "flap",
     "joint": "score",
-    "root_len": 16.0,
+    "root_len": 30.0,
     "phi_open_deg": 30.0,
     "drum_y": 33.0,
     "palm_edge_relief": 1.5,
@@ -19,11 +19,14 @@
       -4.0
     ],
     "knot": {
-      "_doc": "레버 없이: 플랩 안쪽 면 매듭 구멍(힌지에서 s, y=0) → 손바닥 구멍(x=±hole_x, y=0) → 위. 좌우 한 가닥 루프",
-      "s": 14.0,
-      "hole_x": 5.0
+      "_doc": "교차 실: 오른쪽 플랩 매듭 → 왼쪽 구멍(x=−hole_x, y=+dy), 왼쪽 → 오른쪽 구멍(x=+hole_x, y=−dy). 손바닥 밑에서 X 자, 엇갈림 dy 로 안 닿음",
+      "s": 26.0,
+      "hole_x": 10.0,
+      "dy": 1.5,
+      "cross": true
     },
-    "finray_tab": 12.0
+    "finray_tab": 12.0,
+    "_doc_finray": "플랩을 16→30 으로 늘려 매듭을 힌지에서 26 까지 내림 (Fin Ray 85 그대로 — 71 로 줄이면 뻣뻣해져 스펀지를 못 감쌈, 시뮬). 끝 도달 101→115, 손바닥 높이·손끝판 길이는 calc 가 다시 맞춤"
   },
   "hard": {
     "type": "fold",
@@ -42,9 +45,11 @@
     },
     "nail_plies": 3,
     "knot": {
-      "_doc": "안쪽 링크 바깥면(가운데 쪽) 매듭, 윗 접는 선에서 s",
+      "_doc": "교차 실: 앞 손가락 매듭 → 뒤쪽 구멍(x=+dx, y=−hole_y), 뒤 → 앞쪽 구멍(x=−dx, y=+hole_y)",
       "s": 70.0,
-      "hole_y": 0.0
+      "hole_y": 8.0,
+      "dx": 1.5,
+      "cross": true
     }
   },
   "force_video": {
@@ -53,5 +58,11 @@
     "soft_per_finger_N": 0.5,
     "battery_min_N": 0.85,
     "hand_T_max_N": 10.0
+  },
+  "sleeve": {
+    "_doc": "손바닥 실 구멍 4개에 빨대 토막 (실이 골판지 모서리에 걸리지 않게, 마찰↓)",
+    "len": 10.0,
+    "mu_cardboard": 0.5,
+    "mu_straw": 0.25
   }
 }

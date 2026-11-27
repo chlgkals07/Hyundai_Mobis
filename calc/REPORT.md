@@ -536,22 +536,25 @@
 
 | ID | 조건 | 값 | 범위 | 결과 |
 |---|---|---|---|---|
-| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.838 deg | [-7.968, ] | ✅ |
-| S2 | 스펀지 폭이 개방 범위 안 | 2.838 deg | [, 30.0] | ✅ |
-| S6 | soft 매듭 실의 모멘트 팔 (열림 30° … 닫힘 −8°) 최소 ≥ 8 mm | 10.592 mm | [8.0, ] | ✅ |
-| S7 | soft 매듭이 플랩 위 (s ≤ 뿌리 길이 − 2) | 14.0 mm | [, 14.0] | ✅ |
-| S8 | 영상용 0.5 N/손가락에서 soft 실 장력 ≤ 손 한계 | 9.535 N | [, 10.0] | ✅ |
+| S1 | 건전지 끝 접촉각이 스토퍼보다 열린 쪽 (스토퍼가 건전지 지지를 막지 않음) | -2.492 deg | [-6.992, ] | ✅ |
+| S2 | 스펀지 폭이 개방 범위 안 | 2.492 deg | [, 30.0] | ✅ |
+| S6 | soft 매듭 실의 모멘트 팔 (열림 30° … 닫힘 −8°) 최소 ≥ 8 mm | 17.629 mm | [8.0, ] | ✅ |
+| S7 | soft 매듭이 플랩 위 (s ≤ 뿌리 길이 − 2) | 26.0 mm | [, 28.0] | ✅ |
+| S8 | 영상용 0.5 N/손가락에서 soft 실 장력 ≤ 손 한계 | 6.523 N | [, 10.0] | ✅ |
+| X1 | soft 교차 구멍이 팔 장착 영역 안 (|x| ≤ 12) | 10.0 mm | [, 12.0] | ✅ |
 | S9 | 닫힘 스토퍼 블록이 실 경로(y=0)에서 떨어짐 (블록 y 끝 ≤ −2) | -4.0 mm | [, -2.0] | ✅ |
-| S5 | 아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| | 1.5 mm | [0.84, ] | ✅ |
+| S5 | 아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min| | 1.5 mm | [0.736, ] | ✅ |
 | R2 | Rigid(건전지): Fin Ray 끝이 바닥 위 [3,10] mm — 걸리지 않으면서 건전지 옆면에 닿음 | 6.5 mm | [3.0, 10.0] | ✅ |
 | H4 | 케이블 파지 시 손톱 끝 상승 ≤ 케이블 반지름 | 0.135 mm | [, 2.5] | ✅ |
 | R1 | Soft 모드: 열린 hard 손끝판이 Fin Ray 끝보다 ≥10 위 | 24.416 mm | [10.0, ] | ✅ |
 | F1 | 열림에서 두 링크 판 사이 ≥ 판 두께 + 2 (d·cos ψ_open) | 14.107 mm | [5.0, ] | ✅ |
 | H8 | 바깥 접는 선이 손바닥 안 (yp + d + 2 ≤ sy/2) | 38.0 mm | [, 44.0] | ✅ |
-| F2 | hard 매듭 실의 모멘트 팔: 쥐는 구간(맞닿음 … 뚜껑) 최소 ≥ 8 mm | 10.814 mm | [8.0, ] | ✅ |
-| F2b | 완전 열림(54°)에서도 실이 닫는 방향 팔 ≥ 2 mm (약한 복원 고무줄을 이기고 출발) | 3.969 mm | [2.0, ] | ✅ |
+| X2 | hard 교차 구멍이 반대 손가락 안쪽 접는 선에서 ≥ 3 떨어짐 (yp − hole_y) | 4.0 mm | [3.0, ] | ✅ |
+| X3 | hard 교차 구멍이 팔 장착 영역 안 (|y| ≤ 15) | 8.0 mm | [, 15.0] | ✅ |
+| F2 | hard 매듭 실의 모멘트 팔: 쥐는 구간(맞닿음 … 뚜껑) 최소 ≥ 8 mm | 17.645 mm | [8.0, ] | ✅ |
+| F2b | 완전 열림(54°)에서도 실이 닫는 방향 팔 ≥ 2 mm (약한 복원 고무줄을 이기고 출발) | 7.384 mm | [2.0, ] | ✅ |
 | F3 | 매듭이 링크 위 (10 ≤ s ≤ L − 5) | 70.0 mm | [10.0, 70.0] | ✅ |
-| F4 | 영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계 | 9.908 N | [, 10.0] | ✅ |
+| F4 | 영상용 pinch 1.5 N 에서 텐던 장력 ≤ 손 한계 | 6.082 N | [, 10.0] | ✅ |
 | E10 | 영상용 pinch ≥ 건전지 최소 0.85 N | 1.5 N | [0.85, ] | ✅ |
 | C1 | 손톱이 접히며 얻는 상승 ≥ 10 mm | 11.569 mm | [10.0, ] | ✅ |
 
@@ -560,22 +563,26 @@
 | 항목 | 값 |
 |---|---|
 | `soft_hinge_x` | 30.0 |
-| `soft_reach` | 101.0 |
-| `soft_phi_min_deg` | -7.9676 |
+| `soft_reach` | 115.0 |
+| `soft_phi_min_deg` | -6.9925 |
 | `soft_x_min` | 16.0 |
-| `soft_phi_battery_deg` | -2.8376 |
-| `soft_phi_chip_deg` | -2.8376 |
-| `soft_phi_sponge_deg` | 2.8376 |
-| `soft_open_half_width` | 104.7487 |
-| `soft_knot_arm_min` | 10.5924 |
-| `soft_knot_arm_max` | 13.749 |
-| `soft_string_T_video_N` | 9.5351 |
-| `soft_pull_mm` | 8.217 |
-| `soft_stop_face_x` | 28.0405 |
-| `soft_edge_interference_mm` | 0.8398 |
+| `soft_phi_battery_deg` | -2.4919 |
+| `soft_phi_chip_deg` | -2.4919 |
+| `soft_phi_sponge_deg` | 2.4919 |
+| `soft_open_half_width` | 111.7487 |
+| `soft_knot_arm_min` | 17.6292 |
+| `soft_knot_arm_max` | 24.2281 |
+| `soft_string_T_video_N` | 6.5233 |
+| `soft_hand_loop_N` | 13.0465 |
+| `soft_hole_bend_deg` | 62.801 |
+| `soft_hand_loop_straw_N` | 17.1594 |
+| `soft_hand_loop_cardboard_N` | 22.5687 |
+| `soft_pull_mm` | 13.6917 |
+| `soft_stop_face_x` | 28.2829 |
+| `soft_edge_interference_mm` | 0.7359 |
 | `hard_pivot_y` | 12.0 |
-| `hard_coupler_below_E` | 23.3762 |
-| `rigid_palm_height` | 101.3762 |
+| `hard_coupler_below_E` | 37.3913 |
+| `rigid_palm_height` | 115.3913 |
 | `rigid_finray_tip_above_floor` | 6.5 |
 | `hard_psi_cable_deg` | -3.4398 |
 | `hard_tip_rise_cable_mm` | 0.1351 |
@@ -584,13 +591,19 @@
 | `hard_psi_min_deg` | -5.3554 |
 | `soft_mode_hard_above_finray` | 24.4161 |
 | `hard_opening_mm` | 135.3525 |
-| `hard_knot_arm_min` | 3.9686 |
-| `hard_knot_arm_max` | 11.7412 |
-| `hard_knot_arm_grip_min` | 10.8136 |
-| `hard_knot_arm_at_pinch` | 11.3545 |
-| `hard_string_T_video_N` | 9.908 |
-| `hard_string_T_N` | 9.908 |
-| `hard_pull_mm` | 8.7031 |
+| `hard_knot_arm_min` | 7.3838 |
+| `hard_knot_arm_max` | 19.119 |
+| `hard_knot_arm_grip_min` | 17.6445 |
+| `hard_knot_arm_at_pinch` | 18.4965 |
+| `hard_string_T_video_N` | 6.0822 |
+| `hard_string_T_N` | 6.0822 |
+| `hard_hand_loop_N` | 12.1645 |
+| `hard_hole_bend_deg` | 15.3215 |
+| `hard_hole_friction_cardboard` | 1.1431 |
+| `hard_hole_friction_straw` | 1.0691 |
+| `hard_hand_loop_straw_N` | 13.0055 |
+| `hard_hand_loop_cardboard_N` | 13.9047 |
+| `hard_pull_mm` | 14.5058 |
 | `hard_face_wedge_deg` | 0.0 |
 | `vertical_compliance_mm` | 11.5689 |
 | `fold_strip_len` | 210.0 |
@@ -629,6 +642,7 @@
 | `soft_knot_arm_min` | 10.5924 |
 | `soft_knot_arm_max` | 13.749 |
 | `soft_string_T_video_N` | 9.5351 |
+| `soft_hand_loop_N` | 19.0703 |
 | `soft_pull_mm` | 8.217 |
 | `soft_stop_face_x` | 28.0405 |
 | `soft_edge_interference_mm` | 0.8398 |

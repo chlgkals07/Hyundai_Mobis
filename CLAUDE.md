@@ -21,9 +21,9 @@ npx tsx scripts/score.ts         # 채점 → docs/COMPARISON.md + out/viewer-da
 npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개도-A4.pdf, README.md
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
-node scripts/record-assembly.mjs 20 - B5E # 조립 애니메이션 → docs/<B5E|B5N>-조립과정.mp4 (프레임 캡처 + ffmpeg)
-node scripts/manual-shots.mjs    # 설명서 그림 → docs/manual-img/*.png (build 후, 조립 페이지 캡처)
-npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg (B5N), docs/diagrams/B5E/*.svg
+node scripts/record-assembly.mjs 20 - B6P # 조립 애니메이션 → docs/<B6P|B5E|B5N>-조립과정.mp4 (프레임 캡처 + ffmpeg)
+node scripts/manual-shots.mjs B6P # 설명서 그림 (B6P: b6p-*.png) → docs/manual-img/*.png (build 후, 조립 페이지 캡처)
+npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg (B5N), docs/diagrams/B5E|B6P/*.svg
 python3 calc/envelope.py         # 팔 결합용 그리퍼 점유 공간·장착 영역·실 마찰
 npx tsx scripts/arm-check.ts     # 팔↔그리퍼 간섭표 → docs/arm-check.md (params/arm/R4.json 은 가정값)
 ```
@@ -106,6 +106,11 @@ DIY 골판지 손 원칙(관절 = 접는 선·테이프, 실은 빨대 터널, �
 - 전개도 전량판: `patterns/B6P/B6P-전개도-전량-A4.pdf` (4장), `patterns/B6F/…` (3장)
 - **하민 결정 (2026-11-27): B6P 로 간다.** 설명서 `docs/B6P-제작설명서.md`(그림 15장 `docs/manual-img/b6p-*`, 단면도 `docs/diagrams/B6P/`), 조립 영상 `docs/B6P-조립과정.mp4`, 조립 Artifact 기본 설계 = B6P (블록 A = 접는 상자 만들기)
 - 접는 상자 순서: 끝 탭을 윗변에 붙여 상자부터 → 그다음 윗변을 손바닥에 (탭이 상자 안쪽이라)
+- **교차 실 + 빨대 슬리브 (2026-11-27, 하민: '멀리서 당기기 어렵다')**: 한 가닥 루프라 손잡이는 2T (≈20 N) 였음. 모멘트 팔 상한 = 피벗 ↔ 구멍 수평 거리 → 실을 반대쪽 구멍으로 (손바닥 밑 X 자, 구멍 1.5 엇갈림).
+  hard 구멍 y=∓8 (팔 17.6–19.1, T 6.1 N), soft 플랩 16→30 + 매듭 26 + 구멍 x=∓10 (팔 17.6–24.2, T 6.5 N). 당김 9→15 mm. X1–X3
+  - Fin Ray 를 85→71 로 줄여 끝 도달을 유지하려 했더니 뻣뻣해져 스펀지 감싸기 실패(시뮬 접촉 1점) → Fin Ray 85 유지, 도달 101→115 (손바닥 높이 +14, calc 가 Lc 재계산)
+  - 실 구멍 4개 Ø6.5 + 빨대 슬리브 10 mm (캡스턴: 꺾임 hard 15°·soft 63°, μ 골판지 0.5 → 빨대 0.25). 경로 전체에 빨대는 불필요 (직선 구간은 마찰 0)
+  - 손잡이 힘(그리퍼 쪽, 슬리브 포함): hard 13 N, soft 17 N — 팔 경로 마찰은 별도
 
 ## 다음 할 일
 - [ ] 목요일 실물 (B5E 권장, B5N 도 가능): Fin Ray 1개 → EI 보정, 평행 링크 손가락 1개 → 손끝판 수직 유지·손톱 접힘 확인

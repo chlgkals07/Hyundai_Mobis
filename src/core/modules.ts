@@ -62,7 +62,9 @@ export interface FlapCfg {
   /** B5E: 드럼 대신 레버 (플랩에 세운 판, 힌지선 → 안쪽·위). beta0 = 열림 자세에서 손바닥 윗면 위로 잰 각(rad) */
   lever?: { r: number; w: number; beta0: number; guideX: number; guideDz: number };
   /** B6: 레버 없이 플랩 안쪽 면 매듭(힌지에서 s, y=0) → 손바닥 구멍(x=holeX) → 위 */
-  knot?: { s: number; holeX: number };
+  knot?: { s: number; holeX: number; dy?: number; cross?: boolean };
+  /** Fin Ray 길이 (B6P 71). 없으면 common */
+  finrayL?: number;
 }
 
 /** 2D 레버 모멘트 팔 (닫힘 +): 피벗 → 끝 rv, 실 방향 u (같은 평면 좌표 2개) */
@@ -82,6 +84,7 @@ export interface SoftOut {
 }
 
 export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
+  const FR_SPEC: FinraySpec = cfg.finrayL ? { ...FINRAY, L: cfg.finrayL } : FINRAY;
   const qmax = cfg.phiOpen - cfg.phiMin;
   const qcmd = clamp(a, 0, 1) * qmax;
   const yf = C.finray.pair_y;
@@ -94,7 +97,7 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     return { O: hinge(1).add(V(0, yf, 0)).addScaledVector(A, cfg.rootLen), A, N: outAt(phi), W: Y };
   };
   const forceAt = (q: number) => {
-    const { res, Q } = finrayGenForce(FINRAY, frameAt, 0, q, 0.004, sdf, 2 * DEG);
+    const { res, Q } = finrayGenForce(FR_SPEC, frameAt, 0, q, 0.004, sdf, 2 * DEG);
     let F = 0;
     if (res.contactCentroid) {
       const h = hinge(1).add(V(0, yf, 0));
@@ -143,11 +146,20 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     R.push(cylPart("axle", "flap", "straw", h.clone().setY(yc), Y, yHi - yLo + 10, C.straw_d));
   }
   let armNow = cfg.drumR;
+  let knotLines: Line[] = [];
   if (cfg.knot) {
-    const K = h.clone().addScaledVector(A, cfg.knot.s);
-    const G = V(cfg.knot.holeX, 0, 0);
-    const top = V(cfg.knot.holeX, 0, Z_TOP + 50);
-    RL.push({ id: "stringA", kind: "string", pts: [K, G, top], attached: ["flap", "palm"] });
+    // 매듭 → 손바닥 구멍 → 위. 교차 실이면 오른쪽 플랩 실이 왼쪽 구멍(−x, +dy)으로, 왼쪽은 (+x, −dy) 로 (손바닥 밑 X 자)
+    const kn = cfg.knot;
+    const K = h.clone().addScaledVector(A, kn.s);
+    const gx = kn.cross ? -kn.holeX : kn.holeX;
+    const dy = kn.dy ?? 0;
+    const G = V(gx, dy, 0);
+    const top = V(gx, dy, Z_TOP + 50);
+    const KL = V(-K.x, K.y, K.z);
+    knotLines = [
+      { id: "stringA.R", kind: "string", pts: [K, G, G.clone().setZ(Z_TOP), top], attached: ["flapR", "palm"] },
+      { id: "stringA.L", kind: "string", pts: [KL, V(-gx, -dy, 0), V(-gx, -dy, Z_TOP), V(-gx, -dy, Z_TOP + 50)], attached: ["flapL", "palm"] },
+    ];
     tops.push(top);
     armNow = leverArm([K.x - h.x, K.z - h.z], [G.x - K.x, G.z - K.z]);
   } else if (cfg.lever) {
@@ -185,6 +197,7 @@ export function softFlap(cfg: FlapCfg, a: number, sdf: Sdf): SoftOut {
     lines.push(mirrorLine(l, -1, 1, ".L", ["flapL", "palm"]));
   }
   tops.push(mir(tops[0], -1, 1));
+  lines.push(...knotLines);
   if (cfg.joint === "axle") {
     // 굵은 빨대 부싱 (손바닥 쪽에 접착)
     for (const s of [1, -1]) parts.push(cylPart(`bush.${s > 0 ? "R" : "L"}`, "palm", "bubble", V(s * cfg.xh, yc, Z_TOP), Y, 20, C.bubble_d));

@@ -96,13 +96,13 @@ function stepsB6P(): Step[] {
     { t0: 10, t1: 16, title: "2. 접는 선·구멍", craft: "파란 점선 = 볼펜으로 자 대고 꾹. 빨간 원 = 송곳으로 Ø3 실 구멍 (빨대 구멍 없음)", feas: "정밀 구멍 없음 — 위치가 1–2 mm 틀려도 동작", level: 1 },
     { t0: 16, t1: 22, title: "3. Fin Ray 띠 — 한쪽 라이너 벗기기", craft: "Fin Ray 띠 4개: 한쪽 겉종이를 물에 살짝 적셔 벗김 → 길이 방향으로 잘 휨", feas: "벗기기 + 건조 (드라이어 5분)", level: 2 },
     { t0: 22, t1: 27, title: "4. 잘린 부품들", craft: "손바닥 2장, Fin Ray 띠 4, 접는 상자 띠 2, 손끝판·손톱·스토퍼", feas: "적층은 손끝판(2장)·손톱(3장)·스토퍼 블록(2장)뿐", level: 1 },
-    { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장·아랫장(좌우 1.5 mm 좁게) 골 방향 엇갈려 풀칠, 플랩 부분 풀칠 금지. 구멍 7개 함께 뚫기. 닫힘 스토퍼 블록", feas: "쉬움", level: 1 },
+    { t0: 27, t1: 33, title: "5. 손바닥 + 플랩", craft: "윗장(날개 30 mm 포함)·아랫장 골 방향 엇갈려 풀칠, 날개 부분 풀칠 금지. 실 구멍 4개(Ø6.5)에 빨대 슬리브 10 mm, 매듭·고무줄 구멍. 닫힘 스토퍼 블록", feas: "빨대 슬리브 끝은 둥글게 — 실이 걸리지 않게", level: 1 },
     { t0: 33, t1: 41, title: "6. Fin Ray 접기 + 리브", craft: "띠를 접는 선 4곳에서 접어 삼각형 → 끝 탭 풀칠. 빨대 리브 4개를 R2–R8 에 테이프 힌지", feas: "Fin Ray 4개 × 약 10분", level: 2 },
-    { t0: 41, t1: 46, title: "7. Fin Ray → 플랩", craft: "Fin Ray 앞 탭(12 mm)을 플랩 안쪽 면 빗금 자리에 풀칠 → contact 면이 플랩과 한 줄. 플랩 하나에 2개", feas: "밑판·레버 없음", level: 1 },
+    { t0: 41, t1: 46, title: "7. Fin Ray → 플랩", craft: "Fin Ray 앞 탭(12 mm)을 날개 끝부분 안쪽 면 빗금 자리에 풀칠 → contact 면이 날개와 한 줄. 날개 하나에 2개", feas: "밑판·레버 없음", level: 1 },
     { t0: 46, t1: 52, title: "8. 접는 상자 만들기 → 손바닥에", craft: "띠의 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠(납작한 상자) → 윗변을 손바닥 아랫면 빗금 자리에 풀칠", feas: "안쪽 링크(매듭 구멍)가 손바닥 가운데 쪽", level: 2 },
     { t0: 52, t1: 58, title: "9. 접는 상자 — 링크·아랫변", craft: "바깥 링크·아랫변·안쪽 링크가 평행사변형으로 매달림. 손으로 밀어 아랫변이 수평을 유지하는지 확인", feas: "두 링크(75 mm) 길이가 같으면 평행 — 구멍 정렬 필요 없음", level: 2 },
     { t0: 58, t1: 64, title: "10. 손끝판 + 손톱", craft: "ㄱ자 손끝판(2장)을 아랫변 아래 안쪽 끝에 풀칠 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼 + 고무줄 2바퀴", feas: "손끝판이 수직인지 상자를 기울여 확인", level: 2 },
-    { t0: 64, t1: 70, title: "11. 실·고무줄", craft: "soft: 좌 매듭 → 구멍 → 손잡이 → 구멍 → 우 매듭 (한 가닥). hard: 앞 매듭 → 가운데 구멍 → 손잡이 → 같은 구멍 → 뒤 매듭 (한 가닥). 복원 고무줄은 약하게", feas: "매듭 4개, 균형막대 없음. 실 장력 약 10 N — 매끄러운 실", level: 1 },
+    { t0: 64, t1: 70, title: "11. 실·고무줄", craft: "교차 실 — soft: 오른쪽 날개 매듭 → 왼쪽 구멍 → 손잡이 → 오른쪽 구멍 → 왼쪽 날개 매듭. hard: 앞 매듭 → 뒤쪽 구멍 → 손잡이 → 앞쪽 구멍 → 뒤 매듭. 손바닥 밑에서 X 자. 복원 고무줄은 약하게", feas: "교차로 지렛대 ↑: 실 장력 약 6 N, 당김 약 15 mm. 매끄러운 실", level: 1 },
     { t0: 70, t1: 84, title: "12. 동작 — 건전지 (Rigid) · 감자칩 (Soft)", craft: "hard 실을 당기면 손끝판이 수직을 유지한 채 닫힘 · soft 실을 당기면 Fin Ray 가 감쌈 (영상용 0.5 N/손가락)", feas: "시뮬 결과 재생 (마찰·골판지 휨 미포함)", level: 1 },
     { t0: 84, t1: 94, title: "실현 가능한가?", craft: "", feas: "", level: 1 },
   ];
@@ -388,7 +388,7 @@ function fillEnd() {
         ["손바닥·플랩·Fin Ray 붙이기", 20, "쉬움 — 레버·밑판 없음", true],
         ["접는 상자 2개", 30, "두 링크 길이만 맞으면 평행. 관절 테이프 수명은 실물 확인", false],
         ["손끝판·손톱", 20, "손톱 3겹 테이프 힌지", true],
-        ["실·고무줄·조정", 25, "매듭 4개, 실 장력 약 10 N — 매끄러운 실", false],
+        ["실·고무줄·조정", 25, "교차 실 매듭 4개 + 빨대 슬리브 4개, 실 장력 약 6 N", true],
       ] as [string, number, string, boolean][])
     : [
     [`인쇄·붙이기·자르기 (판 ${FEAS.boardPieces}장, 그중 원판 ${FEAS.circles})`, cutTot, "가능 — 2인 분담 시 절반", true],
@@ -400,7 +400,7 @@ function fillEnd() {
   ] as [string, number, string, boolean][];
   const tot = rows.reduce((a, r) => a + r[1], 0);
   document.getElementById("endRows")!.innerHTML = rows.map((r) => `<tr><td>${r[0]}</td><td>${h(r[1])}</td><td class="${r[3] ? "ok" : "warn"}">${r[2]}</td></tr>`).join("");
-  document.getElementById("endSum")!.innerHTML = `합계 약 <b>${(tot / 60).toFixed(1)} 시간 (1인)</b>, 2인이면 약 ${(tot / 60 / 1.7).toFixed(1)} 시간. 골판지 면적 ${FEAS.areaM2.toFixed(2)} m² → 택배상자 약 ${FEAS.boxes}–${FEAS.boxes + 1}개 + Fin Ray 용 여분. 그 외: 일반 빨대 ${FOLD ? "3개 (Fin Ray 리브만)" : "10개"}${LEV || FOLD ? "" : ", 버블티 빨대 2개"}, 고무줄, 실, 테이프, 목공풀. 시간은 모두 추정.`;
+  document.getElementById("endSum")!.innerHTML = `합계 약 <b>${(tot / 60).toFixed(1)} 시간 (1인)</b>, 2인이면 약 ${(tot / 60 / 1.7).toFixed(1)} 시간. 골판지 면적 ${FEAS.areaM2.toFixed(2)} m² → 택배상자 약 ${FEAS.boxes}–${FEAS.boxes + 1}개 + Fin Ray 용 여분. 그 외: 일반 빨대 ${FOLD ? "5개 (Fin Ray 리브 + 구멍 슬리브)" : "10개"}${LEV || FOLD ? "" : ", 버블티 빨대 2개"}, 고무줄, 실, 테이프, 목공풀. 시간은 모두 추정.`;
 }
 fillEnd();
 let shownSheet = -1;
@@ -781,10 +781,10 @@ function blocksB6P(): Block[] {
       parts: isSoftR,
       lines: /^(stringA|returnA)\.R$/,
       steps: [
-        { t0: 0, t1: 2.5, match: R_("^(palm|flap)"), from: [0, 0, -60], cap: "윗장(플랩 포함) + 아랫장(좌우 1.5 mm 좁게) 풀칠. 플랩은 접는 선 = 힌지. 매듭 구멍은 접는 선에서 14 mm" },
+        { t0: 0, t1: 2.5, match: R_("^(palm|flap)"), from: [0, 0, -60], cap: "윗장(날개 30 mm 포함) + 아랫장 풀칠. 날개는 접는 선 = 힌지. 매듭 구멍은 접는 선에서 26 mm, 실 구멍엔 빨대 슬리브" },
         { t0: 2.5, t1: 4, match: R_("softStop"), from: [0, 0, -50], cap: "닫힘 스토퍼 블록 (실 경로 y=0 을 피해 뒤쪽): 플랩이 −8° 에서 기댐" },
-        { t0: 4, t1: 6.5, match: R_("^finray"), from: [60, 0, -40], cap: "Fin Ray 2개: 앞 탭을 플랩 안쪽 면 빗금 자리에 풀칠 → contact 면이 플랩과 한 줄" },
-        { t0: 6.5, t1: 7.5, match: R_("zzz"), from: [0, 0, 0], cap: "실: 플랩 매듭 → 손바닥 구멍 → 위 (좌·우 한 가닥) · 복원 고무줄: 플랩 ↔ 손바닥 구멍" },
+        { t0: 4, t1: 6.5, match: R_("^finray"), from: [60, 0, -40], cap: "Fin Ray 2개: 앞 탭을 날개 끝 안쪽 면 빗금 자리에 풀칠 → contact 면이 날개와 한 줄" },
+        { t0: 6.5, t1: 7.5, match: R_("zzz"), from: [0, 0, 0], cap: "교차 실: 날개 매듭 → 손바닥 밑 → 반대쪽 구멍(빨대 슬리브) → 위 · 복원 고무줄: 날개 ↔ 손바닥 구멍" },
       ],
       act: [7.5, (uu) => ({ a: uu < 0.5 ? uu * 2 : 2 - uu * 2, b: 0, obj: null })],
       feas: "레버·밑판 없음 — 매듭 하나로 구동",
@@ -799,12 +799,12 @@ function blocksB6P(): Block[] {
         { t0: 0, t1: 2.5, match: R_("^(palm$|foldTop)"), from: [0, 0, -50], cap: "접는 상자 윗변을 손바닥 아랫면 빗금 자리에 풀칠" },
         { t0: 2.5, t1: 5.5, match: R_("^(foldOut|foldIn|foldBot)"), from: [0, 0, -45], cap: "미리 접어 둔 상자의 바깥 링크·아랫변·안쪽 링크 (관절 = 접는 선 + 테이프). 안쪽 링크가 가운데 쪽" },
         { t0: 5.5, t1: 8.5, match: R_("^(tipPlate|pad|nail)"), from: [0, -20, -60], cap: "ㄱ자 손끝판(2겹)을 아랫변 밑 안쪽 끝에 + 삼각 보강. 손톱(3겹) 테이프 힌지 + 스토퍼" },
-        { t0: 8.5, t1: 9.5, match: R_("zzz"), from: [0, 0, 0], cap: "안쪽 링크 '매듭' 구멍에 실 → 손바닥 가운데 구멍 · 복원 고무줄" },
+        { t0: 8.5, t1: 9.5, match: R_("zzz"), from: [0, 0, 0], cap: "안쪽 링크 '매듭' 구멍에 실 → 손바닥 밑을 지나 반대쪽(뒤쪽) 구멍 · 복원 고무줄" },
       ],
       act: [9.5, (uu) => ({ a: 0, b: uu < 0.55 ? uu / 0.55 : 1 - (uu - 0.55) / 0.45, obj: "battery" })],
       feas: "손으로 기울여 손끝판이 수직인지 확인 — 기울면 두 링크 길이 차이",
     },
-    { ...str, steps: [{ t0: 0, t1: 4, match: R_("zzz"), from: [0, 0, 0], cap: "soft 실(파랑): 좌 매듭 → 구멍 → 손잡이 → 구멍 → 우 매듭 · hard 실(보라): 앞 매듭 → 가운데 구멍 → 손잡이 → 뒤 매듭 (각각 한 가닥)" }] },
+    { ...str, steps: [{ t0: 0, t1: 4, match: R_("zzz"), from: [0, 0, 0], cap: "교차 실 — soft(파랑): 우 날개 → 왼쪽 구멍 → 손잡이 → 오른쪽 구멍 → 좌 날개 · hard(보라): 앞 → 뒤쪽 구멍 → 손잡이 → 앞쪽 구멍 → 뒤 (각각 한 가닥, 손바닥 밑 X 자)" }] },
   ];
 }
 let BLOCKS: Block[] = makeBlocks();

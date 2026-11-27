@@ -26,9 +26,9 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <polyline class="mark" points="87,62 101,62"/>
 <polyline class="mark" points="87,66 101,66"/>
 <polyline class="mark" points="87,88 101,88"/>
-<circle class="hole" cx="61" cy="64" r="1.5"/>
+<circle class="hole" cx="61" cy="64" r="3.25"/>
 <path class="cross" d="M60 64h2M61 63v2"/>
-<circle class="hole" cx="51" cy="64" r="1.5"/>
+<circle class="hole" cx="51" cy="64" r="3.25"/>
 <path class="cross" d="M50 64h2M51 63v2"/>
 <circle class="hole" cx="56" cy="98" r="1.5"/>
 <path class="cross" d="M55 98h2M56 97v2"/>
