@@ -40,7 +40,7 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <text x="21" y="134.59" font-size="3" transform="rotate(-90 21 134.59)">R8</text>
 <text x="14" y="209.99" font-size="3" transform="rotate(-90 14 209.99)">contact (물체 쪽)</text>
 <text x="14" y="114.75" font-size="3" transform="rotate(-90 14 114.75)">back</text>
-<text x="29" y="249.49" font-size="2.6" transform="rotate(-90 29 249.49)">플랩</text>
+<text x="29" y="249.49" font-size="2.6" transform="rotate(-90 29 249.49)">날개에 풀칠</text>
 <path class="flute" d="M18 33H28M26 31L28 33L26 35M20 31L18 33L20 35"/>
 <text class="lbl" x="10" y="254.49">9. Fin Ray 띠 4/4 ×1</text>
 <text class="dim" x="10" y="258.09">226.49×22 · 단면 골판지 (한쪽 라이너 벗김)</text>

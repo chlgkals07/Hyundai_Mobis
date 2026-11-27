@@ -26,6 +26,8 @@ h1 { font-size: 18px; margin: 0; text-wrap: balance; }
 .cap .craft { color: #2a3330; line-height: 1.45; }
 .cap .feas { color: #7a4a00; background: #fbecd2; border-radius: 5px; padding: .25em .55em; line-height: 1.4; }
 .cap .lvl { color: #2f6b5b; font-family: var(--font-num); font-size: .85em; letter-spacing: .05em; }
+.legend { position: absolute; left: 1.5%; top: 2%; display: flex; gap: .9em; flex-wrap: wrap; background: rgba(250,251,250,.85); padding: 3px 8px; border-radius: 5px; font-size: clamp(9px, 1vw, 12px); color: #2a3330; }
+.legend i { display: inline-block; width: 1.4em; height: .35em; border-radius: 2px; margin-right: .35em; vertical-align: middle; }
 .time { position: absolute; right: 1.5%; top: 2%; font-family: var(--font-num); font-size: clamp(9px, 1vw, 13px); color: #5b6763; background: rgba(250,251,250,.8); padding: 2px 6px; border-radius: 4px; }
 .end { position: absolute; inset: 6% 8%; background: rgba(250,251,250,.97); border-radius: 10px; padding: 3% 4%; display: grid; gap: 1.2em; align-content: start; font-size: clamp(10px, 1.35vw, 16px); color: #1d2422; }
 .end h2 { margin: 0; font-size: 1.6em; }
@@ -95,6 +97,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--mat); outli
       <div class="lvl" id="capLevel"></div>
     </div>
     <div class="time" id="time"></div>
+    <div class="legend" aria-label="색 범례"><span><i style="background:#1b3a6b"></i>soft 실</span><span><i style="background:#8e44ad"></i>hard 실</span><span><i style="background:#e4572e"></i>복원 고무줄</span><span><i style="background:#f0b25a"></i>지금 붙이는 부품</span></div>
     <div class="end" id="end" hidden>
       <h2>실현 가능한가? — 네, 하루 작업 분량. 단 3곳이 관건</h2>
       <table><thead><tr><th>단계</th><th>시간 (추정)</th><th>판단</th></tr></thead><tbody id="endRows"></tbody></table>

@@ -709,6 +709,9 @@ type B6Soft = {
   stop_block_y: number[];
   knot: { s: number; hole_x: number; dy?: number; cross?: boolean };
   finray_L?: number;
+  finray_tab?: number;
+  finray_end_tab?: number;
+  finray_flatten?: boolean;
 };
 /** B6 공용 soft: 손바닥 윗장(플랩 포함)·아랫장·Fin Ray 띠(플랩 풀칠 탭 포함)·닫힘 스토퍼. 레버·슬롯·밑판 없음 */
 function b6Soft(palm: { sx: number; sy: number }, so: B6Soft, d: Record<string, number>, hardHoles: P2[], hardNote: string): Shape[] {
@@ -755,12 +758,13 @@ function b6Soft(palm: { sx: number; sy: number }, so: B6Soft, d: Record<string, 
   const L = so.finray_L ?? FR.L;
   const b = FR.base;
   const Lb = Math.hypot(L, b);
-  const t0 = 12;
-  const tab = 12;
+  const t0 = so.finray_tab ?? 12;
+  const tab = so.finray_end_tab ?? 12;
   const W = FR.width;
+  const flat = so.finray_flatten === true;
   for (let k = 1; k <= 4; k++) {
     const total = t0 + L + Lb + b + tab;
-    const st = blank(`Fin Ray 띠 ${k}/4`, 1, "단면 골판지 (한쪽 라이너 벗김)", total, W, `앞 탭 ${t0} 을 플랩 안쪽 면(접는 선 아래, 표시 위치)에 풀칠 → contact 면이 플랩과 한 줄. 접는 선 3개로 삼각형 → 끝 탭을 contact 뿌리 안쪽에 풀칠. 리브 R2–R8 빨대는 테이프 힌지.`);
+    const st = blank(`Fin Ray 띠 ${k}/4`, 1, flat ? "B골 3 mm, 병으로 굴려 골을 눌러 폄" : "단면 골판지 (한쪽 라이너 벗김)", total, W, `${flat ? "자르기 전에 병·밀대로 여러 번 굴려 골을 납작하게 (겉종이 벗기지 않음). " : ""}앞 탭 ${t0} 을 날개 안쪽 면 빗금 자리(바깥 ${t0} mm)에 통째로 풀칠 → contact 면이 날개와 한 줄. 접는 선으로 삼각형 → 끝 탭을 contact 뿌리 안쪽에 풀칠. 리브 R2–R8 빨대는 테이프 힌지.`);
     rectCut(st, 0, 0, total, W);
     for (const x of [t0, t0 + L, t0 + L + Lb, t0 + L + Lb + b]) st.score.push([[x, 0], [x, W]]);
     st.glue.push({ x: 0, y: 0, w: t0, h: W }, { x: t0 + L + Lb + b, y: 0, w: tab, h: W });
@@ -770,7 +774,7 @@ function b6Soft(palm: { sx: number; sy: number }, so: B6Soft, d: Record<string, 
       st.mark.push([[xc, 2], [xc, W - 2]], [[xb, 2], [xb, W - 2]]);
       st.text.push({ p: [xc + 1, W / 2], s: `R${i}`, size: 3 }, { p: [xb + 1, W / 2], s: `R${i}`, size: 3 });
     }
-    st.text.push({ p: [t0 + L / 2 - 14, 4], s: "contact (물체 쪽)", size: 3 }, { p: [t0 + L + Lb / 2 - 6, 4], s: "back", size: 3 }, { p: [1, W - 3], s: "플랩", size: 2.6 });
+    st.text.push({ p: [t0 + L / 2 - 14, 4], s: "contact (물체 쪽)", size: 3 }, { p: [t0 + L + Lb / 2 - 6, 4], s: "back", size: 3 }, { p: [1, W - 3], s: "날개에 풀칠", size: 2.6 });
     st.flute = "y";
     shapes.push(st);
   }
@@ -787,7 +791,7 @@ function b6Common(p: { soft: B6Soft; force_video: { pinch_N: number; soft_per_fi
             `빨대 슬리브 4개 × 10 mm: 손바닥 실 구멍(Ø6.5)에 끼워 풀칠, 실이 들어오는 쪽으로 살짝 기울여 꽂음. 끝은 둥글게 (가위 자국 → 실 걸림). 골판지 모서리 마찰 μ≈0.5 → 빨대 μ≈0.25`,
           ]
         : []),
-      `일반 빨대(Ø${C.straw_d}) Fin Ray 리브: 손가락당 ${[2, 4, 6, 8].map((i) => fx(FR.base * (1 - i / 10))).join(" / ")} mm (도면 길이, 실제는 벽 두께만큼 약 2 mm 짧게) × 4개 손가락, 양끝 테이프 힌지`,
+      `빨대 자르기 (빨대 2개면 충분): Fin Ray 리브 R2 약 20 · R4 약 15 · R6 약 9 · R8 약 4 mm(생략 가능) × 4개 손가락 — 도면 길이 ${[2, 4, 6, 8].map((i) => fx(FR.base * (1 - i / 10))).join("/")} 에서 벽 두께만큼 짧게, 접은 삼각형에 대 보고 다듬기. 양끝 테이프 힌지${kn.cross ? " · 실 구멍 슬리브 10 mm × 4" : ""}`,
       kn.cross
         ? `soft 실 (좌우 한 가닥, 교차): 오른쪽 플랩 매듭 → 손바닥 밑을 지나 왼쪽 구멍(x=−${kn.hole_x}) 위로 → 손잡이 → 오른쪽 구멍(x=+${kn.hole_x}) 아래로 → 손바닥 밑 → 왼쪽 플랩 매듭. 손바닥 밑에서 X 자 (구멍이 y 로 ${kn.dy} 엇갈려 서로 안 닿음). 균형막대 불필요`
         : `soft 실 (좌우 한 가닥 루프): 오른쪽 플랩 매듭 구멍 → 손바닥 구멍 x=+${kn.hole_x} 위로 → 손잡이 → x=−${kn.hole_x} 아래로 → 왼쪽 플랩 매듭. 균형막대 불필요 (한 가닥이 양쪽을 같이 당김)`,
@@ -860,7 +864,7 @@ function b6p(): DesignPattern {
     ],
     steps: [
       "손바닥: 윗장(플랩 포함) + 아랫장(좌우 1.5 mm 좁게) 엇갈려 풀칠, 플랩 부분 풀칠 금지. 가운데 실 구멍 4개(빨대 슬리브), 플랩 매듭 구멍 2개(테이프 보강), 고무줄 구멍 2개를 함께 뚫음. 닫힘 스토퍼 블록 2개를 아랫면 표시에.",
-      "Fin Ray 4개: 겉종이 벗긴 띠를 접어 삼각형, 리브 빨대 테이프 힌지 → 앞 탭을 플랩 안쪽 면 표시에 풀칠 (플랩 하나에 2개).",
+      "Fin Ray 4개: 띠를 병으로 굴려 골을 눌러 편 뒤 접어 삼각형, 리브 빨대 테이프 힌지 → 앞 탭 26 을 날개 안쪽 면 빗금 자리에 통째로 풀칠 (날개 하나에 2개).",
       "접는 상자 2개: 접는 선 4개를 깊게 눌러 양방향으로 길들이고 바깥 면 테이프 → 끝 탭을 윗변 안쪽 끝에 겹쳐 풀칠(납작한 상자) → 손으로 밀어 평행사변형으로 기우는지 확인 → 윗변을 손바닥 아랫면 빗금에 풀칠 (안쪽 링크가 가운데 쪽).",
       "손끝판(ㄱ자 2장 적층)을 아랫변 아래 안쪽 끝에 풀칠 + 삼각 보강, 손톱(3겹) 테이프 힌지 + 손톱 스토퍼 + 고무줄 2바퀴.",
       "실 (교차): soft 한 가닥(우 매듭 → 왼쪽 구멍 → 손잡이 → 오른쪽 구멍 → 좌 매듭), hard 한 가닥(앞 매듭 → 뒤쪽 구멍 → 손잡이 → 앞쪽 구멍 → 뒤 매듭). 손바닥 밑에서 X 자. 복원 고무줄과 열림 제한 실 → 전 범위 동작 확인.",
