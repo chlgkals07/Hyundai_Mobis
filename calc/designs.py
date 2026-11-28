@@ -672,7 +672,17 @@ def soft_knot(r: Report, s: dict):
     y0, y1 = so["stop_block_y"]
     r.check("S9", "닫힘 스토퍼 블록이 실 경로(y=0)에서 떨어짐 (블록 y 끝 ≤ −2)", y1, hi=-2, unit="mm")
     hb = so.get("stop_block_h", 8.0)
-    r.put("soft_stop_face_x", d["palm"]["sx"] / 2 - (zt + hb) * sp.tan(abs(s["phi_min"])))
+    face = d["palm"]["sx"] / 2 - (zt + hb) * sp.tan(abs(s["phi_min"]))
+    # 블록 아래 모서리가 닿는 날개 위치 s_c. Fin Ray 앞 탭(날개 안쪽 면, root−tab … root)이 그 자리에 있으면
+    # 탭 두께만큼 날개 안쪽 면이 안으로 나와 있음 → 블록 바깥 면을 그만큼 안쪽으로 (실물 조립 검토에서 발견)
+    s_c = (zt + hb) / sp.cos(abs(s["phi_min"]))
+    tab = so.get("finray_tab", 0)
+    if tab and so["root_len"] - tab <= f(s_c) <= so["root_len"]:
+        tt = c["flank_t"]
+        face = face - tt / sp.cos(abs(s["phi_min"]))
+        r.put("soft_stop_contact_s", s_c)
+        r.check("S10", "닫힘 블록이 닿는 날개 위치가 Fin Ray 앞 탭 위 → 블록 면을 탭 두께만큼 안쪽으로 (블록 바깥 면 ≥ 아랫장 끝 − 6)", face, lo=d["palm"]["sx"] / 2 - so.get("palm_edge_relief", 0) - 6, unit="mm")
+    r.put("soft_stop_face_x", face)
     need = zt * sp.tan(abs(s["phi_min"]))
     r.put("soft_edge_interference_mm", need)
     r.check("S5", "아랫장 측면 relief ≥ 손바닥 두께·tan|φ_min|", so.get("palm_edge_relief", 0), lo=need, unit="mm")

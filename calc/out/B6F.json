@@ -15,7 +15,8 @@
     "soft_string_T_video_N": 9.5351,
     "soft_hand_loop_N": 19.0703,
     "soft_pull_mm": 8.217,
-    "soft_stop_face_x": 28.0405,
+    "soft_stop_contact_s": 14.1365,
+    "soft_stop_face_x": 26.021,
     "soft_edge_interference_mm": 0.8398,
     "hard_theta1_pinch_deg": -7.9588,
     "hard_theta2_pinch_deg": -22.0412,
@@ -82,6 +83,15 @@
       "unit": "mm",
       "lo": null,
       "hi": -2.0,
+      "pass": true
+    },
+    {
+      "id": "S10",
+      "desc": "닫힘 블록이 닿는 날개 위치가 Fin Ray 앞 탭 위 → 블록 면을 탭 두께만큼 안쪽으로 (블록 바깥 면 ≥ 아랫장 끝 − 6)",
+      "value": 26.021,
+      "unit": "mm",
+      "lo": 22.5,
+      "hi": null,
       "pass": true
     },
     {

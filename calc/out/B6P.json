@@ -18,7 +18,8 @@
     "soft_hand_loop_straw_N": 17.1594,
     "soft_hand_loop_cardboard_N": 22.5687,
     "soft_pull_mm": 13.6917,
-    "soft_stop_face_x": 28.2829,
+    "soft_stop_contact_s": 14.1049,
+    "soft_stop_face_x": 26.2679,
     "soft_edge_interference_mm": 0.7359,
     "hard_pivot_y": 12.0,
     "hard_coupler_below_E": 37.3913,
@@ -110,6 +111,15 @@
       "unit": "mm",
       "lo": null,
       "hi": -2.0,
+      "pass": true
+    },
+    {
+      "id": "S10",
+      "desc": "닫힘 블록이 닿는 날개 위치가 Fin Ray 앞 탭 위 → 블록 면을 탭 두께만큼 안쪽으로 (블록 바깥 면 ≥ 아랫장 끝 − 6)",
+      "value": 26.268,
+      "unit": "mm",
+      "lo": 22.5,
+      "hi": null,
       "pass": true
     },
     {

@@ -22,6 +22,7 @@ npx tsx scripts/patterns.ts      # 전개도 → patterns/<ID>/*.svg, *-전개�
 npm run build                    # 뷰어 → out/gripper-bench.html (Artifact), out/local.html
 node scripts/shots.mjs           # Playwright 스크린샷 → docs/shots/
 node scripts/record-assembly.mjs 20 - B6P # 조립 애니메이션 → docs/<B6P|B5E|B5N>-조립과정.mp4 (프레임 캡처 + ffmpeg)
+node scripts/final-print.mjs [팔PDF] # 최종 인쇄 묶음 → docs/print/B6P-최종-전개도+도면-A4.pdf (표지+전량판+도면 5+부품표)
 node scripts/manual-shots.mjs B6P # 설명서 그림 (B6P: b6p-*.png) → docs/manual-img/*.png (build 후, 조립 페이지 캡처)
 npx tsx scripts/diagrams.ts      # 메커니즘 단면도 → docs/diagrams/*.svg (B5N), docs/diagrams/B5E|B6P/*.svg
 python3 calc/envelope.py         # 팔 결합용 그리퍼 점유 공간·장착 영역·실 마찰
@@ -113,6 +114,8 @@ DIY 골판지 손 원칙(관절 = 접는 선·테이프, 실은 빨대 터널, �
   - 손잡이 힘(그리퍼 쪽, 슬리브 포함): hard 13 N, soft 17 N — 팔 경로 마찰은 별도
 - Fin Ray 앞 탭 12→26 (날개 바깥 26 mm 면 접착, 접는 선 쪽 4 mm 비움), 끝 탭 8 (A4 에 들어가게 236 mm). 겉종이 벗기기 대신 병으로 굴려 골을 눌러 폄 (하민: 벗기기 잘 안 될 것). 조립 애니메이션: 접는 띠를 매트에 한 장으로 펼쳐 보임 + 색 범례
 - (하민: 영상에서 여전히 잘라 붙이는 것처럼 보임) → 3D 에 Fin Ray 앞 탭 부품(finray.F/B.tab) 추가, 조립 8단계는 `drawFoldStrips()` 가 띠 한 장을 그리퍼 앞에서 접어 상자로 만든 뒤 통째로 손바닥 밑에 붙임 (개별 판 애니메이션 숨김). 블록 D 도 상자를 한 덩어리로
+
+- **최종 검토 (2026-11-28)** `docs/B6P-최종검토.md`: 간이 그리퍼 제출물로 충분 (22 조건, 물체 5/5, 간섭 0, 수직 순응 12 mm). 검토 중 발견: 닫힘 블록이 닿는 날개 위치(14)가 Fin Ray 앞 탭(4…30) 위 → 블록 면 28.0→26.3 (S10, 시뮬은 palm–flap 인접이라 못 잡음). 빨대 슬리브 윗면 평평 (팔 장착부). 남은 위험: Fin Ray EI·접는 관절 수명·팔 실 마찰 (실물)
 
 ## 다음 할 일
 - [ ] 목요일 실물 (B5E 권장, B5N 도 가능): Fin Ray 1개 → EI 보정, 평행 링크 손가락 1개 → 손끝판 수직 유지·손톱 접힘 확인

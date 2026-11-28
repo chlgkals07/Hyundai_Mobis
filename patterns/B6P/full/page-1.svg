@@ -68,14 +68,14 @@ text{font-family:"WenQuanYi Zen Hei","IBM Plex Sans KR","Apple SD Gothic Neo","M
 <polygon class="glue" points="26.5,183 50.5,183 50.5,207 26.5,207"/>
 <polygon class="glue" points="26.5,135 50.5,135 50.5,159 26.5,159"/>
 <polygon class="cut" points="10,127 67,127 67,215 10,215"/>
-<polyline class="mark" points="60.78,147 66.78,147"/>
-<polyline class="mark" points="60.78,167 66.78,167"/>
-<polyline class="mark" points="60.78,147 60.78,167"/>
-<polyline class="mark" points="66.78,147 66.78,167"/>
-<polyline class="mark" points="10.22,147 16.22,147"/>
-<polyline class="mark" points="10.22,167 16.22,167"/>
-<polyline class="mark" points="10.22,147 10.22,167"/>
-<polyline class="mark" points="16.22,147 16.22,167"/>
+<polyline class="mark" points="58.77,147 64.77,147"/>
+<polyline class="mark" points="58.77,167 64.77,167"/>
+<polyline class="mark" points="58.77,147 58.77,167"/>
+<polyline class="mark" points="64.77,147 64.77,167"/>
+<polyline class="mark" points="12.23,147 18.23,147"/>
+<polyline class="mark" points="12.23,167 18.23,167"/>
+<polyline class="mark" points="12.23,147 12.23,167"/>
+<polyline class="mark" points="18.23,147 18.23,167"/>
 <circle class="hole" cx="28.5" cy="172.5" r="3.25"/>
 <path class="cross" d="M27.5 172.5h2M28.5 171.5v2"/>
 <circle class="hole" cx="48.5" cy="169.5" r="3.25"/>
